@@ -6,13 +6,13 @@ import { environment } from '../../environments/environment';
 @Injectable()
 export class ConfigurationService {
     // private instance variable to hold base url
-    private GET_CATEGORIES_URL = environment.BASE_URL + 'categories';
+    private GET_CATEGORIES_URL = environment.BASE_URL + 'category';
     private GET_CATEGORY_URL = environment.BASE_URL + 'category';
 
     constructor(private http: Http) { }
 
     /**
-     *   GET  | /foglamp/categories
+     *   GET  | /foglamp/category
      */
     getCategories() {
         return this.http.get(this.GET_CATEGORIES_URL)
