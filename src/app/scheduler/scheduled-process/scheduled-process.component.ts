@@ -249,4 +249,33 @@ export class ScheduledProcessComponent implements OnInit {
         };
       });
   }
+
+  /**
+   * Start schedule
+   * @param schedule_id id of the schedule to start
+   */
+  public startSchedule(schedule_id) {
+    console.log('Starting Schedule:', schedule_id);
+    /** request started */
+    this.ngProgress.start();
+    this.schedulesService.startSchedule(schedule_id).
+      subscribe(
+      data => {
+        /** request completed */
+        this.ngProgress.done();
+        let schedule = this.scheduleData.find(item => item.id === schedule_id);
+        schedule.running = true;
+        this.alertService.success(data.message);
+      },
+      error => {
+        /** request completed */
+        this.ngProgress.done();
+        if (error.status === 0) {
+          console.log('service down ', error);
+        } else {
+          console.log('error in response ', error);
+          this.alertService.error(error.statusText);
+        };
+      });
+  }
 }

@@ -105,6 +105,15 @@ export class SchedulesService {
   }
 
   /**
+   *  POST | /foglamp/schedule/start/{schedule_id}
+   */
+  public startSchedule(id) {
+    return this.http.post(this.GET_SCHEDULE + '/start/' + id, null)
+      .map(response => response.json())
+      .catch((error: Response) => Observable.throw(error));
+  }
+
+  /**
    *  PUT | /foglamp/schedule/{schedule_id}/disable
    */
   public disableSchedule(id) {
