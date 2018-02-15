@@ -34,6 +34,7 @@ export class CreateScheduleComponent implements OnInit {
       repeatDay: [Validators.min(0), Validators.max(365)],
       repeatTime: ['', [Validators.required, Validators.pattern(regExp)]],
       exclusive: [Validators.required],
+      enabled: [Validators.required],
       processName: [Validators.required],
       type: [Validators.required],
       day: [Validators.required],
@@ -47,6 +48,7 @@ export class CreateScheduleComponent implements OnInit {
     // Set default values on form
     this.form.get('type').setValue(1);
     this.form.get('exclusive').setValue(true);
+    this.form.get('enabled').setValue(false);
     this.form.get('day').setValue(1);
   }
 
@@ -57,7 +59,7 @@ export class CreateScheduleComponent implements OnInit {
       return;
     }
     schedule_name.classList.remove('is-active');
-    this.form.reset({ exclusive: true, processName: this.scheduleProcess[0], type: 1, repeatTime: 'hh:mm:ss', day: 1, time: 'hh:mm:ss' });
+    this.form.reset({ exclusive: true, enabled: false, processName: this.scheduleProcess[0], type: 1, repeatTime: 'hh:mm:ss', day: 1, time: 'hh:mm:ss' });
     this.selected_schedule_type = 1; // reset to default
     this.form.get('day').disable();
     this.form.get('time').disable();
@@ -86,6 +88,7 @@ export class CreateScheduleComponent implements OnInit {
         'day': this.form.get('day').value,
         'time': time,
         'exclusive': this.form.get('exclusive').value,
+        'enabled': this.form.get('enabled').value,
       };
 
       this.schedulesService.createSchedule(payload).
