@@ -9,7 +9,7 @@
       <div class="card-content">
         <form [formGroup]="form" novalidate>
           <div class="columns">
-            <div class="column">
+            <div class="column is-half is-fullwidth">
               <div class="field">
                 <div class="form-group">
                   <label class="label">Name</label>
@@ -25,6 +25,14 @@
                 <label class="label">Exclusive</label>
                 <div class="control is-fullwidth">
                   <input type="checkbox" checked formControlName="exclusive">
+                </div>
+              </div>
+            </div>
+            <div class="column is-fullwidth">
+              <div class="field">
+                <label class="label">Enabled</label>
+                <div class="control is-fullwidth">
+                  <input type="checkbox" formControlName="enabled">
                 </div>
               </div>
             </div>

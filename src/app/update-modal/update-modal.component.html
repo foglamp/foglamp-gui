@@ -9,7 +9,7 @@
       <div class="card-content">
         <form [formGroup]="form" (ngSubmit)="f.form.valid && updateSchedule()" #f="ngForm" novalidate>
           <div class="columns">
-            <div class="column">
+            <div class="column is-half">
               <div class="field">
                 <div class="form-group">
                   <label class="label">Name</label>
@@ -25,6 +25,14 @@
                 <label class="label">Exclusive</label>
                 <div class="control">
                   <input type="checkbox" checked formControlName="exclusive">
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="field">
+                <label class="label">Enabled</label>
+                <div class="control">
+                  <input type="checkbox" checked formControlName="enabled">
                 </div>
               </div>
             </div>

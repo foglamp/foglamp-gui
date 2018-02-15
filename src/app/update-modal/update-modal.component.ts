@@ -35,6 +35,7 @@ export class UpdateModalComponent implements OnInit, OnChanges {
       repeatDay: ['', [Validators.min(0), Validators.max(365)]],
       repeat: ['', [Validators.required, Validators.pattern(regExp)]],
       exclusive: [Validators.required],
+      enabled: [Validators.required],
       process_name: [Validators.required],
       type: [Validators.required],
       day: [Validators.required],
@@ -105,6 +106,7 @@ export class UpdateModalComponent implements OnInit, OnChanges {
           repeatDay: repeatTimeObj.days,
           repeat: repeatTimeObj.time,
           exclusive: data.exclusive,
+          enabled: data.enabled,
           process_name: data.processName,
           type: data.type,
           day: schedule_day,
@@ -155,6 +157,7 @@ export class UpdateModalComponent implements OnInit, OnChanges {
       'day': this.form.get('day').value,
       'time': time,
       'exclusive': this.form.get('exclusive').value,
+      'enabled': this.form.get('enabled').value
     };
 
     this.schedulesService.updateSchedule(this.childData.id, updatePayload).
