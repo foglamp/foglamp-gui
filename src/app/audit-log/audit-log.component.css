@@ -1,12 +1,3 @@
-.scroll tr {
-  display: flex;
-}
-
-.scroll tbody {
-  width: 100%;
-  height: 400px;
-}
-
 .panel{
   margin-top: 10px; 
 }
@@ -17,4 +8,25 @@ thead {
 
 select {
   width: 200px;
+}
+
+@media screen and (max-width: 769px) {
+  table.scroll {
+    height: 220px;
+  }
+}
+@media screen and (min-width: 1024px) {
+  table.scroll {
+    height: 300px;
+  }
+}
+@media screen and (min-width: 1216px) {
+  table.scroll {
+    height: 350px;
+  }
+}
+@media screen and (min-width: 1408px) {
+  table.scroll {
+    height: 600px;
+  }
 }
