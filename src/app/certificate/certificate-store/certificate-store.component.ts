@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { CertificateService, AlertService } from '../../services/index';
 import { ModalComponent } from '../../modal/modal.component';
 import { NgProgress } from 'ngx-progressbar';
-import { UploadCertificateComponent } from '../upload-certificate/upload-certificate.component';
 
 @Component({
   selector: 'cert-store',
@@ -22,20 +21,11 @@ export class CertificateStoreComponent implements OnInit {
   };
 
   @ViewChild(ModalComponent) child: ModalComponent;
-  @ViewChild(UploadCertificateComponent) uploadModal: UploadCertificateComponent;
 
   constructor(private certService: CertificateService, public ngProgress: NgProgress, private alertService: AlertService) { }
 
   ngOnInit() {
     this.getcertificates();
-  }
-
-  /**
-  * Open upload certificate modal dialog
-  */
- openUploadCertModal() {
-    // call child component method to toggle modal
-    this.uploadModal.toggleModal(true);
   }
 
   public getcertificates() {
@@ -99,7 +89,6 @@ export class CertificateStoreComponent implements OnInit {
       data => {
           /** request completed */
           this.ngProgress.done();
-          console.log('delete data ', data.result);
           this.alertService.success(data.result);
           this.getcertificates();
       },
