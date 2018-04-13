@@ -1,0 +1,29 @@
+.media-content{
+   overflow: hidden;
+}
+
+table.readings-scroll {
+    overflow-x: auto;
+    display: block;
+}
+
+@media screen and (max-width: 769px) {
+    table.readings-scroll {
+        height: 300px;
+    }
+}
+@media screen and (min-width: 1024px) {
+    table.readings-scroll {
+        height: 350px;
+    }
+}
+@media screen and (min-width: 1216px) {
+    table.readings-scroll {
+        height: 400px;
+    }
+}
+@media screen and (min-width: 1408px) {
+    table.readings-scroll {
+        height: 650px;
+    }
+}
