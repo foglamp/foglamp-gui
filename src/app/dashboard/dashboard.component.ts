@@ -20,7 +20,7 @@ export class DashboardComponent implements OnInit {
   // Array of Statistics Keys (["BUFFERED", "DISCARDED", "PURGED", ....])
   statisticsKeys = [];
 
-  // Object of dropdown setting
+  // Object of drop down setting
   dropdownSettings = {};
 
   selectedItems = [];
@@ -40,8 +40,8 @@ export class DashboardComponent implements OnInit {
   }
 
   public showGraph(graphs) {
-    var cache = [];
-    // array 'graphs' has circular reference 
+    let cache = [];
+    // array 'graphs' has circular reference
     localStorage.setItem('SELECTED_GRAPHS', JSON.stringify(graphs, function (key, value) {
       if (typeof value === 'object' && value !== null) {
         if (cache.indexOf(value) !== -1) {
@@ -54,7 +54,7 @@ export class DashboardComponent implements OnInit {
       return value;
     }));
     cache = null;
-    const savedGraphs = localStorage.getItem("SELECTED_GRAPHS");
+    const savedGraphs = localStorage.getItem('SELECTED_GRAPHS');
     this.graphsToShow = JSON.parse(savedGraphs);
   }
 
@@ -67,41 +67,42 @@ export class DashboardComponent implements OnInit {
         /** request completed */
         this.ngProgress.done();
         console.log('received statisticsData ', data);
-        // filter received data for FOGBENCH data  
+        // filter received data for FOGBENCH data
         this.statistics = data.filter(value => value['key'].toLowerCase().indexOf('fogbench') === -1);
         console.log('statisticsData ', this.statistics);
 
-        for (let data of this.statistics) {
-          this.statisticsKeys.push(data.key);
+        for (const d of this.statistics) {
+          this.statisticsKeys.push(d.key);
         }
         console.log('keys array', this.statisticsKeys);
 
         // show default graphs ('READINGS', 'SENT_1', 'PURGED') on fresh launch of the app
         if (this.graphsToShow.length === 0) {
-          this.showDefaultGraphs = this.statistics.filter(value => value['key'] == 'READINGS' || value['key'] == 'SENT_1' || value['key'] == 'PURGED')
+          this.showDefaultGraphs = this.statistics.filter(value => value['key'] === 'READINGS'
+            || value['key'] === 'SENT_1' || value['key'] === 'PURGED');
         }
         this.graphsToShow = this.showDefaultGraphs;
 
         // Rename 'key' to 'itemName' and add a new key as named 'id'
-        for (var i = 0; i < this.statistics.length; i++) {
+        for (let i = 0; i < this.statistics.length; i++) {
           this.statistics[i].id = i;
           this.statistics[i].itemName = this.statistics[i]['key'];
           delete this.statistics[i].key;
         }
 
-        // Set the options for dropdown setting
+        // Set the options for drop down setting
         this.dropdownSettings = {
           singleSelection: false,
-          text: "Select Graphs",
+          text: 'Select Graphs',
           selectAllText: 'Select All',
           unSelectAllText: 'UnSelect All',
           enableSearchFilter: true
         };
         if (localStorage.getItem('SELECTED_GRAPHS')) {
-          const savedGraphs = localStorage.getItem("SELECTED_GRAPHS");
+          const savedGraphs = localStorage.getItem('SELECTED_GRAPHS');
           this.graphsToShow = JSON.parse(savedGraphs);
         }
-        // Selected Items are the items, to show in the dropdown (having keys- 'READINGS', 'SENT_1', 'PURGED')
+        // Selected Items are the items, to show in the drop down (having keys- 'READINGS', 'SENT_1', 'PURGED')
         this.selectedItems = this.graphsToShow;
         localStorage.setItem('SELECTED_GRAPHS', JSON.stringify(this.selectedItems));
         this.getStatisticsHistory();
@@ -153,15 +154,15 @@ export class DashboardComponent implements OnInit {
     this.statisticsService.getStatisticsHistory().
       subscribe(data => {
         this.ngProgress.done();
-        let labels = [];
-        let record = map(data.statistics, graphKey)
-        let history_ts = map(data.statistics, 'history_ts');
+        const labels = [];
+        const record = map(data.statistics, graphKey);
+        const history_ts = map(data.statistics, 'history_ts');
         history_ts.forEach(element => {
-          element = moment(element).format('HH:mm:ss:SSS')
-          labels.push(element)
+          element = moment(element).format('HH:mm:ss:SSS');
+          labels.push(element);
         });
         this.statistics.map(statistics => {
-          if (statistics.itemName == graphKey) {
+          if (statistics.itemName === graphKey) {
             statistics.chartValue = this.getChartValues(labels, record, 'rgb(144,238,144)');;
             statistics.chartType = 'line';
             return statistics;
@@ -182,16 +183,16 @@ export class DashboardComponent implements OnInit {
     this.statisticsService.getStatisticsHistory().
       subscribe(data => {
         this.statisticsKeys.forEach(key => {
-          let labels = [];
-          let record = map(data.statistics, key)
-          let history_ts = map(data.statistics, 'history_ts');
+          const labels = [];
+          const record = map(data.statistics, key);
+          const history_ts = map(data.statistics, 'history_ts');
           history_ts.forEach(element => {
-            element = moment(element).format('HH:mm:ss:SSS')
-            labels.push(element)
+            element = moment(element).format('HH:mm:ss:SSS');
+            labels.push(element);
           });
           this.statistics.map(statistics => {
-            if (statistics.itemName == key) {
-              statistics.chartValue = this.getChartValues(labels, record, 'rgb(144,238,144)');;
+            if (statistics.itemName === key) {
+              statistics.chartValue = this.getChartValues(labels, record, 'rgb(144,238,144)');
               statistics.chartType = 'line';
               return statistics;
             }
