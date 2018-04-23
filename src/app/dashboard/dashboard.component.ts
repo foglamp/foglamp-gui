@@ -189,7 +189,7 @@ export class DashboardComponent implements OnInit {
             element = moment(element).format('HH:mm:ss:SSS');
             labels.push(element);
           });
-          this.statistics.map(statistics => {
+          this.graphsToShow.map(statistics => {
             if (statistics.itemName === key) {
               statistics.chartValue = this.getChartValues(labels, record, 'rgb(144,238,144)');
               statistics.chartType = 'line';
