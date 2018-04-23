@@ -56,6 +56,7 @@ export class DashboardComponent implements OnInit {
     cache = null;
     const savedGraphs = localStorage.getItem('SELECTED_GRAPHS');
     this.graphsToShow = JSON.parse(savedGraphs);
+    this.getStatisticsHistory();
   }
 
   public getStatistics(): void {
