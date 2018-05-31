@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ServicesHealthService } from '../../../services/index';
-import { environment } from '../../../../environments/environment';
+import { NgProgress } from 'ngx-progressbar';
+
+import { ServicesHealthService } from '../../../services';
 import { AlertService } from '../../../services/alert.service';
 import Utils from '../../../utils';
-import { NgProgress } from 'ngx-progressbar';
 import { AlertDialogComponent } from '../../common/alert-dialog/alert-dialog.component';
 
 @Component({

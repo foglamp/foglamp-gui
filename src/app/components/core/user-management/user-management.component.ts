@@ -1,11 +1,12 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { AlertService, AuthService, UserService } from '../../../services/index';
-import { SharedService } from '../../../services/shared.service';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgProgress } from 'ngx-progressbar';
+
+import { AlertService, AuthService, UserService } from '../../../services';
+import { SharedService } from '../../../services/shared.service';
+import { AlertDialogComponent } from '../../common/alert-dialog/alert-dialog.component';
 import { CreateUserComponent } from './create-user/create-user.component';
 import { UpdateUserComponent } from './update-user/update-user.component';
-import { AlertDialogComponent } from '../../common/alert-dialog/alert-dialog.component';
 
 @Component({
   selector: 'app-user-management',

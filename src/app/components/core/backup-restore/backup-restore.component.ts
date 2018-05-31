@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgProgress } from 'ngx-progressbar';
-import { AlertDialogComponent } from '../../common/alert-dialog/alert-dialog.component';
 
-import { BackupRestoreService } from '../../../services/backup-restore.service';
 import { AlertService } from '../../../services';
+import { BackupRestoreService } from '../../../services/backup-restore.service';
+import { AlertDialogComponent } from '../../common/alert-dialog/alert-dialog.component';
 
 @Component({
   selector: 'app-backup-restore',

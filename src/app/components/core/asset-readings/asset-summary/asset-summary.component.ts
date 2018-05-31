@@ -39,31 +39,31 @@ export class AssetSummaryComponent implements OnInit {
     this.assetCode = dt.assetCode;
     this.assetService.getAssetReadings(encodeURIComponent(dt.assetCode)).
       subscribe(
-      data => {
-        const validRecord = ReadingsValidator.validate(data);
-        if (validRecord) {
-          const record = {
-            assetCode: dt.assetCode,
-            readings: data[0],
-            time: dt.time_param
-          };
-          this.assetSummaryService.getReadingSummary(record);
-          this.assetSummaryService.assetReadingSummary.subscribe(
-            value => {
-              this.assetReadingSummary = value;
-            });
-        } else {
-          this.isValidData = false;
-          console.log('No valid data to show trends.');
-        }
-      },
-      error => {
-        if (error.status === 0) {
-          console.log('service down ', error);
-        } else {
-          console.log('error in response ', error);
-        }
-      });
+        data => {
+          const validRecord = ReadingsValidator.validate(data);
+          if (validRecord) {
+            const record = {
+              assetCode: dt.assetCode,
+              readings: data[0],
+              time: dt.time_param
+            };
+            this.assetSummaryService.getReadingSummary(record);
+            this.assetSummaryService.assetReadingSummary.subscribe(
+              value => {
+                this.assetReadingSummary = value;
+              });
+          } else {
+            this.isValidData = false;
+            console.log('No valid data to show trends.');
+          }
+        },
+        error => {
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            console.log('error in response ', error);
+          }
+        });
   }
 
   public getTimedBasedSummary(time, key) {

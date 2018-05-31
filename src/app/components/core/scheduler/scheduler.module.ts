@@ -1,16 +1,17 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ScheduledProcessComponent } from './scheduled-process/scheduled-process.component';
-import { ListTasksComponent } from './list-tasks/list-tasks.component';
-import { CreateScheduleComponent } from './create-schedule/create-schedule.component';
-import { UpdateScheduleComponent } from './update-schedule/update-schedule.component';
 import { NgProgressModule } from 'ngx-progressbar';
-import { SchedulesService } from '../../../services';
-import { NgxMaskModule } from 'ngx-mask';
+
+import { InputMaskDirective } from '../../../directives/input-mask.directive';
 import { PipesModule } from '../../../pipes/pipes.module';
+import { SchedulesService } from '../../../services';
 import { AlertDialogModule } from '../../common/alert-dialog/alert-dialog.module';
+import { CreateScheduleComponent } from './create-schedule/create-schedule.component';
 import { ListSchedulesComponent } from './list-schedules/list-schedules.component';
+import { ListTasksComponent } from './list-tasks/list-tasks.component';
+import { ScheduledProcessComponent } from './scheduled-process/scheduled-process.component';
+import { UpdateScheduleComponent } from './update-schedule/update-schedule.component';
 
 @NgModule({
   declarations: [
@@ -19,17 +20,17 @@ import { ListSchedulesComponent } from './list-schedules/list-schedules.componen
     CreateScheduleComponent,
     UpdateScheduleComponent,
     ListSchedulesComponent,
+    InputMaskDirective
   ],
   imports: [
     ReactiveFormsModule,
     FormsModule,
     CommonModule,
     NgProgressModule,
-    NgxMaskModule,
     PipesModule,
     AlertDialogModule
   ],
   providers: [SchedulesService],
-  exports: []
+  exports: [InputMaskDirective]
 })
 export class SchedulerModule {}

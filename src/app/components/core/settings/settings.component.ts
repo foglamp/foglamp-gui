@@ -1,9 +1,9 @@
-import { Component, OnInit, Input, Output, EventEmitter, NgModule, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { environment } from '../../../../environments/environment';
-import { PingService } from '../../../services/index';
-import { NavbarComponent } from '../../layout/navbar/navbar.component';
 import { PlatformLocation } from '@angular/common';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+
+import { PingService } from '../../../services';
+import { NavbarComponent } from '../../layout/navbar/navbar.component';
 import { ServiceDiscoveryComponent } from '../service-discovery';
 
 @Component({

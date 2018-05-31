@@ -1,6 +1,5 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-
-import { SchedulesService, AlertService } from '../../../services/index';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AlertService, SchedulesService } from '../../../services';
 
 @Component({
   selector: 'app-shutdown-modal',

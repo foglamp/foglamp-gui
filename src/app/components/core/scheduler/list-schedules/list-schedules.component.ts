@@ -1,10 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { SchedulesService, AlertService } from '../../../../services/index';
-import { UpdateScheduleComponent } from '../update-schedule/update-schedule.component';
-import Utils from '../../../../utils';
-import { CreateScheduleComponent } from '../create-schedule/create-schedule.component';
 import { NgProgress } from 'ngx-progressbar';
+
+import { AlertService, SchedulesService } from '../../../../services';
+import Utils from '../../../../utils';
 import { AlertDialogComponent } from '../../../common/alert-dialog/alert-dialog.component';
+import { CreateScheduleComponent } from '../create-schedule/create-schedule.component';
+import { UpdateScheduleComponent } from '../update-schedule/update-schedule.component';
 
 enum weekDays {
   Mon = 1,

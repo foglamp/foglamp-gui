@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { SupportService, AlertService } from '../../../services/index';
 import { NgProgress } from 'ngx-progressbar';
-import { environment } from '../../../../environments/environment';
+
+import { AlertService, SupportService } from '../../../services';
 
 @Component({
   selector: 'app-support',

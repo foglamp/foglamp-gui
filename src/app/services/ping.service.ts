@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
 import { POLLING_INTERVAL } from '../utils';
 
 @Injectable()

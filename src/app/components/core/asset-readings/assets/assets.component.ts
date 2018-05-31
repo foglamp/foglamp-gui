@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AssetsService, AlertService } from '../../../../services/index';
+import { NgProgress } from 'ngx-progressbar';
+
+import { AlertService, AssetsService } from '../../../../services';
 import { AssetSummaryComponent } from './../asset-summary/asset-summary.component';
 import { ReadingsGraphComponent } from './../readings-graph/readings-graph.component';
-import { NgProgress } from 'ngx-progressbar';
 
 @Component({
   selector: 'app-assets',

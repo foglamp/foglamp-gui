@@ -61,7 +61,7 @@
             <small *ngIf="form.controls.repeatDay.invalid && form.controls.repeatDay.touched" class="help is-danger level-left">&nbsp; Repeat days must be in range 0 - 365.</small>
           </div>
           <div class="column">
-            <input id="repeat_time" class="input" type='text' placeholder="hh:mm:ss" formControlName="repeatTime" mask='00:00:00'>
+            <input id="repeat_time" class="input" type='text' placeholder="hh:mm:ss" formControlName="repeatTime" mask="00:00:00">
             <small *ngIf="form.controls.repeatTime.invalid && form.controls.repeatTime.touched" class="help is-danger level-left">&nbsp; Repeat hours must be in range 00:00:00 - 23:59:59 </small>
           </div>
         </div>

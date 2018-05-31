@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertService, DiscoveryService, PingService } from '../../../services/index';
-import { Router } from '@angular/router';
-import { ConnectedServiceStatus } from '../../../services/connected-service-status.service';
 import { FormControl, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+
+import { AlertService, DiscoveryService } from '../../../services';
+import { ConnectedServiceStatus } from '../../../services/connected-service-status.service';
 
 @Component({
   selector: 'app-service-discovery',

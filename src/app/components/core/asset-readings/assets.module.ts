@@ -1,16 +1,17 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgProgressModule } from 'ngx-progressbar';
+
+import { PipesModule } from '../../../pipes/pipes.module';
+import { AssetsService } from '../../../services';
+import { ChartModule } from '../../common/chart';
 import { NumberInputDebounceComponent } from '../../common/number-input-debounce/number-input-debounce.component';
-import { PaginationComponent } from '../../common/pagination/index';
-import { AssetsComponent } from './assets/assets.component';
+import { PaginationComponent } from '../../common/pagination';
+import { AssetSummaryService } from '../asset-readings/asset-summary/asset-summary-service';
 import { AssetSummaryComponent } from '../asset-readings/asset-summary/asset-summary.component';
 import { ReadingsGraphComponent } from '../asset-readings/readings-graph/readings-graph.component';
-import { AssetSummaryService } from '../asset-readings/asset-summary/asset-summary-service';
-import { PipesModule } from '../../../pipes/pipes.module';
-import { ChartModule } from '../../common/chart/index';
-import { AssetsService } from '../../../services';
+import { AssetsComponent } from './assets/assets.component';
 
 @NgModule({
   declarations: [

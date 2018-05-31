@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ConfigurationService, AlertService } from '../../../services/index';
 import { NgProgress } from 'ngx-progressbar';
+
+import { AlertService, ConfigurationService } from '../../../services';
 import { AddConfigItemComponent } from './add-config-item/add-config-item.component';
 
 @Component({

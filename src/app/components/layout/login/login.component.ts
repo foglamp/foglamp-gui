@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertService, AuthService, UserService } from '../../../services/index';
-import { SharedService } from '../../../services/shared.service';
 import { NgProgress } from 'ngx-progressbar';
+
+import { AlertService, AuthService, UserService } from '../../../services';
+import { SharedService } from '../../../services/shared.service';
 
 @Component({
   moduleId: module.id.toString(),

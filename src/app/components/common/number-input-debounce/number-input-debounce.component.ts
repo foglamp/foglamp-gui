@@ -1,4 +1,4 @@
-import { Component, Input, Output, ElementRef, EventEmitter } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 
 @Component({

@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
-import { MomentDatePipe, KeysPipe, FilterPipe } from '.';
+
+import { FilterPipe, KeysPipe, MomentDatePipe } from '.';
 
 @NgModule({
   declarations: [MomentDatePipe, KeysPipe, FilterPipe],

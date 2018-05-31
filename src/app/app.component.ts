@@ -1,8 +1,9 @@
-import { Component, OnInit, HostListener, ViewChild, ChangeDetectorRef, AfterViewInit } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import { AfterViewInit, ChangeDetectorRef, Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
 import { SidebarModule } from 'ng-sidebar';
+
+import { PingService } from './services';
 import { SharedService } from './services/shared.service';
-import { PingService } from './services/index';
 
 @Component({
   selector: 'app-root',

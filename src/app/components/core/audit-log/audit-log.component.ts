@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AuditService, AlertService } from '../../../services/index';
 import { NgProgress } from 'ngx-progressbar';
+
+import { AlertService, AuditService } from '../../../services';
 
 @Component({
   selector: 'app-audit-log',

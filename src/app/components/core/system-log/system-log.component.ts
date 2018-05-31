@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { SystemLogService, AlertService } from '../../../services/index';
 import { NgProgress } from 'ngx-progressbar';
+
+import { AlertService, SystemLogService } from '../../../services';
 
 @Component({
   selector: 'app-system-log',

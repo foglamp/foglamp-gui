@@ -42,7 +42,6 @@ Set API base URL in `environments/environment.prod.ts`, you can always change it
 chart.js         |  2.7.2        |        2.7.2          | MIT 
 core-js          |  2.5.6        |        2.5.6          | MIT 
 lodash-es        |  4.17.10      |        4.17.10        | MIT
-ngx-mask         |  1.0.3        |        1.0.3          | MIT 
 ng-sidebar       |  6.0.4        |        7.1.0          | MIT 
 moment           |  2.22.1       |        2.22.1         | MIT
 ngx-progressbar  |  2.1.1        |        2.1.1          | MIT

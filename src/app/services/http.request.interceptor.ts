@@ -1,7 +1,8 @@
-import { HttpRequest, HttpResponse, HttpErrorResponse, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { Router } from '@angular/router';
+import { Observable } from 'rxjs/Observable';
+
 export const InterceptorSkipHeader = 'X-Skip-Interceptor';
 
 @Injectable()
