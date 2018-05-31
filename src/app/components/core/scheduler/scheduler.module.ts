@@ -13,6 +13,17 @@ import { ListTasksComponent } from './list-tasks/list-tasks.component';
 import { ScheduledProcessComponent } from './scheduled-process/scheduled-process.component';
 import { UpdateScheduleComponent } from './update-schedule/update-schedule.component';
 
+import { Routes, RouterModule } from '@angular/router';
+import { AuthGuard } from '../../../guards';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: ScheduledProcessComponent,
+    canActivate: [AuthGuard]
+  }
+];
+
 @NgModule({
   declarations: [
     ScheduledProcessComponent,
@@ -26,6 +37,7 @@ import { UpdateScheduleComponent } from './update-schedule/update-schedule.compo
     ReactiveFormsModule,
     FormsModule,
     CommonModule,
+    RouterModule.forChild(routes),
     NgProgressModule,
     PipesModule,
     AlertDialogModule
@@ -33,4 +45,4 @@ import { UpdateScheduleComponent } from './update-schedule/update-schedule.compo
   providers: [SchedulesService],
   exports: [InputMaskDirective]
 })
-export class SchedulerModule {}
+export class SchedulerModule { }
