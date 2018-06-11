@@ -91,12 +91,10 @@ install () {
       echo -e INFO: "${CINFO} Found ${nginx_version} ${CRESET}"
   fi
 
-  # Download foglamp-gui build artifacts i.e. dist directory compressed file
-  # url e.g. http://192.168.1.120/foglamp-gui-${FOGLAMP_GUI_VER}.tar.gz
-  # github release https://github.com/foglamp/foglamp-gui/releases/download/v1.2.0/foglamp-gui-1.2.0.tar.gz
-  # wget ${BUILD_URL}
+  echo -e INFO: "${CINFO} Download foglamp-gui release build from git ${CRESET}"
+  BUILD_URL=https://github.com/foglamp/foglamp-gui/releases/download/v${FOGLAMP_GUI_VER}/foglamp-gui-${FOGLAMP_GUI_VER}.tar.gz
+  wget ${BUILD_URL}
 
-  # FIXME: scp foglamp-gui-${FOGLAMP_GUI_VER}.tar.gz pi@<IP>:/home/pi
   tar -zxvf foglamp-gui-${FOGLAMP_GUI_VER}.tar.gz
 
   # put them into /var/www/html and start nginx
