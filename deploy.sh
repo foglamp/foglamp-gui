@@ -91,9 +91,12 @@ install () {
       echo -e INFO: "${CINFO} Found ${nginx_version} ${CRESET}"
   fi
 
-  echo -e INFO: "${CINFO} Downloading foglamp-gui release build from git ${CRESET}"
-  BUILD_URL=https://github.com/foglamp/foglamp-gui/releases/download/v${FOGLAMP_GUI_VER}/foglamp-gui-${FOGLAMP_GUI_VER}.tar.gz
-  wget ${BUILD_URL} --show-progress --quiet
+  if [[ "$OPTION" != "LOCAL" ]] 
+  then
+    echo -e INFO: "${CINFO} Downloading foglamp-gui release build from git ${CRESET}"
+    BUILD_URL=https://github.com/foglamp/foglamp-gui/releases/download/v${FOGLAMP_GUI_VER}/foglamp-gui-${FOGLAMP_GUI_VER}.tar.gz
+    wget ${BUILD_URL} --show-progress --quiet
+  fi
 
   # FIXME: scp foglamp-gui-${FOGLAMP_GUI_VER}.tar.gz pi@<IP>:/home/pi
   tar -zxvf foglamp-gui-${FOGLAMP_GUI_VER}.tar.gz
