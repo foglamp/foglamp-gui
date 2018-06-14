@@ -6,11 +6,11 @@
     <div class="column is-7">
       <angular2-multiselect (ngModelChange)="showGraph($event)" [data]="statistics" [(ngModel)]="selectedItems" [settings]="dropdownSettings"></angular2-multiselect>
     </div>
-    <div class="column">
+    <div class="column" *ngIf="graphsToShow.length != 0">
       <app-number-input-debounce placeholder="limit" (value)="getLimitBasedGraph($event)" [val]='limit'></app-number-input-debounce>
       <p *ngIf='invalidLimitSize' class='help is-danger'>Limit must be in range 1 - {{MAX_RANGE}}</p>
     </div>
-    <div class="column">
+    <div class="column" *ngIf="graphsToShow.length != 0">
       <button (click)="refreshGraph()" class="button is-small">
         <i class="fa fa-refresh" aria-hidden="true"></i>
       </button>
