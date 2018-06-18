@@ -16,7 +16,7 @@ export class SideMenuComponent implements OnInit {
 
   ngOnInit() {
     this.isAdmin = JSON.parse(sessionStorage.getItem('isAdmin'));
-    this.isSkip = JSON.parse(sessionStorage.getItem('skip'));
+    this.isSkip = JSON.parse(sessionStorage.getItem('login_skipped'));
     this.router.events.subscribe(() => {
       if (this.router.url === '/' || this.router.url === '/dashboard') {
         this.step = '/dashboard';

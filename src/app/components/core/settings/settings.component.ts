@@ -29,7 +29,7 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.isSkipped = JSON.parse(sessionStorage.getItem('skip'));
+    this.isSkipped = JSON.parse(sessionStorage.getItem('login_skipped'));
     this.serviceUrl = sessionStorage.getItem('SERVICE_URL');
     // get last selected time interval
     this.pingInterval = localStorage.getItem('PING_INTERVAL');

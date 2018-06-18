@@ -27,17 +27,14 @@ export class SkipLogin {
 
   loginPageInputTag() {
     browser.ignoreSynchronization = true;
+    // wait
+    browser.wait(this.EC.visibilityOf(element(by.css('app-login form input'))), 2000);
     return element.all(by.css('app-login form input')).count();
   }
 
   getLoginButton() {
     browser.ignoreSynchronization = true;
     return element(by.css('app-login form button.is-info')).getText();
-  }
-
-  clickSkip() {
-    browser.ignoreSynchronization = true;
-    element(by.css('app-login .is-grouped div:nth-child(1) button')).click();
   }
 
   getCountOfSelectedGraph() {

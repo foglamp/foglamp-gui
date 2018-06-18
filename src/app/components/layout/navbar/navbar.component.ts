@@ -71,7 +71,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     // get user token from session
     const token = sessionStorage.getItem('token');
-    const skip = sessionStorage.getItem('skip');
+    const skip = sessionStorage.getItem('login_skipped');
     if (token != null && token.length > 0) {
       this.isUserLoggedIn = true;
     } else if (skip != null && skip.trim().length > 0) {
@@ -96,7 +96,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
           this.status.changeMessage(true);
           this.ping_data = data;
           // set skip to true if authenticationOptional is true
-          sessionStorage.setItem('skip', JSON.stringify(data['authenticationOptional']));
+          sessionStorage.setItem('login_skipped', JSON.stringify(data['authenticationOptional']));
           const statsTxt = 'Read: ' + data['dataRead'] + '\n' + 'Sent: ' + data['dataSent'] + '\n' + 'Purged: ' + data['dataPurged'];
           this.ping_info = { stats: statsTxt, is_alive: true, service_status: 'running' };
         },
