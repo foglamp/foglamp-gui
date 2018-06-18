@@ -56,7 +56,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     // get loggedin user token from session
     const token = sessionStorage.getItem('token');
-    const skip = sessionStorage.getItem('skip');
+    const skip = sessionStorage.getItem('login_skipped');
     if (token != null && token.trim().length > 0) {
       this.isUserLoggedIn = true;
     } else if (skip != null && skip.trim().length > 0) {
