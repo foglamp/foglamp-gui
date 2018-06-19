@@ -1,9 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { PingService } from '../../../services';
+import { PingService, ServicesHealthService  } from '../../../services';
+import { AlertService } from '../../../services/index';
 import { NavbarComponent } from '../../layout/navbar/navbar.component';
 import { ServiceDiscoveryComponent } from '../service-discovery';
+import { SharedService } from '../../../services/shared.service';
+import { NgProgress } from 'ngx-progressbar';
 
 @Component({
   selector: 'app-settings',
@@ -21,7 +24,8 @@ export class SettingsComponent implements OnInit {
   pingInterval;
   isSkipped = false;
   serviceUrl = '';
-  constructor(private router: Router, private pingService: PingService) {
+  constructor(private router: Router, private pingService: PingService, private alertService: AlertService,
+    private servicesHealthService: ServicesHealthService, private sharedService: SharedService, public ngProgress: NgProgress) {
     this.protocol = localStorage.getItem('CONNECTED_PROTOCOL') != null ?
     localStorage.getItem('CONNECTED_PROTOCOL') : location.protocol.replace(':', '').trim();
     this.host = localStorage.getItem('CONNECTED_HOST') != null ? localStorage.getItem('CONNECTED_HOST') : location.hostname;
@@ -29,7 +33,7 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.isSkipped = JSON.parse(sessionStorage.getItem('login_skipped'));
+    this.isSkipped = JSON.parse(sessionStorage.getItem('LOGIN_SKIPPED'));
     this.serviceUrl = sessionStorage.getItem('SERVICE_URL');
     // get last selected time interval
     this.pingInterval = localStorage.getItem('PING_INTERVAL');
@@ -55,18 +59,40 @@ export class SettingsComponent implements OnInit {
     localStorage.setItem('CONNECTED_PORT', servicePortField.value);
     this.serviceUrl = protocolField.value + '://' + hostField.value + ':'
       + servicePortField.value + '/foglamp/';
+    localStorage.setItem('SERVICE_URL', this.serviceUrl);
   }
 
   public resetEndPoint() {
+    this.ngProgress.start();
     this.setServiceUrl();
-    localStorage.setItem('SERVICE_URL', this.serviceUrl);
-    this.reloadApp();
+    this.servicesHealthService.pingService()
+      .subscribe(
+            (data) => {
+              this.ngProgress.done();
+              if (data['authenticationOptional'] === true) {
+                this.reloadApp();
+              }
+            },
+            (error) => {
+              this.ngProgress.done();
+              if (error.status === 0) {
+                console.log('service down ', error);
+              } else {
+                this.alertService.error('Please enter correct Host IP');
+              }
+            },
+        );
   }
 
   public reloadApp() {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('isAdmin');
+    sessionStorage.removeItem('uid');
+    this.sharedService.isLoginSkiped.next(true);
+    sessionStorage.setItem('LOGIN_SKIPPED', JSON.stringify(true));
     location.reload();
     location.href = '';
-    this.router.navigate([location.href]);
+    this.router.navigate(['']);
   }
 
   /**

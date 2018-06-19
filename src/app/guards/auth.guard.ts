@@ -5,7 +5,7 @@ import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from
 export class AuthGuard implements CanActivate {
   constructor(private router: Router) { }
   canActivate() {
-    if (sessionStorage.getItem('token') || sessionStorage.getItem('login_skipped')) {
+    if (sessionStorage.getItem('token') || sessionStorage.getItem('LOGIN_SKIPPED')) {
       // logged in so return true
       return true;
     }
