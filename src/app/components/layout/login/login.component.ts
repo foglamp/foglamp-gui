@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertService, AuthService, UserService } from '../../../services/index';
-import { SharedService } from '../../../services/shared.service';
 import { NgProgress } from 'ngx-progressbar';
+
+import { AlertService, AuthService, UserService } from '../../../services';
+import { SharedService } from '../../../services/shared.service';
 
 @Component({
   moduleId: module.id.toString(),
@@ -19,12 +20,7 @@ export class LoginComponent implements OnInit {
     private alertService: AlertService,
     private sharedService: SharedService,
     private userService: UserService,
-    public ngProgress: NgProgress) {
-    this.sharedService.isUserLoggedIn.next({
-      'loggedIn': false
-    });
-    this.sharedService.isLoginSkiped.next(false);
-  }
+    public ngProgress: NgProgress) { }
 
   ngOnInit() {
     // clear session
@@ -43,8 +39,10 @@ export class LoginComponent implements OnInit {
           sessionStorage.setItem('token', data['token']);
           sessionStorage.setItem('uid', data['uid']);
           sessionStorage.setItem('isAdmin', JSON.stringify(data['admin']));
+          this.sharedService.isAdmin.next(JSON.parse(sessionStorage.getItem('isAdmin')));
           this.getUser(data['uid']);
           this.router.navigate(['']);
+          this.sharedService.isUserLoggedIn.next(true);
         },
         error => {
           this.ngProgress.done();
@@ -61,15 +59,6 @@ export class LoginComponent implements OnInit {
           }
         });
   }
-
-  // public skip() {
-  //   sessionStorage.removeItem('token');
-  //   sessionStorage.removeItem('isAdmin');
-  //   sessionStorage.removeItem('uid');
-  //   this.sharedService.isLoginSkiped.next(true);
-  //   sessionStorage.setItem('skip', JSON.stringify(true));
-  //   this.router.navigate(['']);
-  // }
 
   public setupInstance() {
     this.router.navigate(['/setting'], { queryParams: { id: '1' } });

@@ -16,7 +16,6 @@ export class ServicesHealthComponent implements OnInit {
   timer: any = '';
   time: number;
   public service_data;
-  public isAdmin = false;
 
   @ViewChild(AddServiceComponent) addServiceModal: AddServiceComponent;
 
@@ -34,7 +33,6 @@ export class ServicesHealthComponent implements OnInit {
   constructor(private servicesHealthService: ServicesHealthService, private alertService: AlertService, public ngProgress: NgProgress) { }
 
   ngOnInit() {
-    this.isAdmin = JSON.parse(sessionStorage.getItem('isAdmin'));
     this.getServiceData();
   }
 

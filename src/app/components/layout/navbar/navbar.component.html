@@ -1,6 +1,6 @@
 <nav class="navbar" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
-    <div *ngIf='isUserLoggedIn || isSkip' class="navbar-burger" (click)="toggleClick()">
+    <div *ngIf='isUserLoggedIn' class="navbar-burger" (click)="toggleClick()">
       <span></span>
       <span></span>
       <span></span>
@@ -20,7 +20,9 @@
             <i [ngClass]="ping_info.is_alive?'fa fa-check-circle-o':'fa fa-times-circle'" aria-hidden="true"></i>
           </span>
           <span class="tag is-hidden-mobile">{{ping_info.service_status}}</span>
-          <button  (click)="pingService(true)" class="tag button is-small"><i class="fa fa-refresh" aria-hidden="true"></i></button>
+          <button (click)="pingService(true)" class="tag button is-small">
+            <i class="fa fa-refresh" aria-hidden="true"></i>
+          </button>
         </div>
 
       </a>
@@ -28,8 +30,8 @@
     <div class="navbar-end">
       <div class="dropdown is-right" id="dropdown-box" (click)="toggleDropdown()">
         <div class="dropdown-trigger">
-          <a *ngIf='isUserLoggedIn || isSkip' class="navbar-link">
-            <b class="has-text-grey"> &nbsp;{{(isSkip == true)? 'Guest' : userName}}&nbsp; </b>
+          <a *ngIf='isUserLoggedIn' class="navbar-link">
+            <b class="has-text-grey">{{userName}}</b>
             <span class="icon is-small">
               <i class="fa fa-angle-down is-hidden-desktop" aria-hidden="true"></i>
             </span>
@@ -43,10 +45,7 @@
             <a *ngIf='isUserLoggedIn' (click)="logout()" class="dropdown-item">
               <i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp; Log Out
             </a>
-            <a *ngIf='isSkip' (click)="login()" class="dropdown-item">
-              <i class="fa fa-sign-in" aria-hidden="true"></i>&nbsp; Login
-            </a>
-            <a *ngIf="ping_info.is_alive && isUserLoggedIn || isSkip" (click)="openModal()" class="dropdown-item">
+            <a *ngIf="ping_info.is_alive && isUserLoggedIn" (click)="openModal()" class="dropdown-item">
               <i class="fa fa-power-off" aria-hidden="true"></i>&nbsp; Shut down
             </a>
           </div>

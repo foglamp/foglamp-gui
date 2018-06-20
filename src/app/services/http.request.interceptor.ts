@@ -29,7 +29,6 @@ export class HttpsRequestInterceptor implements HttpInterceptor {
         if (err instanceof HttpErrorResponse) {
           if (err.status === 401) {
             sessionStorage.clear();
-            this.router.navigate(['/login']);
           }
           return observableThrowError(err);
         }
