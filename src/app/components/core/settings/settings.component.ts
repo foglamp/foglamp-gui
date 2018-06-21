@@ -74,6 +74,7 @@ export class SettingsComponent implements OnInit {
           this.ngProgress.done();
           if (error.status === 0) {
             console.log('service down ', error);
+            this.alertService.error('Service is down.');
           } else {
             this.alertService.error('Please enter correct Host IP');
           }

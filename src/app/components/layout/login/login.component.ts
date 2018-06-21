@@ -41,7 +41,7 @@ export class LoginComponent implements OnInit {
           sessionStorage.setItem('isAdmin', JSON.stringify(data['admin']));
           this.sharedService.isAdmin.next(JSON.parse(sessionStorage.getItem('isAdmin')));
           this.getUser(data['uid']);
-          this.router.navigate(['']);
+          this.router.navigate([''], {replaceUrl: true});
           this.sharedService.isUserLoggedIn.next(true);
         },
         error => {
