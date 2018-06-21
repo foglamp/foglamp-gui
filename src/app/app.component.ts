@@ -2,7 +2,7 @@ import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { SidebarModule } from 'ng-sidebar';
 
-import { PingService, ServicesHealthService } from './services';
+import { PingService, ServicesHealthService, AlertService } from './services';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +20,7 @@ export class AppComponent implements OnInit {
 
   constructor(private router: Router,
     private ping: PingService,
+    private alertService: AlertService,
     private servicesHealthService: ServicesHealthService) {
     if (sessionStorage.getItem('LOGIN_SKIPPED') === null) {
       sessionStorage.setItem('LOGIN_SKIPPED', JSON.stringify(true));
@@ -29,13 +30,18 @@ export class AppComponent implements OnInit {
         (data) => {
           sessionStorage.setItem('LOGIN_SKIPPED', JSON.stringify(data['authenticationOptional']));
           if (JSON.parse(sessionStorage.getItem('LOGIN_SKIPPED')) === true) {
-            this.router.navigate([''], {replaceUrl: true});
+            this.router.navigate([''], { replaceUrl: true });
           } else if (JSON.parse(sessionStorage.getItem('LOGIN_SKIPPED')) === false && sessionStorage.getItem('token') === null) {
-            this.router.navigate(['/login'], {replaceUrl: true});
+            this.router.navigate(['/login'], { replaceUrl: true });
           }
         },
         (error) => {
-          console.log('error: ', error);
+          if (error.status === 0) {
+            console.log('service down ', error);
+            this.alertService.error('Connected service is down.');
+          } else {
+            this.alertService.error('Failed to connect to service.');
+          }
         },
     );
   }

@@ -62,33 +62,8 @@ export class SettingsComponent implements OnInit {
   public resetEndPoint() {
     this.ngProgress.start();
     this.setServiceUrl();
-    this.servicesHealthService.pingService()
-      .subscribe(
-        (data) => {
-          this.ngProgress.done();
-          if (data['authenticationOptional'] === true) {
-            this.reloadApp();
-          }
-        },
-        (error) => {
-          this.ngProgress.done();
-          if (error.status === 0) {
-            console.log('service down ', error);
-            this.alertService.error('Service is down.');
-          } else {
-            this.alertService.error('Please enter correct Host IP');
-          }
-        },
-    );
-  }
-
-  public reloadApp() {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('isAdmin');
-    sessionStorage.removeItem('uid');
     location.reload();
-    location.href = '';
-    this.router.navigate([location.href]);
+    sessionStorage.clear();
   }
 
   /**

@@ -185,6 +185,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
     this.authService.logout().
       subscribe(
         () => {
+          this.sharedService.isUserLoggedIn.next(false);
           this.ngProgress.done();
           this.router.navigate(['/login']);
           this.alertService.success('You have been successfully logged out!');
