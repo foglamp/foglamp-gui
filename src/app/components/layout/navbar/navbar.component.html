@@ -51,8 +51,8 @@
           </div>
         </div>
       </div>
-      <div class="icon has-text-danger is-large">
-        <a *ngIf="ping_info.is_alive && !isUserLoggedIn" class=" tooltip is-tooltip-left" data-tooltip="shut down" (click)="openModal()">
+      <div *ngIf="ping_info.is_alive && !isUserLoggedIn" class="icon has-text-danger is-large">
+        <a class=" tooltip is-tooltip-left" data-tooltip="shut down" (click)="openModal()">
           <i class="fa fa-power-off" aria-hidden="true"></i>
         </a>
       </div>

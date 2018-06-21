@@ -105,9 +105,15 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
           if (pingManually === true) {
             this.ngProgress.done();
           }
-          console.log('error: ', error);
           this.status.changeMessage(false);
           this.ping_info = { stats: 'No data', is_alive: false, service_status: 'service down' };
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else if (error.status === 403) {
+            this.router.navigate(['/login'], { replaceUrl: true });
+          } else {
+            this.alertService.error('Failed to connect to service.');
+          }
         },
     );
   }

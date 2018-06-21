@@ -39,6 +39,8 @@ export class AppComponent implements OnInit {
           if (error.status === 0) {
             console.log('service down ', error);
             this.alertService.error('Connected service is down.');
+          } else if (error.status === 403) {
+            this.router.navigate(['/login'], { replaceUrl: true });
           } else {
             this.alertService.error('Failed to connect to service.');
           }
