@@ -62,14 +62,14 @@ export class LoginComponent implements OnInit {
         });
   }
 
-  public skip() {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('isAdmin');
-    sessionStorage.removeItem('uid');
-    this.sharedService.isLoginSkiped.next(true);
-    sessionStorage.setItem('skip', JSON.stringify(true));
-    this.router.navigate(['']);
-  }
+  // public skip() {
+  //   sessionStorage.removeItem('token');
+  //   sessionStorage.removeItem('isAdmin');
+  //   sessionStorage.removeItem('uid');
+  //   this.sharedService.isLoginSkiped.next(true);
+  //   sessionStorage.setItem('skip', JSON.stringify(true));
+  //   this.router.navigate(['']);
+  // }
 
   public setupInstance() {
     this.router.navigate(['/setting'], { queryParams: { id: '1' } });

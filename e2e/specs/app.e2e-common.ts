@@ -20,7 +20,6 @@ describe('FogLAMP gui', () => {
   });
 
   it('Should Display Nav Title and App Status', () => {
-    skipLogin.navigateToHome();
     expect(skipLogin.getNavTitle()).toEqual('FogLAMP Management');
     expect(skipLogin.getAppStatus()).toEqual('running');
     expect(skipLogin.loginPageInputTag()).toEqual(2);
@@ -28,7 +27,6 @@ describe('FogLAMP gui', () => {
   });
 
   it('Should Display Default Graphs', () => {
-    skipLogin.clickSkip();
     expect(skipLogin.getCountOfSelectedGraph()).toEqual(3);
     expect(skipLogin.getReadingsGraph()).toEqual('READINGS');
     expect(skipLogin.getSent1Graph()).toEqual('SENT_1');
