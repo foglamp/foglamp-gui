@@ -33,7 +33,6 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   // Define a variable to use for showing/hiding the Login button
   isUserLoggedIn: boolean;
   userName: string;
-  isSkip = false;
   @ViewChild(ShutdownModalComponent) child: ShutdownModalComponent;
 
   constructor(private servicesHealthService: ServicesHealthService,
@@ -50,9 +49,6 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
     this.sharedService.isUserLoggedIn.subscribe(value => {
       this.isUserLoggedIn = value.loggedIn;
       this.userName = value.userName;
-    });
-    this.sharedService.isLoginSkiped.subscribe(value => {
-      this.isSkip = value;
     });
   }
 
@@ -71,15 +67,14 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     // get user token from session
     const token = sessionStorage.getItem('token');
-    const skip = sessionStorage.getItem('skip');
     if (token != null && token.length > 0) {
       this.isUserLoggedIn = true;
-    } else if (skip != null && skip.trim().length > 0) {
-      this.isSkip = true;
     }
+
     if (sessionStorage.getItem('userName') != null) {
       this.userName = sessionStorage.getItem('userName');
     }
+
     this.changeDetectorRef.detectChanges();
   }
 
@@ -95,16 +90,30 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
           }
           this.status.changeMessage(true);
           this.ping_data = data;
-          const statsTxt = 'Read:' + data['dataRead'] + '\n' + 'Sent:' + data['dataSent'] + '\n' + 'Purged:' + data['dataPurged'];
+
+          const statsTxt = 'Read: ' + data['dataRead'] + '\n' + 'Sent: ' + data['dataSent'] + '\n' + 'Purged: ' + data['dataPurged'];
           this.ping_info = { stats: statsTxt, is_alive: true, service_status: 'running' };
+          if (JSON.parse(sessionStorage.getItem('LOGIN_SKIPPED')) === true) {
+            this.isUserLoggedIn = false;
+            sessionStorage.removeItem('token');
+            sessionStorage.setItem('isAdmin', JSON.stringify(false));
+          }
+          this.sharedService.isAdmin.next(JSON.parse(sessionStorage.getItem('isAdmin')));
+          sessionStorage.setItem('LOGIN_SKIPPED', JSON.stringify(data['authenticationOptional']));
         },
         (error) => {
           if (pingManually === true) {
             this.ngProgress.done();
           }
-          console.log('error: ', error);
           this.status.changeMessage(false);
           this.ping_info = { stats: 'No data', is_alive: false, service_status: 'service down' };
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else if (error.status === 403) {
+            this.router.navigate(['/login'], { replaceUrl: true });
+          } else {
+            this.alertService.error('Failed to connect to service.');
+          }
         },
     );
   }
@@ -182,6 +191,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
     this.authService.logout().
       subscribe(
         () => {
+          this.sharedService.isUserLoggedIn.next(false);
           this.ngProgress.done();
           this.router.navigate(['/login']);
           this.alertService.success('You have been successfully logged out!');
@@ -198,8 +208,6 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public login() {
     this.router.navigate(['/login']);
-    this.isSkip = false;
-    sessionStorage.clear();
   }
 }
 

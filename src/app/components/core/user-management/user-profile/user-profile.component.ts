@@ -5,6 +5,7 @@ import { NgProgress } from 'ngx-progressbar';
 
 import { AlertService, AuthService, UserService } from '../../../../services';
 import { AlertDialogComponent } from '../../../common/alert-dialog/alert-dialog.component';
+import { SharedService } from '../../../../services/shared.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -20,6 +21,7 @@ export class UserProfileComponent implements OnInit {
   constructor(private authService: AuthService,
     private alertService: AlertService,
     private userService: UserService,
+    private sharedService: SharedService,
     public ngProgress: NgProgress,
     private router: Router) { }
 
@@ -141,6 +143,7 @@ export class UserProfileComponent implements OnInit {
         () => {
           this.ngProgress.done();
           this.alertService.success('All active sessions cleared');
+          this.sharedService.isUserLoggedIn.next(false);
           this.router.navigate(['/login']);
         },
         error => {

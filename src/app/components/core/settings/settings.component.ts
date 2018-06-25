@@ -1,7 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { NgProgress } from 'ngx-progressbar';
 
-import { PingService } from '../../../services';
+import { AlertService, PingService, ServicesHealthService } from '../../../services';
+import { SharedService } from '../../../services/shared.service';
 import { NavbarComponent } from '../../layout/navbar/navbar.component';
 import { ServiceDiscoveryComponent } from '../service-discovery';
 
@@ -19,17 +21,16 @@ export class SettingsComponent implements OnInit {
   host;
   servicePort;
   pingInterval;
-  isSkipped = false;
   serviceUrl = '';
-  constructor(private router: Router, private pingService: PingService) {
+  constructor(private router: Router, private pingService: PingService, private alertService: AlertService,
+    private servicesHealthService: ServicesHealthService, public ngProgress: NgProgress) {
     this.protocol = localStorage.getItem('CONNECTED_PROTOCOL') != null ?
-    localStorage.getItem('CONNECTED_PROTOCOL') : location.protocol.replace(':', '').trim();
+      localStorage.getItem('CONNECTED_PROTOCOL') : location.protocol.replace(':', '').trim();
     this.host = localStorage.getItem('CONNECTED_HOST') != null ? localStorage.getItem('CONNECTED_HOST') : location.hostname;
     this.servicePort = localStorage.getItem('CONNECTED_PORT') != null ? localStorage.getItem('CONNECTED_PORT') : 8081;
   }
 
   ngOnInit() {
-    this.isSkipped = JSON.parse(sessionStorage.getItem('skip'));
     this.serviceUrl = sessionStorage.getItem('SERVICE_URL');
     // get last selected time interval
     this.pingInterval = localStorage.getItem('PING_INTERVAL');
@@ -55,18 +56,14 @@ export class SettingsComponent implements OnInit {
     localStorage.setItem('CONNECTED_PORT', servicePortField.value);
     this.serviceUrl = protocolField.value + '://' + hostField.value + ':'
       + servicePortField.value + '/foglamp/';
+    localStorage.setItem('SERVICE_URL', this.serviceUrl);
   }
 
   public resetEndPoint() {
+    this.ngProgress.start();
     this.setServiceUrl();
-    localStorage.setItem('SERVICE_URL', this.serviceUrl);
-    this.reloadApp();
-  }
-
-  public reloadApp() {
     location.reload();
-    location.href = '';
-    this.router.navigate([location.href]);
+    sessionStorage.clear();
   }
 
   /**

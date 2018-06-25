@@ -8,7 +8,7 @@ import { InterceptorSkipHeader } from '../services/http.request.interceptor';
 
 @Injectable()
 export class ServicesHealthService {
-  private GET_PING_URL = environment.BASE_URL + 'ping';
+  private GET_PING_URL;
   private FOGLAMP_SHUTDOWN_URL = environment.BASE_URL + 'shutdown';
   private GET_SERVICES_URL = environment.BASE_URL + 'service';
   private REQUEST_TIMEOUT_INTERVAL = 5000;
@@ -19,6 +19,11 @@ export class ServicesHealthService {
      *  GET  | /foglamp/ping
      */
   pingService() {
+    if (localStorage.getItem('SERVICE_URL') == null) {
+      this.GET_PING_URL = environment.BASE_URL + 'ping';
+    } else {
+      this.GET_PING_URL = localStorage.getItem('SERVICE_URL') + 'ping';
+    }
     return this.http.get(this.GET_PING_URL).pipe(
       timeout(this.REQUEST_TIMEOUT_INTERVAL),
       map(response => response),

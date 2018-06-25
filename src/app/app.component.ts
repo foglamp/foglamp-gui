@@ -1,35 +1,51 @@
-import { Component, OnInit, HostListener, ViewChild, ChangeDetectorRef, AfterViewInit } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
 import { SidebarModule } from 'ng-sidebar';
-import { SharedService } from './services/shared.service';
-import { PingService } from './services/index';
+
+import { PingService, ServicesHealthService, AlertService } from './services';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit, AfterViewInit {
+export class AppComponent implements OnInit {
   title = 'app';
   @ViewChild('sidebar') sidebar: SidebarModule;
   navMode = 'side';
 
   public _opened = true;
   returnUrl: string;
-  isUserLoggedIn = false;
-  skip = false;
   isLoginView = false;
 
   constructor(private router: Router,
-    private sharedService: SharedService,
-    private cdr: ChangeDetectorRef, private ping: PingService) {
-    this.sharedService.isUserLoggedIn.subscribe(value => {
-      this.isUserLoggedIn = value.loggedIn;
-    });
-
-    this.sharedService.isLoginSkiped.subscribe(value => {
-      this.skip = value;
-    });
+    private ping: PingService,
+    private alertService: AlertService,
+    private servicesHealthService: ServicesHealthService) {
+    if (sessionStorage.getItem('LOGIN_SKIPPED') === null) {
+      sessionStorage.setItem('LOGIN_SKIPPED', JSON.stringify(true));
+    }
+    this.servicesHealthService.pingService()
+      .subscribe(
+        (data) => {
+          sessionStorage.setItem('LOGIN_SKIPPED', JSON.stringify(data['authenticationOptional']));
+          if (JSON.parse(sessionStorage.getItem('LOGIN_SKIPPED')) === true) {
+            this.router.navigate([''], { replaceUrl: true });
+          } else if (JSON.parse(sessionStorage.getItem('LOGIN_SKIPPED')) === false && sessionStorage.getItem('token') === null) {
+            this.router.navigate(['/login'], { replaceUrl: true });
+          }
+        },
+        (error) => {
+          if (error.status === 0) {
+            this.router.navigate(['/setting'], { replaceUrl: true });
+            this.alertService.error('Connected service is down.');
+          } else if (error.status === 403) {
+            this.router.navigate(['/login'], { replaceUrl: true });
+          } else {
+            this.alertService.error('Failed to connect to service.');
+          }
+        },
+    );
   }
 
   public toggleSidebar() {
@@ -43,26 +59,15 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.navMode = 'over';
       this._opened = false;
     }
+    this.ping.setDefaultPingTime();
+    const pingInterval = JSON.parse(localStorage.getItem('PING_INTERVAL'));
+    this.ping.pingIntervalChanged.next(pingInterval);
+
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.isActive(event.url);
       }
     });
-    this.ping.setDefaultPingTime();
-    const pingInterval = JSON.parse(localStorage.getItem('PING_INTERVAL'));
-    this.ping.pingIntervalChanged.next(pingInterval);
-  }
-
-  ngAfterViewInit() {
-    // get loggedin user token from session
-    const token = sessionStorage.getItem('token');
-    const skip = sessionStorage.getItem('skip');
-    if (token != null && token.trim().length > 0) {
-      this.isUserLoggedIn = true;
-    } else if (skip != null && skip.trim().length > 0) {
-      this.skip = true;
-    }
-    this.cdr.detectChanges();
   }
 
   @HostListener('window:resize', ['$event'])
