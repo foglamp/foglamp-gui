@@ -44,10 +44,6 @@ table.scroll tbody {
        overflow: auto;
 }
 
-.dropdown-list[_ngcontent-c8] {
-  position: relative !important;
-}
-
 #card-title {
   overflow: hidden;
 }
