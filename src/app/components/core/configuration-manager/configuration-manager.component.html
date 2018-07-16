@@ -41,21 +41,33 @@
               <div class="field">
                 <div class="control">
                   <p hidden="true"> {{v.value.type}} </p>
-                  <input *ngIf='isObject(v?.value?.value)' id="{{category.key.trim() + '-' + v.key.trim() | lowercase }}" class="input is-small" type="text"
-                    [value]="v?.value?.value != undefined ? (JSON.stringify(v?.value?.value)) : '' " [textContent]="v?.value?.value != undefined ? (JSON.stringify(v?.value?.value)) : '' "
-                    (input)="onTextChange(category.key.trim() + '-' + v.key.trim())" />
-
-                  <input *ngIf='!isObject(v?.value?.value)' id="{{category.key.trim() + '-' + v.key.trim() | lowercase }}" class="input is-small" type="text"
-                    [value]='v?.value?.value != undefined ? v?.value?.value : "" ' [textContent]='v?.value?.value != undefined ? v?.value?.value : "" '
-                    (input)="onTextChange(category.key.trim() + '-' + v.key.trim())" />
+                  <div class="control is-fullwidth">
+                    <form name="form" id="ngForm" #f="ngForm" novalidate>
+                      <select *ngIf="v.value.type == 'boolean'" id="{{category.key.trim() + '-' + v.key.trim() | lowercase }}" (input)="onTextChange(category.key.trim() + '-' + v.key.trim())"
+                        (focus)="oldVal=v.value.value" class="select is-fullwidth is-small" [(ngModel)]="v.value.value" name="categoryValue"
+                        #categoryValue="ngModel" (ngModelChange)="onModelChange(oldVal);">
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                      </select>
+                      <input *ngIf="v.value.type == 'string'" id="{{category.key.trim() + '-' + v.key.trim() | lowercase }}" (input)="onTextChange(category.key.trim() + '-' + v.key.trim())"
+                        (focus)="oldVal=v.value.value" type="text" class="input" name='categoryValue' [(ngModel)]="v.value.value"
+                        #categoryValue="ngModel" [textContent]='v?.value?.value != undefined ? v?.value?.value : "" ' (ngModelChange)="onModelChange(oldVal);"
+                        appAlphabetsOnly />
+                      <input *ngIf="v.value.type == 'integer'" id="{{category.key.trim() + '-' + v.key.trim() | lowercase }}" (input)="onTextChange(category.key.trim() + '-' + v.key.trim())"
+                        (focus)="oldVal=v.value.value" type="number" class="input" name='categoryValue' [(ngModel)]="v.value.value"
+                        #categoryValue="ngModel" [textContent]='v?.value?.value != undefined ? v?.value?.value : "" ' (ngModelChange)="onModelChange(oldVal);"
+                        appNumberOnly />
+                    </form>
+                  </div>
                 </div>
               </div>
               <div class="field is-grouped">
                 <div class="control">
-                  <button id="btn-save-{{category.key.trim() + '-' + v.key.trim() | lowercase}}" class="button is-small is-primary" (click)="saveConfigValue(category?.key, v?.key, v?.value?.type)">Save</button>
+                  <button id="btn-save-{{category.key.trim() + '-' + v.key.trim() | lowercase}}" type="button" (click)="saveConfigValue(category.key, v.key, v.value.type, f)"
+                    class="button is-small is-primary" form="ngForm">Save</button>
                 </div>
                 <div class="control">
-                  <button id="btn-cancel-{{category.key.trim() + '-' + v.key.trim() | lowercase}}" class="button is-small is-text hidden" (click)="restoreConfigFieldValue(category.key.trim() + '-' + v.key.trim())">Cancel</button>
+                  <button id="btn-cancel-{{category.key.trim() + '-' + v.key.trim() | lowercase}}" class="button is-small is-text hidden" (click)="restoreConfigFieldValue(category.key.trim() + '-' + v.key.trim(), f)">Cancel</button>
                 </div>
               </div>
             </div>

@@ -8,6 +8,7 @@ import { ConfigurationManagerComponent } from '.';
 import { AddConfigItemComponent } from './add-config-item/add-config-item.component';
 import { Routes, RouterModule } from '@angular/router';
 import { AuthCheckGuard } from '../../../guards';
+import { AlphabetsOnlyDirective } from '../../../directives/alpha-only.directive';
 
 const routes: Routes = [
   {
@@ -20,7 +21,8 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     ConfigurationManagerComponent,
-    AddConfigItemComponent
+    AddConfigItemComponent,
+    AlphabetsOnlyDirective
   ],
   imports: [
     FormsModule,

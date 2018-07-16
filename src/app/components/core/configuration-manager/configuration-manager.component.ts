@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfigurationService, AlertService } from '../../../services/index';
 import { NgProgress } from 'ngx-progressbar';
 import { AddConfigItemComponent } from './add-config-item/add-config-item.component';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-configuration-manager',
@@ -13,6 +14,7 @@ export class ConfigurationManagerComponent implements OnInit {
   public JSON;
   public addConfigItem: any;
   public isCategoryData = false;
+  public oldValue;
 
   @ViewChild(AddConfigItemComponent) addConfigItemModal: AddConfigItemComponent;
 
@@ -60,6 +62,7 @@ export class ConfigurationManagerComponent implements OnInit {
         (data) => {
           categoryValues.push(data);
           this.categoryData.push({ key: category_name, value: categoryValues, description: category_desc });
+          console.log('categoryData', this.categoryData);
         },
         error => {
           if (error.status === 0) {
@@ -70,33 +73,38 @@ export class ConfigurationManagerComponent implements OnInit {
         });
   }
 
-  public restoreConfigFieldValue(config_item_key: string) {
-    const inputField = <HTMLInputElement>document.getElementById(config_item_key.toLowerCase());
-    inputField.value = inputField.textContent;
+  onModelChange(oldVal) {
+    if (oldVal !== undefined) {
+      this.oldValue = oldVal;
+    }
+  }
+
+  public restoreConfigFieldValue(config_item_key: string, form: NgForm) {
+    form.controls['categoryValue'].setValue(this.oldValue);
     const cancelButton = <HTMLButtonElement>document.getElementById('btn-cancel-' + config_item_key.toLowerCase());
     cancelButton.classList.add('hidden');
   }
 
-  public saveConfigValue(category_name: string, config_item: string, type: string) {
+  public saveConfigValue(category_name, config_item, type, form: NgForm) {
+    const categoryValue = form.controls['categoryValue'].value;
     const cat_item_id = (category_name.trim() + '-' + config_item.trim()).toLowerCase();
     const inputField = <HTMLInputElement>document.getElementById(cat_item_id);
-    const value = inputField.value.trim();
     const id = inputField.id.trim();
     const cancelButton = <HTMLButtonElement>document.getElementById('btn-cancel-' + id);
     cancelButton.classList.add('hidden');
 
     /** request started */
     this.ngProgress.start();
-    this.configService.saveConfigItem(category_name, config_item, value, type).
+    this.configService.saveConfigItem(category_name, config_item, categoryValue, type).
       subscribe(
         (data) => {
           /** request completed */
           this.ngProgress.done();
           if (data['value'] !== undefined) {
             if (type.toUpperCase() === 'JSON') {
-              inputField.textContent = inputField.value = JSON.stringify(data['value']);
+              form.controls['categoryValue'].setValue(JSON.stringify(data['value']));
             } else {
-              inputField.textContent = inputField.value = data['value'];
+              form.controls['categoryValue'].setValue(data['value']);
             }
             this.alertService.success('Value updated successfully');
           }
