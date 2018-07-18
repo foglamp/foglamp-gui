@@ -49,10 +49,11 @@
                         <option value="true">true</option>
                         <option value="false">false</option>
                       </select>
-                      <input *ngIf="v.value.type == 'string' || v.value.type == 'IPv4' || v.value.type == 'IPv6' || v.value.type == 'X509 certificate' || v.value.type == 'password' || v.value.type == 'JSON'" id="{{category.key.trim() + '-' + v.key.trim() | lowercase }}" (input)="onTextChange(category.key.trim() + '-' + v.key.trim())"
+                      <input *ngIf="v.value.type == 'string' || v.value.type == 'IPv4' || v.value.type == 'IPv6' || v.value.type == 'X509 certificate' || v.value.type == 'password' || v.value.type == 'JSON'"
+                        id="{{category.key.trim() + '-' + v.key.trim() | lowercase }}" (input)="onTextChange(category.key.trim() + '-' + v.key.trim())"
                         (focus)="oldVal=v.value.value" type="text" class="input" name='categoryValue' [(ngModel)]="v.value.value"
                         #categoryValue="ngModel" [textContent]='v?.value?.value != undefined ? v?.value?.value : "" ' (ngModelChange)="onModelChange(oldVal);"
-                        appAlphabetsOnly />
+                      />
                       <input *ngIf="v.value.type == 'integer'" id="{{category.key.trim() + '-' + v.key.trim() | lowercase }}" (input)="onTextChange(category.key.trim() + '-' + v.key.trim())"
                         (focus)="oldVal=v.value.value" type="number" class="input" name='categoryValue' [(ngModel)]="v.value.value"
                         #categoryValue="ngModel" [textContent]='v?.value?.value != undefined ? v?.value?.value : "" ' (ngModelChange)="onModelChange(oldVal);"
