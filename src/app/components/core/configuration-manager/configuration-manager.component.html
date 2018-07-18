@@ -43,18 +43,18 @@
                   <p hidden="true"> {{v.value.type}} </p>
                   <div class="control is-fullwidth">
                     <form name="form" id="ngForm" #f="ngForm" novalidate>
-                      <select *ngIf="v.value.type == 'boolean'" id="{{category.key.trim() + '-' + v.key.trim() | lowercase }}" (input)="onTextChange(category.key.trim() + '-' + v.key.trim())"
+                      <select *ngIf="(v.value.type | uppercase) == 'BOOLEAN'" id="{{category.key.trim() + '-' + v.key.trim() | lowercase }}" (input)="onTextChange(category.key.trim() + '-' + v.key.trim())"
                         (focus)="oldVal=v.value.value" class="select is-fullwidth is-small" [(ngModel)]="v.value.value" name="categoryValue"
                         #categoryValue="ngModel" (ngModelChange)="onModelChange(oldVal);">
                         <option value="true">true</option>
                         <option value="false">false</option>
                       </select>
-                      <input *ngIf="v.value.type == 'string' || v.value.type == 'IPv4' || v.value.type == 'IPv6' || v.value.type == 'X509 certificate' || v.value.type == 'password' || v.value.type == 'JSON'"
+                      <input *ngIf="(v.value.type | uppercase) == 'STRING' || (v.value.type | uppercase) == 'IPV4' || (v.value.type | uppercase) == 'IPV6' || (v.value.type | uppercase) == 'X509 CERTIFICATE' ||(v.value.type | uppercase) == 'PASSWORD' || (v.value.type | uppercase) == 'JSON'"
                         id="{{category.key.trim() + '-' + v.key.trim() | lowercase }}" (input)="onTextChange(category.key.trim() + '-' + v.key.trim())"
                         (focus)="oldVal=v.value.value" type="text" class="input" name='categoryValue' [(ngModel)]="v.value.value"
                         #categoryValue="ngModel" [textContent]='v?.value?.value != undefined ? v?.value?.value : "" ' (ngModelChange)="onModelChange(oldVal);"
                       />
-                      <input *ngIf="v.value.type == 'integer'" id="{{category.key.trim() + '-' + v.key.trim() | lowercase }}" (input)="onTextChange(category.key.trim() + '-' + v.key.trim())"
+                      <input *ngIf="(v.value.type | uppercase) == 'INTEGER'" id="{{category.key.trim() + '-' + v.key.trim() | lowercase }}" (input)="onTextChange(category.key.trim() + '-' + v.key.trim())"
                         (focus)="oldVal=v.value.value" type="number" class="input" name='categoryValue' [(ngModel)]="v.value.value"
                         #categoryValue="ngModel" [textContent]='v?.value?.value != undefined ? v?.value?.value : "" ' (ngModelChange)="onModelChange(oldVal);"
                         appNumberOnly />
