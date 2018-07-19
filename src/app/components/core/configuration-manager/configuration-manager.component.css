@@ -9,3 +9,12 @@
 .hidden {
     display: none;
 }
+.input {
+    width: auto;
+}
+.select.is-fullwidth select {
+    width: auto;
+}
+.select select {
+    padding-right: 10em;
+}
