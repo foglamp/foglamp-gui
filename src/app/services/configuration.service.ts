@@ -37,7 +37,7 @@ export class ConfigurationService {
         const categoryName = encodeURIComponent(category_name);
         let body = JSON.stringify({ 'value': value });
         if (type.toUpperCase() === 'JSON') {
-            body = JSON.stringify({ 'value': JSON.parse(value) });
+            body = JSON.stringify({ 'value': value });
         }
         return this.http.put(this.CATEGORY_URL + '/' + categoryName + '/' + config_item, body).pipe(
             map(response => response),
