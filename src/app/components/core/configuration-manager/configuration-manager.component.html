@@ -46,7 +46,7 @@
                     (input)="onTextChange(category.key.trim() + '-' + v.key.trim())" />
 
                   <textarea rows="3" *ngIf="v.value.type.toUpperCase() === 'JSON'" class="textarea is-small" id="{{category.key.trim() + '-' + v.key.trim() | lowercase }}"
-                    (input)="onTextChange(category.key.trim() + '-' + v.key.trim())">{{v?.value?.value.trim()}}</textarea>
+                    (input)="onTextChange(category.key.trim() + '-' + v.key.trim())">{{ JSON.stringify(v?.value?.value).trim() }}</textarea>
                 </div>
               </div>
               <div class="field is-grouped">
