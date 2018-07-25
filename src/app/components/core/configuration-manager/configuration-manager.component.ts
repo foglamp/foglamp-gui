@@ -93,7 +93,11 @@ export class ConfigurationManagerComponent implements OnInit {
           /** request completed */
           this.ngProgress.done();
           if (data['value'] !== undefined) {
-            inputField.textContent = inputField.value = data['value'];
+            let v = data['value'];
+            if (type == 'JSON'){
+              v = JSON.stringify(v)
+            }
+            inputField.textContent = inputField.value = v;
             this.alertService.success('Value updated successfully');
           }
         },
