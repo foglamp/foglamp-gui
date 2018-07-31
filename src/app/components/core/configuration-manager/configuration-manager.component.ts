@@ -1,9 +1,10 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, Renderer, ViewChild } from '@angular/core';
+import _ from 'lodash-es/array';
 import { NgProgress } from 'ngx-progressbar';
 
 import { AlertService, ConfigurationService } from '../../../services';
+import { AddCategoryChildComponent } from './add-category-child/add-category-child.component';
 import { AddConfigItemComponent } from './add-config-item/add-config-item.component';
-import _ from 'lodash-es/array';
 
 @Component({
   selector: 'app-configuration-manager',
@@ -17,16 +18,56 @@ export class ConfigurationManagerComponent implements OnInit {
   public JSON;
   public addConfigItem: any;
   public selectedRootCategory = 'General';
-  public selectedChildIndex = [];
+  element: Element;
 
-  public isCategoryData = false;
   @Input() categoryConfigurationData;
   @ViewChild(AddConfigItemComponent) addConfigItemModal: AddConfigItemComponent;
+  @ViewChild(AddCategoryChildComponent) addCategoryChild: AddCategoryChildComponent;
 
   constructor(private configService: ConfigurationService,
     private alertService: AlertService,
+    private renderer: Renderer,
     public ngProgress: NgProgress) {
     this.JSON = JSON;
+    this.renderer.listen('document', 'click', (evt) => {
+      const i = evt.target.id;
+      if (i.indexOf('UKEY-') !== -1) {
+        console.log('UKEY-');
+        const iconElement = document.getElementById(evt.target.id);
+        const childElementPanel = document.getElementById(evt.target.id + '-children');
+        const cl = iconElement.getAttribute('class');
+        if (cl === 'fa fa-plus-square') {
+          iconElement.setAttribute('class', 'fa fa-minus');
+          this.getChildren(i.replace('UKEY-', ''), false, i + '-children');
+          childElementPanel.classList.remove('child-panel');
+          const els = <HTMLCollection>document.getElementsByClassName('cat-desc');
+          for (let l = 0; l < els.length; l++) {
+            els[l].classList.remove('cat-desc');
+          }
+        } else {
+          iconElement.setAttribute('class', 'fa fa-plus-square');
+          childElementPanel.classList.add('child-panel');
+        }
+      }
+      if (i.indexOf('UDESC-') !== -1) {
+        const elementId = document.getElementById(evt.target.id);
+        const desc = elementId.innerText;
+        const els = <HTMLCollection>document.getElementsByClassName('cat-desc');
+        for (let l = 0; l < els.length; l++) {
+          els[l].classList.remove('cat-desc');
+        }
+        console.log('UDESC-');
+        const selectedElement = <HTMLElement>document.getElementById(i.replace('UDESC-', ''));
+        selectedElement.setAttribute('class', 'cat-desc');
+        this.getCategory(i.replace('UDESC-', ''), desc);
+      }
+      if (i.indexOf('ADD-CHILD-') !== -1) {
+        console.log('ADD-CHILD-');
+        this.addCategoryChild.setCategoryData(i.replace('ADD-CHILD-', ''));
+        // call child component method to toggle modal
+        this.addCategoryChild.toggleModal(true);
+      }
+    });
   }
 
   ngOnInit() {
@@ -55,12 +96,15 @@ export class ConfigurationManagerComponent implements OnInit {
         });
   }
 
-  public getChildren(category_name, onLoadingPage = false) {
+  public getChildren(category_name, onLoadingPage = false, appendTo = 'root-children') {
+    console.log("onLoadingPage: ", onLoadingPage);
     /** request started */
     this.ngProgress.start();
     this.childCategories = [];
-    this.categoryData = [];
-    this.selectedRootCategory = category_name;
+    if (appendTo === 'root-children') {
+      this.selectedRootCategory = category_name;
+      this.categoryData = [];
+    }
     this.configService.getChildren(category_name).
       subscribe(
         (data) => {
@@ -71,17 +115,25 @@ export class ConfigurationManagerComponent implements OnInit {
             this.rootCategories.forEach(el => {
               if (el.key === category_name) {
                 this.getCategory(el.key, el.description);
+                document.getElementById('root-children').innerHTML =
+                '<div class="panel-block"><button class="button is-rounded is-small is-fullwidth" disabled>no sub-category</button></div>';
               }
             });
           }
           else {
             data['categories'].forEach(element => {
-              this.childCategories.push({ key: element.key, description: element.description, is_selected: 'false' });
+              this.childCategories.push({ key: element.key, description: element.description });
             });
-
-            if (onLoadingPage === true) {
-              this.childCategories[0].is_selected = 'true';
+            
+            if (this.childCategories.length) {
+              const h = this.getchildCategoriesNodesHtml(this.childCategories);
+              document.getElementById(appendTo).innerHTML = h;
               this.getCategory(this.childCategories[0].key, this.childCategories[0].description);
+            }
+            else {
+              this.childCategories = [];
+              document.getElementById('root-children').innerHTML =
+                '<div class="panel-block"><button class="button is-rounded is-small is-fullwidth" disabled>no sub-category</button></div>';
             }
           }
         },
@@ -96,17 +148,18 @@ export class ConfigurationManagerComponent implements OnInit {
         });
   }
 
-  private getCategory(category_name: string, category_desc: string, event = null): void {
-    if (event != null && event.target.checked === false) {
-      this.categoryData = this.categoryData.filter(value => value.key !== category_name);
-      return;
-    }
+  public resetAllFilters() {
+    this.selectedRootCategory = 'General';
+    this.getRootCategories(true);
+  }
+
+  private getCategory(category_name: string, category_desc: string): void {
     const categoryValues = [];
     this.configService.getCategory(category_name).
       subscribe(
         (data) => {
           categoryValues.push(data);
-          this.categoryData.push({ key: category_name, value: categoryValues, description: category_desc });
+          this.categoryData = [{ key: category_name, value: categoryValues, description: category_desc }];
         },
         error => {
           if (error.status === 0) {
@@ -115,6 +168,28 @@ export class ConfigurationManagerComponent implements OnInit {
             this.alertService.error(error.statusText);
           }
         });
+  }
+
+  public getchildCategoriesNodesHtml(childCategories) {
+    let html = '';
+    let counter = 0;
+    let selClass = 'cat-desc';
+    childCategories.forEach(el => {
+      if (counter > 0) {
+        selClass = '';
+      }
+      counter += 1;
+      html += '<div class="panel-block" style="display: inherit;" id="root-child">';
+      html += '<ul><li id="' + el.key.trim() + '" class="' + selClass + '"><span class="icon">';
+      html += '<i id="UKEY-' + el.key.trim() + '" class="fa fa-plus-square" aria-hidden="true"></i>';
+      html += '</span>';
+      html += '<a class="subtitle is-6" id="UDESC-' + el.key.trim() + '">' + el.description + '</a>';
+      html += '</li></ul>';
+      html += '<br/><div id="UKEY-' + el.key.trim() + '-children"> </div>';
+      html += '<center><button class="button is-text is-small" id="ADD-CHILD-' + el.key.trim() + '"> Add Child</button><center>';
+      html += '</div>';
+    });
+    return html;
   }
 
   public refreshCategory(category_name: string, category_desc: string): void {
@@ -141,26 +216,6 @@ export class ConfigurationManagerComponent implements OnInit {
         });
   }
 
-  public getSelectedIndex(index, key) {
-    this.selectedChildIndex.push(index);
-    for (let i = 0; i < this.childCategories.length; i++) {
-      if (this.childCategories[i].key === key) {
-        this.childCategories[i].is_selected = !(this.childCategories[i].is_selected);
-      }
-    }
-  }
-
-  public isChildSelected(index) {
-    if (this.selectedChildIndex === [] && index === 0) {
-      return true;
-    }
-    this.selectedChildIndex.forEach(element => {
-      if (element === index) {
-        return true;
-      }
-    });
-  }
-
   /**
   * @param notify
   * To reload categories after adding a new config item for a category
@@ -169,6 +224,14 @@ export class ConfigurationManagerComponent implements OnInit {
     this.selectedRootCategory = categoryData.rootCategory;
     this.getRootCategories();
     this.refreshCategory(categoryData.categoryKey, categoryData.categoryDescription);
+  }
+
+  /**
+  * @param notify
+  * To reload categories after adding a new child category
+  */
+  onAddChild(categoryData) {
+    this.getChildren(categoryData['parentCategory'], false, 'UKEY-' + categoryData['parentCategory'] + '-children');
   }
 
   /**
