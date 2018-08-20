@@ -3,6 +3,7 @@ import { SchedulesService, AlertService, PingService } from '../../../../service
 import { NgProgress } from 'ngx-progressbar';
 import { Router } from '@angular/router';
 import { POLLING_INTERVAL } from '../../../../utils';
+import { AnonymousSubscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Rx';
 
 @Component({
@@ -50,6 +51,10 @@ export class ListTasksComponent implements OnInit, OnDestroy {
    * Get latest tasks
    */
   public getLatestTasks(): void {
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+      this.timerSubscription = null;
+    }
     this.schedulesService.getLatestTask().
       subscribe(
         (data) => {
@@ -75,6 +80,10 @@ export class ListTasksComponent implements OnInit, OnDestroy {
    * Get running tasks
    */
   public getRunningTasks(): void {
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+      this.timerSubscription = null;
+    }
     this.schedulesService.getTasks('RUNNING').
       subscribe(
         (data) => {
