@@ -59,7 +59,7 @@ export class ListTasksComponent implements OnInit, OnDestroy {
       subscribe(
         (data) => {
           this.tasksData = data['tasks'];
-          if (this.refreshInterval !== 0) {
+          if (this.refreshInterval > 0) {
             this.enableRefreshTimer();
           }
         },
@@ -69,7 +69,7 @@ export class ListTasksComponent implements OnInit, OnDestroy {
             console.log('service down ', error);
           } else {
             this.alertService.error(error.statusText);
-            if (this.refreshInterval !== 0) {
+            if (this.refreshInterval > 0) {
               this.enableRefreshTimer();
             }
           }
@@ -88,7 +88,7 @@ export class ListTasksComponent implements OnInit, OnDestroy {
       subscribe(
         (data) => {
           this.tasksData = data['tasks'];
-          if (this.refreshInterval !== 0) {
+          if (this.refreshInterval > 0) {
             this.enableRefreshTimer();
           }
         },
@@ -98,7 +98,7 @@ export class ListTasksComponent implements OnInit, OnDestroy {
             console.log('service down ', error);
           } else {
             this.alertService.error(error.statusText);
-            if (this.refreshInterval !== 0) {
+            if (this.refreshInterval > 0) {
               this.enableRefreshTimer();
             }
           }
