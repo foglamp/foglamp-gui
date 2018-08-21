@@ -102,7 +102,9 @@ export class ListSchedulesComponent implements OnInit {
         (data) => {
           /** request completed */
           this.ngProgress.done();
-          this.scheduleData = data['schedules'];
+          const schedules = data['schedules'];
+          this.scheduleData = schedules.filter(value =>
+            (value['group'].toLowerCase() !== 'north' && value['group'].toLowerCase() !== 'south'));
           this.scheduleData.forEach(element => {
             const repeatTimeObj = Utils.secondsToDhms(element.repeat);
             if (repeatTimeObj.days == 1) {
