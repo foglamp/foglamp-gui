@@ -16,6 +16,7 @@ export class ListTasksComponent implements OnInit, OnDestroy {
   public selectedTaskType = 'Latest'; // Default is LATEST
   public refreshInterval = POLLING_INTERVAL;
   private timerSubscription: AnonymousSubscription;
+  private REQUEST_TIMEOUT_INTERVAL = 5000;
 
   constructor(
     private schedulesService: SchedulesService,
@@ -119,16 +120,15 @@ export class ListTasksComponent implements OnInit, OnDestroy {
           /** request completed */
           this.ngProgress.done();
           if (data['message']) {
-            this.alertService.success(data['message'] + ' Wait for 5 seconds!');
+            this.alertService.success(data['message'] + ' Wait for few seconds.');
             // TODO: remove cancelled task object from local list
             setTimeout(() => {
-              console.log('waiting...', this.selectedTaskType);
               if (this.selectedTaskType === 'Running') {
                 this.getRunningTasks();
               } else {
                 this.getLatestTasks();
               }
-            }, 5000);
+            }, this.REQUEST_TIMEOUT_INTERVAL);
           }
         },
         error => {
