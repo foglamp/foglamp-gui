@@ -8,6 +8,7 @@ const webpackConfig = {
       }
     },
     plugins: [
+        // https://github.com/chartjs/Chart.js/issues/4303
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
         // new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
         new LodashModuleReplacementPlugin()

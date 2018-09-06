@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import map from 'lodash-es/map';
-import * as moment from 'moment';
+import { format } from 'date-fns';
 import { Observable } from 'rxjs/Rx';
 import { AnonymousSubscription } from 'rxjs/Subscription';
 
@@ -202,9 +202,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
           const record = map(data['statistics'], dt.key).reverse();
           let history_ts = map(data['statistics'], 'history_ts');
           history_ts = history_ts.reverse();
-          history_ts.forEach(element => {
-            element = moment(element).format('HH:mm:ss');
-            labels.push(element);
+          history_ts.forEach(ts => {
+            // use pipe util method
+            ts = format(ts, 'HH:mm:ss');
+            labels.push(ts);
           });
           this.graphsToShow = this.graphsToShow.filter(value => value !== undefined);
           this.graphsToShow.map(statistics => {
