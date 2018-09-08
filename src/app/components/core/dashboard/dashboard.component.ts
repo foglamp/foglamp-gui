@@ -202,12 +202,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           let history_ts = map(data['statistics'], 'history_ts');
           history_ts = history_ts.reverse();
           history_ts.forEach(ts => {
-<<<<<<< HEAD
-            // use pipe util method
-            ts = format(ts, 'HH:mm:ss');
-=======
             ts =  this.dateFormatter.transform(ts, 'HH:mm:ss');
->>>>>>> optimize
             labels.push(ts);
           });
           this.graphsToShow = this.graphsToShow.filter(value => value !== undefined);

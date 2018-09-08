@@ -131,12 +131,7 @@ export class BackupRestoreComponent implements OnInit {
     // create a custom anchor tag
     const a = document.createElement('a');
     a.href = url;
-<<<<<<< HEAD
-    // use pipe util method
-    const date = format(backup.date, 'YYYY_MM_DD_HH_mm_ss');
-=======
     const date = this.dateFormatter.transform(backup.date, 'YYYY_MM_DD_HH_mm_ss');
->>>>>>> optimize
     a.download = 'foglamp_backup_' + date + '.tar.gz';
     document.body.appendChild(a);
     a.click();
