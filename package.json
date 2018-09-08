@@ -46,6 +46,7 @@
     "@types/jasminewd2": "~2.0.2",
     "@types/lodash-es": "^4.17.1",
     "@types/node": "~8.0.16",
+    "@types/lodash-es": "~4.17.0",
     "babel-cli": "^7.0.0-beta.3",
     "babel-core": "^7.0.0-bridge.0",
     "babel-loader": "^8.0.2",

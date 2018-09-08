@@ -1,11 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgProgress } from 'ngx-progressbar';
-import { AlertDialogComponent } from '../../common/alert-dialog/alert-dialog.component';
 
-import { BackupRestoreService } from '../../../services/backup-restore.service';
+import { DateFormatterPipe } from '../../../pipes';
 import { AlertService } from '../../../services';
-
-import { format } from 'date-fns';
+import { BackupRestoreService } from '../../../services/backup-restore.service';
+import { AlertDialogComponent } from '../../common/alert-dialog/alert-dialog.component';
 
 @Component({
   selector: 'app-backup-restore',
@@ -27,7 +26,7 @@ export class BackupRestoreComponent implements OnInit {
 
   constructor(private backupRestoreService: BackupRestoreService,
     public ngProgress: NgProgress,
-    private alertService: AlertService) { }
+    private alertService: AlertService, private dateFormatter: DateFormatterPipe) { }
 
   ngOnInit() {
     this.getBackup();
@@ -132,8 +131,12 @@ export class BackupRestoreComponent implements OnInit {
     // create a custom anchor tag
     const a = document.createElement('a');
     a.href = url;
+<<<<<<< HEAD
     // use pipe util method
     const date = format(backup.date, 'YYYY_MM_DD_HH_mm_ss');
+=======
+    const date = this.dateFormatter.transform(backup.date, 'YYYY_MM_DD_HH_mm_ss');
+>>>>>>> optimize
     a.download = 'foglamp_backup_' + date + '.tar.gz';
     document.body.appendChild(a);
     a.click();

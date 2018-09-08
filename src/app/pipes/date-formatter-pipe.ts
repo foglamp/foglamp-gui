@@ -7,7 +7,8 @@ import { format } from 'date-fns';
  * Time helper using date-fns
 */
 @Pipe({name: 'dateparser'})
-export class MomentDatePipe implements PipeTransform { // TODO: rename to DateFormatterPipe
+
+export class DateFormatterPipe implements PipeTransform {
   transform(value: string, formatter: string): string {
       if (value !== '') {
         return format(value, formatter);
