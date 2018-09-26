@@ -58,6 +58,8 @@ See details [here](windows-nginx-deployment-guide.md)
 
 ## Creating and Installing Debian Package
 [Debian packaging and usage](debian-readme.md)
+### Note: 
+Before installing it, please remove previously installed debian package (if any).
 
 ## Running using Docker 
 [Docker installation and using docker-compose](docker-readme.md)
