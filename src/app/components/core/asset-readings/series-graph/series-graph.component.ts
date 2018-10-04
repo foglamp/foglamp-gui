@@ -5,7 +5,7 @@ import { Chart } from 'chart.js';
 
 import { DateFormatterPipe } from '../../../../pipes/date-formatter-pipe';
 import { AlertService, AssetsService, PingService } from '../../../../services';
-import { ASSET_READINGS_TIME_FILTER, COLOR_CODES, MAX_INT_SIZE, POLLING_INTERVAL } from '../../../../utils';
+import { COLOR_CODES, POLLING_INTERVAL } from '../../../../utils';
 import ReadingsValidator from '../assets/readings-validator';
 
 @Component({
@@ -67,7 +67,6 @@ export class SeriesGraphComponent implements OnDestroy {
 
   getTimeSeriesGraph(group) {
     this.optedGroup = group;
-    this.showAssetAverage(this.assetCode);
     this.plotReadingsGraph(this.assetCode);
   }
 
@@ -81,12 +80,10 @@ export class SeriesGraphComponent implements OnDestroy {
     this.assetCode = assetCode;
     if (autoRefresh === false) {
       this.plotReadingsGraph(assetCode);
-      this.showAssetAverage(assetCode);
     }
     interval(this.graphRefreshInterval)
       .takeWhile(() => this.isAlive) // only fires when component is alive
       .subscribe(() => {
-        this.showAssetAverage(this.assetCode);
         this.plotReadingsGraph(this.assetCode);
       });
   }
@@ -154,6 +151,7 @@ export class SeriesGraphComponent implements OnDestroy {
             this.readings = [];
             this.showGraph = false;
           }
+          this.showAssetAverage(assetCode);
         },
         error => {
           console.log('error in response', error);
@@ -191,7 +189,7 @@ export class SeriesGraphComponent implements OnDestroy {
         assetTimeLabels.push(datePipe.transform(timestamp, 'HH:mm:ss'));
       });
     }
-    this.statsAssetReadingsGraph(assetTimeLabels, assetReading);
+    this.statsAssetSeriesGraph(assetTimeLabels, assetReading);
   }
 
   getColorCode(readKey, cnt, fill) {
@@ -217,7 +215,7 @@ export class SeriesGraphComponent implements OnDestroy {
     return cc;
   }
 
-  private statsAssetReadingsGraph(labels, assetReading): void {
+  private statsAssetSeriesGraph(labels, assetReading): void {
     this.readKeyColorLabel = [];
     const ds = [];
     let count = 0;
