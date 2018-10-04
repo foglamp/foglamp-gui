@@ -1,0 +1,47 @@
+<div id="series_graph" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title is-size-5">{{assetCode}}
+      </p>
+      <div class="close">
+        <button class="delete" aria-label="close" (click)="toggleModal(false)"></button>
+      </div>
+    </header>
+    <section class="modal-card-body">
+      <div *ngIf='showGraph' class="columns is-mobile">
+        <div class="column is-two-fifths">
+          <div class="select is-small">
+            <select #selectedTime (change)="getTimeSeriesGraph(selectedTime.value)">
+              <option value="seconds">seconds</option>
+              <option value="minutes">minutes</option>
+              <option value="hours">hours</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <ng-container *ngIf="showGraph">
+        <div class="field is-grouped is-grouped-multiline" *ngFor="let asset of assetReadingSeries">
+          <div class="control">
+            <div class="tags has-addons" *ngFor="let reading of asset.value">
+              <span>
+                <b>{{asset.name}} &nbsp;</b>
+              </span>
+              <span class="tag is-light"> Avg </span>
+              <span class="tag is-info" [ngStyle]="{'background-color': '#85C1E9'}">{{roundTo(reading.average, 5)}}
+              </span> &nbsp;
+              <span class="tag is-light"> Min </span>
+              <span class="tag is-info" [ngStyle]="{'background-color': '#85C1E9'}">{{roundTo(reading.min, 5)}}</span>
+              &nbsp;
+              <span class="tag is-light"> Max </span>
+              <span class="tag is-info" [ngStyle]="{'background-color': '#85C1E9'}">{{roundTo(reading.max, 5)}}</span>
+              &nbsp;
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <p *ngIf='!showGraph'> Not Available </p>
+      <app-chart *ngIf='showGraph' [type]="assetChartType" [data]="assetReadingValues" [options]="assetChartOptions" #assetChart></app-chart>
+    </section>
+  </div>
+</div>
