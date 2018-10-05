@@ -5,7 +5,7 @@ import { Chart } from 'chart.js';
 
 import { DateFormatterPipe } from '../../../../pipes/date-formatter-pipe';
 import { AlertService, AssetsService, PingService } from '../../../../services';
-import { COLOR_CODES, POLLING_INTERVAL } from '../../../../utils';
+import Utils, { POLLING_INTERVAL } from '../../../../utils';
 import ReadingsValidator from '../assets/readings-validator';
 
 @Component({
@@ -136,8 +136,6 @@ export class SeriesGraphComponent implements OnDestroy {
     this.assetService.getAssetReadings(encodeURIComponent(assetCode)).
       subscribe(
         (data: any[]) => {
-          console.log('assetCode', assetCode);
-          console.log('data1', data);
           if (data.length === 0) {
             this.readings = [];
             this.getAssetTimeReading(data);
@@ -192,23 +190,8 @@ export class SeriesGraphComponent implements OnDestroy {
     this.statsAssetSeriesGraph(assetTimeLabels, assetReading);
   }
 
-  getColorCode(readKey, cnt, fill) {
-    let cc = '';
-    if (!['RED', 'GREEN', 'BLUE', 'R', 'G', 'B'].includes(readKey.toUpperCase())) {
-      if (cnt >= 16) { // 15 is length of Utils' colorCodes array
-        cc = '#ad7ebf';
-      } else {
-        cc = COLOR_CODES[cnt];
-      }
-    }
-    if (readKey.toUpperCase() === 'RED' || readKey.toUpperCase() === 'R') {
-      cc = '#FF334C';
-    } else if (readKey.toUpperCase() === 'BLUE' || readKey.toUpperCase() === 'B') {
-      cc = '#339FFF';
-    } else if (readKey.toUpperCase() === 'GREEN' || readKey.toUpperCase() === 'G') {
-      cc = '#008000';
-    }
-
+  getColor(readKey, cnt, fill) {
+    const cc = Utils.getColorCode(readKey, cnt);
     if (fill) {
       this.readKeyColorLabel.push({ [readKey]: cc });
     }
@@ -227,8 +210,8 @@ export class SeriesGraphComponent implements OnDestroy {
         lineTension: 0.1,
         spanGaps: true,
         hidden: this.getLegendState(element.key),
-        backgroundColor: this.getColorCode(element.key.trim(), count, true),
-        borderColor: this.getColorCode(element.key, count, false)
+        backgroundColor: this.getColor(element.key.trim(), count, true),
+        borderColor: this.getColor(element.key, count, false)
       };
       count++;
       ds.push(dt);

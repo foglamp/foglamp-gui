@@ -20,26 +20,6 @@
           </div>
         </div>
       </div>
-      <ng-container *ngIf="showGraph">
-        <div class="field is-grouped is-grouped-multiline" *ngFor="let asset of assetReadingSeries">
-          <div class="control">
-            <div class="tags has-addons" *ngFor="let reading of asset.value">
-              <span>
-                <b>{{asset.name}} &nbsp;</b>
-              </span>
-              <span class="tag is-light"> Avg </span>
-              <span class="tag is-info" [ngStyle]="{'background-color': '#85C1E9'}">{{roundTo(reading.average, 5)}}
-              </span> &nbsp;
-              <span class="tag is-light"> Min </span>
-              <span class="tag is-info" [ngStyle]="{'background-color': '#85C1E9'}">{{roundTo(reading.min, 5)}}</span>
-              &nbsp;
-              <span class="tag is-light"> Max </span>
-              <span class="tag is-info" [ngStyle]="{'background-color': '#85C1E9'}">{{roundTo(reading.max, 5)}}</span>
-              &nbsp;
-            </div>
-          </div>
-        </div>
-      </ng-container>
       <p *ngIf='!showGraph'> Not Available </p>
       <app-chart *ngIf='showGraph' [type]="assetChartType" [data]="assetReadingValues" [options]="assetChartOptions" #assetChart></app-chart>
     </section>

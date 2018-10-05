@@ -80,6 +80,25 @@ export default class Utils {
     return totalSec < 0 || totalSec >= 86400;
   }
 
+  public static getColorCode(readKey, cnt) {
+    let cc = '';
+    if (!['RED', 'GREEN', 'BLUE', 'R', 'G', 'B'].includes(readKey.toUpperCase())) {
+      if (cnt >= 16) { // 15 is length of Utils' colorCodes array
+        cc = '#ad7ebf';
+      } else {
+        cc = COLOR_CODES[cnt];
+      }
+    }
+    if (readKey.toUpperCase() === 'RED' || readKey.toUpperCase() === 'R') {
+      cc = '#FF334C';
+    } else if (readKey.toUpperCase() === 'BLUE' || readKey.toUpperCase() === 'B') {
+      cc = '#339FFF';
+    } else if (readKey.toUpperCase() === 'GREEN' || readKey.toUpperCase() === 'G') {
+      cc = '#008000';
+    }
+    return cc;
+  }
+
   public static getCurrentDate() {
     return Date.now();
   }
