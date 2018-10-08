@@ -64,9 +64,10 @@ export class AssetsService {
       catchError((error: Response) => observableThrowError(error)));
   }
 
-  public getAssetAverage(assetCode: string, reading: string, group) {
+  public getAssetAverage(assetCode: string, reading: string, group, time) {
     let params = new HttpParams();
     params = params.append('group', group);
+    params = params.append(group, time);
     return this.http.get(this.GET_ASSET + '/' + encodeURIComponent(assetCode) + '/' + reading + '/series',
     { params: params }).pipe(
       map(response => response),

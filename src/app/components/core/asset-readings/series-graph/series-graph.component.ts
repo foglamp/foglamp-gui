@@ -24,6 +24,7 @@ export class SeriesGraphComponent implements OnDestroy {
   public assetReadingSummary = [];
   public graphRefreshInterval = POLLING_INTERVAL;
   public optedGroup = 'seconds';
+  public timeValue = 0;
   public readKeyColorLabel = [];
 
   private isAlive: boolean;
@@ -65,8 +66,13 @@ export class SeriesGraphComponent implements OnDestroy {
     sessionStorage.removeItem(this.assetCode);
   }
 
-  getTimeSeriesGraph(group) {
+  setGroup(group) {
     this.optedGroup = group;
+    this.plotReadingsGraph(this.assetCode);
+  }
+
+  setTimeValue(time) {
+    this.timeValue = time;
     this.plotReadingsGraph(this.assetCode);
   }
 
@@ -116,7 +122,7 @@ export class SeriesGraphComponent implements OnDestroy {
   }
 
   public getAssetAverage(assetCode, reading) {
-    this.assetService.getAssetAverage(assetCode, reading, this.optedGroup).subscribe(
+    this.assetService.getAssetAverage(assetCode, reading, this.optedGroup, this.timeValue).subscribe(
       (data: any) => {
         this.assetReadingSeries = data;
       },
