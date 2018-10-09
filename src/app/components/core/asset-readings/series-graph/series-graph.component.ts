@@ -21,8 +21,8 @@ export class SeriesGraphComponent implements OnDestroy {
   public showGraph = true;
   public readings: any;
   public assetReadingSeries = [];
-  public assetReadingSummary = [];
   public graphRefreshInterval = POLLING_INTERVAL;
+  public readingKey = '';
   public optedGroup = 'seconds';
   public timeValue = 0;
   public readKeyColorLabel = [];
@@ -62,18 +62,26 @@ export class SeriesGraphComponent implements OnDestroy {
     this.isAlive = false;
     // reset showGraph variable to default state
     this.showGraph = true;
+    this.readingKey = '';
+    this.optedGroup = 'seconds';
+    this.timeValue = 0;
     series_graph.classList.remove('is-active');
     sessionStorage.removeItem(this.assetCode);
   }
 
+  setReading(reading) {
+    this.readingKey = reading;
+    this.plotSeriesGraph();
+  }
+
   setGroup(group) {
     this.optedGroup = group;
-    this.plotReadingsGraph(this.assetCode);
+    this.plotSeriesGraph();
   }
 
   setTimeValue(time) {
     this.timeValue = time;
-    this.plotReadingsGraph(this.assetCode);
+    this.plotSeriesGraph();
   }
 
   public getSeriesGraph(assetCode, autoRefresh = true) {
@@ -85,26 +93,24 @@ export class SeriesGraphComponent implements OnDestroy {
     }
     this.assetCode = assetCode;
     if (autoRefresh === false) {
-      this.plotReadingsGraph(assetCode);
+      this.getAssetReadings(this.assetCode);
     }
     interval(this.graphRefreshInterval)
       .takeWhile(() => this.isAlive) // only fires when component is alive
       .subscribe(() => {
-        this.plotReadingsGraph(this.assetCode);
+        this.getAssetReadings(this.assetCode);
       });
   }
 
-  public getAssetReadingsSummary(assetCode) {
-    this.assetService.getAllAssetSummary(assetCode).subscribe(
-      (data: any) => {
-        this.assetReadingSummary = data.map(o => {
-          const k = Object.keys(o)[0];
-          return {
-            name: k,
-            value: [o[k]]
-          };
-        });
-        this.assetReadingSummary = orderBy(this.assetReadingSummary, ['name'], ['asc']);
+  public getAssetReadings(assetCode) {
+    this.assetService.getAssetReadings(encodeURIComponent(assetCode)).subscribe(
+      (data: any[]) => {
+        if (data.length === 0) {
+          this.readings = [];
+          return false;
+        }
+        this.readings = Object.keys(data[0].reading);
+        this.plotSeriesGraph();
       },
       error => {
         if (error.status === 0) {
@@ -115,54 +121,44 @@ export class SeriesGraphComponent implements OnDestroy {
       });
   }
 
-  public showAssetAverage(assetCode, ) {
-      this.readings.forEach(element => {
-        this.getAssetAverage(assetCode, element);
-      });
-  }
-
-  public getAssetAverage(assetCode, reading) {
-    this.assetService.getAssetAverage(assetCode, reading, this.optedGroup, this.timeValue).subscribe(
-      (data: any) => {
-        this.assetReadingSeries = data;
-      },
-      error => {
-        if (error.status === 0) {
-          console.log('service down ', error);
-        } else {
-          this.alertService.error(error.statusText);
-        }
-      });
-  }
-
-  public plotReadingsGraph(assetCode) {
-    if (assetCode === '') {
+  public plotSeriesGraph() {
+    if (this.assetCode === '' || this.readings === '') {
       return false;
     }
-    this.assetService.getAssetReadings(encodeURIComponent(assetCode)).
+    if (this.readingKey === '') {
+      this.readingKey = this.readings[0];
+    }
+    this.assetService.getAssetAverage(this.assetCode, this.readingKey, this.optedGroup, this.timeValue).
       subscribe(
         (data: any[]) => {
           if (data.length === 0) {
-            this.readings = [];
-            this.getAssetTimeReading(data);
+            this.getAssetTimeSeries(data);
             return false;
+          }
+          for (const e in data) {
+            data[e].reading = {
+              'average': data[e].average,
+              'min': data[e].min,
+              'max': data[e].max
+            };
           }
           const validRecord = ReadingsValidator.validate(data);
           if (validRecord) {
-            this.readings = Object.keys(data[0].reading);
-            this.getAssetTimeReading(data);
+            this.getAssetTimeSeries(data);
           } else {
-            this.readings = [];
             this.showGraph = false;
           }
-          this.showAssetAverage(assetCode);
         },
         error => {
-          console.log('error in response', error);
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
         });
   }
 
-  public getAssetTimeReading(assetChartRecord) {
+  public getAssetTimeSeries(assetChartRecord) {
     let assetTimeLabels = [];
     const datePipe = new DateFormatterPipe();
     let assetReading = [];
