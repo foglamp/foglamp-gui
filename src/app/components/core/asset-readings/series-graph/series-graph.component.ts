@@ -23,8 +23,8 @@ export class SeriesGraphComponent implements OnDestroy {
   public assetReadingSeries = [];
   public graphRefreshInterval = POLLING_INTERVAL;
   public readingKey = '';
-  public optedGroup = 'seconds';
-  public timeValue = 0;
+  public optedGroup = 'minutes';
+  public timeValue = 10;
   public readKeyColorLabel = [];
 
   private isAlive: boolean;
@@ -63,8 +63,8 @@ export class SeriesGraphComponent implements OnDestroy {
     // reset showGraph variable to default state
     this.showGraph = true;
     this.readingKey = '';
-    this.optedGroup = 'seconds';
-    this.timeValue = 0;
+    this.optedGroup = 'minutes';
+    this.timeValue = 10;
     series_graph.classList.remove('is-active');
     sessionStorage.removeItem(this.assetCode);
   }
@@ -184,7 +184,7 @@ export class SeriesGraphComponent implements OnDestroy {
           }
         }
       });
-      const timestamps = assetChartRecord.reverse().map(t => t.timestamp);
+      const timestamps = assetChartRecord.map(t => t.timestamp);
       timestamps.forEach(timestamp => {
         assetTimeLabels.push(datePipe.transform(timestamp, 'HH:mm:ss'));
       });

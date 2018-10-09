@@ -10,26 +10,27 @@
     </header>
     <section class="modal-card-body">
       <div *ngIf='showGraph' class="columns is-mobile">
-        <div class="column">
+        <div class="field">
           <div *ngIf='readings' class="select is-small">
             <select #selectedKey (change)="setReading(selectedKey.value)">
               <option *ngFor="let reading of readings" [value]='reading'>{{reading}}</option>
             </select>
           </div>
-        </div>
-        <div class="column">
-          <div class="field has-addons">
-            <p class="control">
-              <app-number-input-debounce placeholder="time" (value)="setTimeValue($event)" [val]="timeValue"></app-number-input-debounce>
-            </p>
-            <div class="select is-small">
+        </div>&nbsp;&nbsp;&nbsp;
+        <div class="field has-addons">
+          <p class="control">
+            <app-number-input-debounce placeholder="time" (value)="setTimeValue($event)" [val]="timeValue"></app-number-input-debounce>
+          </p>
+          <p class="control">
+            <span class="select is-small">
               <select #selectedTime (change)="setGroup(selectedTime.value)">
-                <option value="seconds">seconds</option>
-                <option value="minutes">minutes</option>
+                <option value="minutes" [selected]>minutes</option>
                 <option value="hours">hours</option>
+                <option value="seconds">seconds</option>
               </select>
-            </div>
-          </div>
+            </span>
+          </p>
+
         </div>
       </div>
       <p *ngIf='!showGraph'> Not Available </p>
