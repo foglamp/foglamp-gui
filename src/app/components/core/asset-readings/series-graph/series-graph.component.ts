@@ -77,6 +77,7 @@ export class SeriesGraphComponent implements OnDestroy {
     this.readingKey = '';
     this.optedGroup = 'minutes';
     this.timeValue = 10;
+    this.isOutOfRange = false;
     series_graph.classList.remove('is-active');
     sessionStorage.removeItem(this.assetCode);
   }
@@ -92,12 +93,13 @@ export class SeriesGraphComponent implements OnDestroy {
   }
 
   setTimeValue(time) {
-    if (time === null) {
+    if (time === null || time === undefined) {
       time = 10;
     }
     this.isOutOfRange = false;
     if (time > this.MAX_RANGE) {
       this.isOutOfRange = true;
+      this.timeValue = 10;
       return;
     }
     this.timeValue = time;
