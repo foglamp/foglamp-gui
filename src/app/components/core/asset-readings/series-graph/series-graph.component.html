@@ -19,7 +19,7 @@
         <div class="field">
           <div *ngIf='readings' class="select is-small">
             <select #selectedKey (change)="setReading(selectedKey.value)">
-              <option *ngFor="let reading of readings" [value]='reading'>{{reading}}</option>
+              <option *ngFor="let reading of readings" [value]='reading' [selected]="readingKey == reading">{{reading}}</option>
             </select>
           </div>
         </div>&nbsp;&nbsp;&nbsp;
@@ -30,15 +30,15 @@
           <p class="control">
             <span class="select is-small">
               <select #selectedTime (change)="setGroup(selectedTime.value)">
-                <option value="minutes" [selected]>minutes</option>
-                <option value="hours">hours</option>
-                <option value="seconds">seconds</option>
+                <option value="minutes" [selected]="optedGroup == 'minutes'">minutes</option>
+                <option value="hours" [selected]="optedGroup == 'hours'">hours</option>
+                <option value="seconds" [selected]="optedGroup == 'seconds'">seconds</option>
               </select>
             </span>
           </p>
-
-        </div>
+        </div>  
       </div>
+      <p *ngIf='isOutOfRange' class='help is-danger'>Time must be in range 1 - {{MAX_RANGE}}</p>
       <p *ngIf='!showGraph'> Not Available </p>
       <app-chart *ngIf='showGraph' [type]="assetChartType" [data]="assetReadingValues" [options]="assetChartOptions"
         #assetChart></app-chart>

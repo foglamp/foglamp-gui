@@ -68,7 +68,7 @@ export class AssetsService {
     let params = new HttpParams();
     params = params.append('group', group);
     params = params.append(group, time);
-    return this.http.get(this.GET_ASSET + '/' + encodeURIComponent(assetCode) + '/' + reading + '/series',
+    return this.http.get(this.GET_ASSET + '/' + encodeURIComponent(assetCode) + '/' + encodeURIComponent(reading) + '/series',
     { params: params }).pipe(
       map(response => response),
       catchError((error: Response) => observableThrowError(error)));

@@ -6,6 +6,7 @@ import { DateFormatterPipe } from '../../../../pipes/date-formatter-pipe';
 import { AlertService, AssetsService, PingService } from '../../../../services';
 import Utils, { POLLING_INTERVAL } from '../../../../utils';
 import ReadingsValidator from '../assets/readings-validator';
+import { MAX_INT_SIZE } from '../../../../utils';
 
 @Component({
   selector: 'app-series-graph',
@@ -26,6 +27,8 @@ export class SeriesGraphComponent implements OnDestroy {
   public timeValue = 10;
   public readKeyColorLabel = [];
   public showSpinner = false;
+  public MAX_RANGE = MAX_INT_SIZE;
+  public isOutOfRange = false;
 
   private isAlive: boolean;
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
@@ -92,6 +95,11 @@ export class SeriesGraphComponent implements OnDestroy {
     if (time === null) {
       time = 10;
     }
+    this.isOutOfRange = false;
+    if (time > this.MAX_RANGE) {
+      this.isOutOfRange = true;
+      return;
+    }
     this.timeValue = time;
     this.plotSeriesGraph();
   }
@@ -110,7 +118,8 @@ export class SeriesGraphComponent implements OnDestroy {
     interval(this.graphRefreshInterval)
       .takeWhile(() => this.isAlive) // only fires when component is alive
       .subscribe(() => {
-        this.getAssetReadings(this.assetCode);
+        // this.getAssetReadings(this.assetCode);
+        this.plotSeriesGraph();
       });
   }
 
