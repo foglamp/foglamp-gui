@@ -1,5 +1,4 @@
 import { Component, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
-import { orderBy } from 'lodash';
 import { interval } from 'rxjs';
 import { Chart } from 'chart.js';
 
@@ -26,6 +25,7 @@ export class SeriesGraphComponent implements OnDestroy {
   public optedGroup = 'minutes';
   public timeValue = 10;
   public readKeyColorLabel = [];
+  public showSpinner = false;
 
   private isAlive: boolean;
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
@@ -33,6 +33,7 @@ export class SeriesGraphComponent implements OnDestroy {
 
   constructor(private assetService: AssetsService, private alertService: AlertService,
     private ping: PingService) {
+    this.showLoadingSpinner();
     this.assetChartType = 'line';
     this.assetReadingValues = [];
     this.ping.pingIntervalChanged.subscribe((timeInterval: number) => {
@@ -46,6 +47,14 @@ export class SeriesGraphComponent implements OnDestroy {
   public roundTo(num, to) {
     const _to = Math.pow(10, to);
     return Math.round(num * _to) / _to;
+  }
+
+  public showLoadingSpinner() {
+    this.showSpinner = true;
+  }
+
+  public hideLoadingSpinner() {
+    this.showSpinner = false;
   }
 
   public toggleModal(shouldOpen: Boolean) {
@@ -80,6 +89,9 @@ export class SeriesGraphComponent implements OnDestroy {
   }
 
   setTimeValue(time) {
+    if (time === null) {
+      time = 10;
+    }
     this.timeValue = time;
     this.plotSeriesGraph();
   }
@@ -111,8 +123,10 @@ export class SeriesGraphComponent implements OnDestroy {
         }
         this.readings = Object.keys(data[0].reading);
         this.plotSeriesGraph();
+        this.hideLoadingSpinner();
       },
       error => {
+        this.hideLoadingSpinner();
         if (error.status === 0) {
           console.log('service down ', error);
         } else {

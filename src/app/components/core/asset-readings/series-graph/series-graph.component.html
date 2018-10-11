@@ -9,7 +9,13 @@
       </div>
     </header>
     <section class="modal-card-body">
-      <div *ngIf='showGraph' class="columns is-mobile">
+      <div *ngIf="showSpinner" class="app-loading">
+        &nbsp;
+        <svg class="spinner" viewBox="0 0 100 100">
+          <circle class="path" cx="50%" cy="50%" r="10" fill="none" stroke-width="2" stroke-miterlimit="10" />
+        </svg>
+      </div>
+      <div *ngIf='!showSpinner && showGraph' class="columns is-mobile">
         <div class="field">
           <div *ngIf='readings' class="select is-small">
             <select #selectedKey (change)="setReading(selectedKey.value)">
