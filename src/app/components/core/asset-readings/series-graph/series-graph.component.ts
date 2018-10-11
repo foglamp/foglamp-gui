@@ -118,7 +118,6 @@ export class SeriesGraphComponent implements OnDestroy {
     interval(this.graphRefreshInterval)
       .takeWhile(() => this.isAlive) // only fires when component is alive
       .subscribe(() => {
-        // this.getAssetReadings(this.assetCode);
         this.plotSeriesGraph();
       });
   }
