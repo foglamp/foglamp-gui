@@ -125,6 +125,7 @@ export class SeriesGraphComponent implements OnDestroy {
   }
 
   public getAssetReadings(assetCode) {
+    this.showLoadingSpinner();
     this.assetService.getAssetReadings(encodeURIComponent(assetCode)).subscribe(
       (data: any[]) => {
         if (data.length === 0) {
@@ -136,7 +137,7 @@ export class SeriesGraphComponent implements OnDestroy {
         this.hideLoadingSpinner();
       },
       error => {
-        this.hideLoadingSpinner();
+        this.showLoadingSpinner();
         if (error.status === 0) {
           console.log('service down ', error);
         } else {
