@@ -169,6 +169,7 @@ export class SeriesGraphComponent implements OnDestroy {
           }
           const validRecord = ReadingsValidator.validate(data);
           if (validRecord) {
+            this.showGraph = true;
             this.getAssetTimeSeries(data);
           } else {
             this.showGraph = false;
