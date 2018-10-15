@@ -89,8 +89,21 @@ export class ViewConfigItemComponent implements OnInit, OnChanges {
       };
       formData.push(d);
     }
+    this.configItems.forEach(c => {
+      if (c.type === 'script') {
+        const key = c.key;
+        formData.forEach(fd => {
+          if (fd.key === key) {
+            const fi = this.fileInput.nativeElement;
+            if (fi.files && fi.files[0]) {
+              const fileToUpload = fi.files[0];
+              fd.value = fileToUpload;
+            }
+          }
+        });
+      }
+    });
     const diff = this.difference(formData, this.configItems);
-
     // condition to check if called from add service wizard
     if (this.isWizardCall) {
       this.onConfigChanged.emit(diff);
@@ -102,112 +115,88 @@ export class ViewConfigItemComponent implements OnInit, OnChanges {
   }
 
   public saveConfigValue(categoryName: string, configItem: string, value: string, type: string) {
-    /** request started */
-    this.ngProgress.start();
-    this.configService.saveConfigItem(categoryName, configItem, value.toString(), type).
-      subscribe(
-        (data: any) => {
-          // fill configItems with changed data
-          this.configItems.map(item => item.key === configItem ? item.value = data.value.toString() : item.value);
-          /** request completed */
-          this.ngProgress.done();
-          this.alertService.success('Configuration updated successfully.');
-        },
-        error => {
-          /** request completed */
-          this.ngProgress.done();
-          if (error.status === 0) {
-            console.log('service down ', error);
-          } else {
-            this.alertService.error(error.statusText);
-          }
-        });
-  }
+  /** request started */
+  this.ngProgress.start();
+  this.configService.saveConfigItem(categoryName, configItem, value.toString(), type).
+    subscribe(
+      (data: any) => {
+        // fill configItems with changed data
+        this.configItems.map(item => item.key === configItem ? item.value = data.value.toString() : item.value);
+        /** request completed */
+        this.ngProgress.done();
+        this.alertService.success('Configuration updated successfully.');
+      },
+      error => {
+        /** request completed */
+        this.ngProgress.done();
+        if (error.status === 0) {
+          console.log('service down ', error);
+        } else {
+          this.alertService.error(error.statusText);
+        }
+      });
+}
 
   public getConfigAttributeType(key) {
-    return ConfigTypeValidation.getValueType(key);
-  }
+  return ConfigTypeValidation.getValueType(key);
+}
 
   /**
    * Method to set ngModal value
    * @param configVal Config value to pass in ngModel
    */
   public setConfigValue(configVal) {
-    if (configVal.value !== undefined && configVal.value !== '') {
-      return configVal.value;
-    } else {
-      return configVal.default;
-    }
+  if (configVal.value !== undefined && configVal.value !== '') {
+    return configVal.value;
+  } else {
+    return configVal.default;
   }
+}
 
   /**
    * Method to set isWizardCall = true if called from
    * add south or north wizard.
    */
   public callFromWizard() {
-    this.isWizardCall = true;
-  }
-
-  public uploadScript(configItem) {
-    const fi = this.fileInput.nativeElement;
-    if (fi.files && fi.files[0]) {
-      const fileToUpload = fi.files[0];
-      const formData = new FormData();
-      formData.append('script', fileToUpload);
-      this.ngProgress.start();
-      this.configService.uploadFile(this.categoryConfiguration.key, configItem, formData)
-        .subscribe(() => {
-          this.ngProgress.done();
-          this.alertService.success('File uploaded Successfully');
-          this.getConfigItem(configItem);
-        },
-          error => {
-            this.ngProgress.done();
-            if (error.status === 0) {
-              console.log('service down ', error);
-            } else {
-              this.alertService.error(error.statusText);
-            }
-          });
-    }
-  }
+  this.isWizardCall = true;
+}
 
   public getConfigItem(configItem) {
-    this.configService.getConfigItem(this.categoryConfiguration.key, configItem)
-      .subscribe(data => {
-        this.categoryConfiguration.value.forEach(item => {
-          if (item.key === configItem) {
-            item.value = data['value'];
-            item.description = data['description'];
-            item.key = configItem;
-          }
-        });
-      },
-        error => {
-          if (error.status === 0) {
-            console.log('service down ', error);
-          } else {
-            this.alertService.error(error.statusText);
-          }
-        });
-  }
+  this.configService.getConfigItem(this.categoryConfiguration.key, configItem)
+    .subscribe(data => {
+      this.categoryConfiguration.value.forEach(item => {
+        if (item.key === configItem) {
+          item.value = data['value'];
+          item.description = data['description'];
+          item.key = configItem;
+        }
+      });
+    },
+      error => {
+        if (error.status === 0) {
+          console.log('service down ', error);
+        } else {
+          this.alertService.error(error.statusText);
+        }
+      });
+}
   /**
    * Check if object has a specific key
    * @param o Object
    * @param name key name
    */
   public hasProperty(o, name) {
-    return o.hasOwnProperty(name);
-  }
+  return o.hasOwnProperty(name);
+}
 
   /**
    * display config item name on gui
    * @param configItem config item object
    */
   public setDisplayName(configItem) {
-    if (this.hasProperty(configItem, 'displayName')) {
-      return configItem.displayName.trim().length > 0 ? configItem.displayName : configItem.key;
-    }
-    return configItem.key;
+  if (this.hasProperty(configItem, 'displayName')) {
+    return configItem.displayName.trim().length > 0 ? configItem.displayName : configItem.key;
   }
+  return configItem.key;
+}
 }
