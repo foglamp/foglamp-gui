@@ -21,7 +21,7 @@ export class AddServiceWizardComponent implements OnInit {
   public isSinglePlugin = true;
   public isValidName = true;
   public serviceType = 'South';
-  public isScheduleEnabled: any;
+  public isScheduleEnabled = 'true';
   public formData = new FormData();
   public schedulesName = [];
 
@@ -42,7 +42,6 @@ export class AddServiceWizardComponent implements OnInit {
 
   ngOnInit() {
     this.getSchedules();
-    this.isScheduleEnabled = true;
     this.serviceForm = this.formBuilder.group({
       name: ['', Validators.required],
       plugin: ['', Validators.required]
@@ -130,7 +129,6 @@ export class AddServiceWizardComponent implements OnInit {
           this.formData.append('name', formValues['name']);
           this.formData.append('type', this.serviceType);
           this.formData.append('plugin', formValues['plugin'][0]);
-          this.formData.append('enabled', this.isScheduleEnabled);
         }
         this.getConfiguration();
         break;
@@ -216,12 +214,17 @@ export class AddServiceWizardComponent implements OnInit {
 
     // final array to hold changed configuration
     let finalConfig = [];
+    if (this.formData.get('config')) {
+      this.formData.delete('config');
+    }
     matchedConfigCopy.forEach(item => {
+      let itemValue = item.value;
       if (item.type.toUpperCase() === 'SCRIPT') {
         this.formData.append(item.key, item.value);
+        itemValue = '';
       }
       finalConfig.push({
-        [item.key]: item.type === 'JSON' ? { value: JSON.parse(item.value), type: item.type } : { value: item.value, type: item.type }
+        [item.key]: item.type === 'JSON' ? { value: JSON.parse(item.value), type: item.type } : { value: itemValue, type: item.type }
       });
     });
 
@@ -286,9 +289,9 @@ export class AddServiceWizardComponent implements OnInit {
 
   onCheckboxClicked(event) {
     if (event.target.checked) {
-      this.isScheduleEnabled = true;
+      this.isScheduleEnabled = 'true';
     } else {
-      this.isScheduleEnabled = false;
+      this.isScheduleEnabled = 'false';
     }
     this.formData.append('enabled', this.isScheduleEnabled);
   }

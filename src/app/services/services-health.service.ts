@@ -57,10 +57,10 @@ export class ServicesHealthService {
   }
 
   /**
-  *  POST  | /foglamp/service
+  *  POST  | /foglamp/service/filter
   */
   addService(payload) {
-    return this.http.post(this.GET_SERVICES_URL, payload).pipe(
+    return this.http.post(this.GET_SERVICES_URL + '/filter', payload).pipe(
       map(response => response),
       catchError((error: Response) => observableThrowError(error)));
   }
