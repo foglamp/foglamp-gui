@@ -21,8 +21,8 @@ export class AddServiceWizardComponent implements OnInit {
   public isSinglePlugin = true;
   public isValidName = true;
   public serviceType = 'South';
-  public isScheduleEnabled = true;
-  public payload: any;
+  public isScheduleEnabled = 'true';
+  public formData = new FormData();
   public schedulesName = [];
 
   serviceForm = new FormGroup({
@@ -124,14 +124,11 @@ export class AddServiceWizardComponent implements OnInit {
           return false;
         }
 
-        // create payload to pass in add service
+        // create formData to pass in add service
         if (formValues['name'].trim() !== '' && formValues['plugin'].length > 0) {
-          this.payload = {
-            name: formValues['name'],
-            type: this.serviceType,
-            plugin: formValues['plugin'][0],
-            enabled: this.isScheduleEnabled
-          };
+          this.formData.append('name', formValues['name']);
+          this.formData.append('type', this.serviceType);
+          this.formData.append('plugin', formValues['plugin'][0]);
         }
         this.getConfiguration();
         break;
@@ -145,7 +142,7 @@ export class AddServiceWizardComponent implements OnInit {
         previousButton.textContent = 'Previous';
         break;
       case 3:
-        this.addService(this.payload);
+        this.addService(this.formData);
         break;
       default:
         break;
@@ -179,7 +176,7 @@ export class AddServiceWizardComponent implements OnInit {
    */
   private getConfiguration(): void {
     const config = this.plugins.map(p => {
-      if (p.name === this.payload.plugin) {
+      if (p.name === this.formData.get('plugin')) {
         return p.config;
       }
     }).filter(value => value !== undefined);
@@ -201,7 +198,7 @@ export class AddServiceWizardComponent implements OnInit {
       });
     });
 
-    // make a deep clone copy of matchedConfig array to remove extra keys(not required in payload)
+    // make a deep clone copy of matchedConfig array to remove extra keys(not required in formData)
     const matchedConfigCopy = cloneDeep(matchedConfig);
     /**
      * merge new configuration with old configuration,
@@ -210,34 +207,42 @@ export class AddServiceWizardComponent implements OnInit {
     matchedConfigCopy.forEach(e => {
       changedConfig.forEach(c => {
         if (e.key === c.key) {
-          e.value = c.value.toString();
+          e.value = (c.type.toUpperCase() === 'SCRIPT') ? c.value : c.value.toString();
         }
       });
     });
 
     // final array to hold changed configuration
     let finalConfig = [];
+    if (this.formData.get('config')) {
+      this.formData.delete('config');
+    }
     matchedConfigCopy.forEach(item => {
+      let itemValue = item.value;
+      if (item.type.toUpperCase() === 'SCRIPT') {
+        this.formData.append(item.key, item.value);
+        itemValue = '';
+      }
       finalConfig.push({
-        [item.key]: item.type === 'JSON' ? { value: JSON.parse(item.value) } : { value: item.value }
+        [item.key]: item.type === 'JSON' ? { value: JSON.parse(item.value), type: item.type } : { value: itemValue, type: item.type }
       });
     });
 
     // convert finalConfig array in object of objects to pass in add service
     finalConfig = reduce(finalConfig, function (memo, current) { return assign(memo, current); }, {});
-    this.payload.config = finalConfig;
+    this.formData.append('config', JSON.stringify(finalConfig));
   }
 
   /**
    * Method to add service
-   * @param payload  to pass in request
+   * @param formData  to pass in request
    * @param nxtButton button to go next
    * @param previousButton button to go previous
    */
-  public addService(payload) {
+  public addService(formData) {
     /** request started */
     this.ngProgress.start();
-    this.servicesHealthService.addService(payload)
+    this.servicesHealthService.addService(formData)
       .subscribe(
         () => {
           /** request done */
@@ -284,11 +289,11 @@ export class AddServiceWizardComponent implements OnInit {
 
   onCheckboxClicked(event) {
     if (event.target.checked) {
-      this.isScheduleEnabled = true;
+      this.isScheduleEnabled = 'true';
     } else {
-      this.isScheduleEnabled = false;
+      this.isScheduleEnabled = 'false';
     }
-    this.payload.enabled = this.isScheduleEnabled;
+    this.formData.append('enabled', this.isScheduleEnabled);
   }
 
   public getSchedules(): void {
