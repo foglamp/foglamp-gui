@@ -38,6 +38,11 @@
         <div class="column">
           <div class="field has-addons">
             <p class="control">
+              <a class="button is-small is-static">
+                Group By
+              </a>
+            </p>
+            <p class="control">
               <span class="select is-small">
                 <select #selectedTime (change)="setGroup(selectedTime.value)">
                   <option value="minutes" [selected]="optedGroup == 'minutes'">minutes</option>
@@ -45,11 +50,6 @@
                   <option value="seconds" [selected]="optedGroup == 'seconds'">seconds</option>
                 </select>
               </span>
-            </p>
-            <p class="control">
-              <a class="button is-small is-static">
-                Group By
-              </a>
             </p>
           </div>
         </div>
