@@ -25,6 +25,7 @@ export class SeriesGraphComponent implements OnDestroy {
   public readingKey = '';
   public optedGroup = 'minutes';
   public timeValue = 10;
+  public timeUnit = 'minutes';
   public readKeyColorLabel = [];
   public showSpinner = false;
   public MAX_RANGE = MAX_INT_SIZE;
@@ -92,6 +93,11 @@ export class SeriesGraphComponent implements OnDestroy {
     this.plotSeriesGraph();
   }
 
+  setTimeUnit(timeUnit) {
+    this.timeUnit = timeUnit;
+    this.plotSeriesGraph();
+  }
+
   setTimeValue(time) {
     if (time === null || time === undefined) {
       time = 10;
@@ -153,7 +159,7 @@ export class SeriesGraphComponent implements OnDestroy {
     if (this.readingKey === '') {
       this.readingKey = this.readings[0];
     }
-    this.assetService.getAssetAverage(this.assetCode, this.readingKey, this.optedGroup, this.timeValue).
+    this.assetService.getAssetAverage(this.assetCode, this.readingKey, this.optedGroup, this.timeValue, this.timeUnit).
       subscribe(
         (data: any[]) => {
           if (data.length === 0) {

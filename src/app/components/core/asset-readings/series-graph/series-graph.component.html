@@ -9,27 +9,49 @@
       </div>
     </header>
     <section class="modal-card-body">
-      <div class="columns is-mobile">
-        <div class="field">
-          <div *ngIf='readings' class="select is-small">
-            <select #selectedKey (change)="setReading(selectedKey.value)">
-              <option *ngFor="let reading of readings" [value]='reading' [selected]="readingKey == reading">{{reading}}</option>
-            </select>
-          </div>
-        </div>&nbsp;&nbsp;&nbsp;
-        <div class="field has-addons">
-          <p class="control">
-            <app-number-input-debounce placeholder="time (default 10)" (value)="setTimeValue($event)" [val]="timeValue"></app-number-input-debounce>
-          </p>
-          <p class="control">
-            <span class="select is-small">
-              <select #selectedTime (change)="setGroup(selectedTime.value)">
-                <option value="minutes" [selected]="optedGroup == 'minutes'">minutes</option>
-                <option value="hours" [selected]="optedGroup == 'hours'">hours</option>
-                <option value="seconds" [selected]="optedGroup == 'seconds'">seconds</option>
+      <div class="columns">
+        <div class="column is-3">
+          <div class="field">
+            <div *ngIf='readings' class="select is-small">
+              <select #selectedKey (change)="setReading(selectedKey.value)">
+                <option *ngFor="let reading of readings" [value]='reading' [selected]="readingKey == reading">{{reading}}</option>
               </select>
-            </span>
-          </p>
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="field has-addons">
+            <p class="control">
+              <app-number-input-debounce placeholder="time (default 10)" (value)="setTimeValue($event)" [val]="timeValue"></app-number-input-debounce>
+            </p>
+            <p class="control">
+              <span class="select is-small">
+                <select #selectedTimeUnit (change)="setTimeUnit(selectedTimeUnit.value)">
+                  <option value="minutes" [selected]="timeUnit == 'minutes'">minutes</option>
+                  <option value="hours" [selected]="timeUnit == 'hours'">hours</option>
+                  <option value="seconds" [selected]="timeUnit == 'seconds'">seconds</option>
+                </select>
+              </span>
+            </p>
+          </div>
+        </div>
+        <div class="column">
+          <div class="field has-addons">
+            <p class="control">
+              <span class="select is-small">
+                <select #selectedTime (change)="setGroup(selectedTime.value)">
+                  <option value="minutes" [selected]="optedGroup == 'minutes'">minutes</option>
+                  <option value="hours" [selected]="optedGroup == 'hours'">hours</option>
+                  <option value="seconds" [selected]="optedGroup == 'seconds'">seconds</option>
+                </select>
+              </span>
+            </p>
+            <p class="control">
+              <a class="button is-small is-static">
+                Group By
+              </a>
+            </p>
+          </div>
         </div>
       </div>
       <div *ngIf="showSpinner" class="app-loading">
