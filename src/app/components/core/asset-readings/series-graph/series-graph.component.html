@@ -10,19 +10,20 @@
     </header>
     <section class="modal-card-body">
       <div class="columns">
-        <div class="column is-3">
-          <div class="field">
-            <div *ngIf='readings' class="select is-small">
+        <div class="column">
+          <div *ngIf='readings' class="field">
+            <div *ngIf='readings.length > 1' class="select is-small">
               <select #selectedKey (change)="setReading(selectedKey.value)">
                 <option *ngFor="let reading of readings" [value]='reading' [selected]="readingKey == reading">{{reading}}</option>
               </select>
             </div>
+            <input *ngIf="readings.length == 1" class="input is-fullwidth is-small" disabled type="text" [value]='readings[0]' />
           </div>
         </div>
         <div class="column">
           <div class="field has-addons">
             <p class="control">
-              <app-number-input-debounce placeholder="time (default 10)" (value)="setTimeValue($event)" [val]="timeValue"></app-number-input-debounce>
+              <app-number-input-debounce placeholder="(default) 10" (value)="setTimeValue($event)" [val]="timeValue"></app-number-input-debounce>
             </p>
             <p class="control">
               <span class="select is-small">
