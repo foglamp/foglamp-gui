@@ -12,12 +12,12 @@
       <div class="columns">
         <div class="column">
           <div *ngIf='readings' class="field">
-            <div *ngIf='readings.length > 1' class="select is-small">
+            <div *ngIf='readings.length > 1' class="select is-small is-fullwidth">
               <select #selectedKey (change)="setReading(selectedKey.value)">
                 <option *ngFor="let reading of readings" [value]='reading' [selected]="readingKey == reading">{{reading}}</option>
               </select>
             </div>
-            <input *ngIf="readings.length == 1" class="input is-fullwidth is-small" disabled type="text" [value]='readings[0]' />
+            <label *ngIf="readings.length == 1">{{readings[0]}}</label>
           </div>
         </div>
         <div class="column">
