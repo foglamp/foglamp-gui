@@ -47,11 +47,6 @@ export class SeriesGraphComponent implements OnDestroy {
     });
   }
 
-  public roundTo(num, to) {
-    const _to = Math.pow(10, to);
-    return Math.round(num * _to) / _to;
-  }
-
   public showLoadingSpinner() {
     this.showSpinner = true;
   }
@@ -84,12 +79,12 @@ export class SeriesGraphComponent implements OnDestroy {
 
   setReading(reading) {
     this.readingKey = reading;
-    this.plotSeriesGraph();
+    this.plotSeriesGraph(this.assetCode);
   }
 
   setGroup(group) {
     this.optedGroup = group;
-    this.plotSeriesGraph();
+    this.plotSeriesGraph(this.assetCode);
   }
 
   setTimeValue(time) {
@@ -103,10 +98,10 @@ export class SeriesGraphComponent implements OnDestroy {
       return;
     }
     this.timeValue = time;
-    this.plotSeriesGraph();
+    this.plotSeriesGraph(this.assetCode);
   }
 
-  public getSeriesGraph(assetCode, autoRefresh = true) {
+  public getSeriesGraph(assetCode) {
     this.notify.emit(false);
     if (this.graphRefreshInterval === -1) {
       this.isAlive = false;
@@ -114,40 +109,40 @@ export class SeriesGraphComponent implements OnDestroy {
       this.isAlive = true;
     }
     this.assetCode = assetCode;
-    if (autoRefresh === false) {
-      this.getAssetReadings(this.assetCode);
-    }
+    // if (autoRefresh === false) {
+    //   this.getAssetReadings(this.assetCode);
+    // }
     interval(this.graphRefreshInterval)
       .takeWhile(() => this.isAlive) // only fires when component is alive
       .subscribe(() => {
-        this.plotSeriesGraph();
+        this.plotSeriesGraph(this.assetCode);
       });
   }
 
-  public getAssetReadings(assetCode) {
-    this.showLoadingSpinner();
-    this.assetService.getAssetReadings(encodeURIComponent(assetCode)).subscribe(
-      (data: any[]) => {
-        if (data.length === 0) {
-          this.readings = [];
-          return false;
-        }
-        this.readings = Object.keys(data[0].reading);
-        this.plotSeriesGraph();
-        this.hideLoadingSpinner();
-      },
-      error => {
-        this.showLoadingSpinner();
-        if (error.status === 0) {
-          console.log('service down ', error);
-        } else {
-          this.alertService.error(error.statusText);
-        }
-      });
-  }
+  // public getAssetReadings(assetCode) {
+  //   this.showLoadingSpinner();
+  //   this.assetService.getAssetReadings(encodeURIComponent(assetCode)).subscribe(
+  //     (data: any[]) => {
+  //       if (data.length === 0) {
+  //         this.readings = [];
+  //         return false;
+  //       }
+  //       this.readings = Object.keys(data[0].reading);
+  //       this.plotSeriesGraph(assetCode);
+  //       this.hideLoadingSpinner();
+  //     },
+  //     error => {
+  //       this.showLoadingSpinner();
+  //       if (error.status === 0) {
+  //         console.log('service down ', error);
+  //       } else {
+  //         this.alertService.error(error.statusText);
+  //       }
+  //     });
+  // }
 
-  public plotSeriesGraph() {
-    if (this.assetCode === '' || this.readings === '') {
+  public plotSeriesGraph(assetCode) {
+    if (assetCode === '' || this.readings === '') {
       return false;
     }
     if (this.readingKey === '') {
@@ -297,4 +292,3 @@ export class SeriesGraphComponent implements OnDestroy {
     this.isAlive = false;
   }
 }
-

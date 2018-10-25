@@ -20,13 +20,9 @@ export class ReadingsGraphComponent implements OnDestroy {
   public assetChartOptions: any;
   public showGraph = true;
   public assetReadingSummary = [];
-  public isInvalidLimit = false;
-  public MAX_RANGE = MAX_INT_SIZE;
   public graphRefreshInterval = POLLING_INTERVAL;
-
-  public limit: number;
-  public DEFAULT_LIMIT = 100;
   public optedTime = ASSET_READINGS_TIME_FILTER;
+  public timeUnit = 'minutes';
   public readKeyColorLabel = [];
 
   private isAlive: boolean;
@@ -50,37 +46,19 @@ export class ReadingsGraphComponent implements OnDestroy {
     return Math.round(num * _to) / _to;
   }
 
-  public toggleModal(shouldOpen: Boolean) {
-    const chart_modal = <HTMLDivElement>document.getElementById('chart_modal');
-    if (shouldOpen) {
-      chart_modal.classList.add('is-active');
-      return;
+  getTimeBasedAssetReadingsAndSummary(time, timeUnit) {
+    if (timeUnit === 'hours') {
+      time = time * 3600;
     }
-    if (this.graphRefreshInterval === -1) {
-      this.notify.emit(false);
-    } else {
-      this.notify.emit(true);
+    if (timeUnit === 'minutes') {
+      time = time * 60;
     }
-    this.isAlive = false;
-    // reset showGraph variable to default state
-    this.showGraph = true;
-    chart_modal.classList.remove('is-active');
-    sessionStorage.removeItem(this.assetCode);
-  }
-
-  getTimeBasedAssetReadingsAndSummary(time) {
     this.optedTime = time;
-    if (this.optedTime === 0) {
-      this.showAssetReadingsSummary(this.assetCode, this.DEFAULT_LIMIT, this.optedTime);
-      this.plotReadingsGraph(this.assetCode, this.DEFAULT_LIMIT, this.optedTime);
-    } else {
-      this.limit = 0;
-      this.showAssetReadingsSummary(this.assetCode, this.limit, time);
-      this.plotReadingsGraph(this.assetCode, this.limit, this.optedTime);
-    }
+    this.showAssetReadingsSummary(this.assetCode, this.optedTime);
+    this.plotReadingsGraph(this.assetCode, this.optedTime);
   }
 
-  public getAssetCode(assetCode) {
+  public getReadingsGraph(assetCode) {
     this.notify.emit(false);
     if (this.graphRefreshInterval === -1) {
       this.isAlive = false;
@@ -89,32 +67,19 @@ export class ReadingsGraphComponent implements OnDestroy {
     }
     this.assetCode = assetCode;
     if (this.optedTime !== 0) {
-      this.limit = 0;
-      this.plotReadingsGraph(assetCode, this.limit, this.optedTime);
-      this.showAssetReadingsSummary(assetCode, this.limit, this.optedTime);
+      this.plotReadingsGraph(assetCode, this.optedTime);
+      this.showAssetReadingsSummary(assetCode, this.optedTime);
     }
     interval(this.graphRefreshInterval)
       .takeWhile(() => this.isAlive) // only fires when component is alive
       .subscribe(() => {
-        this.showAssetReadingsSummary(this.assetCode, this.limit, this.optedTime);
-        this.plotReadingsGraph(this.assetCode, this.limit, this.optedTime);
+        this.showAssetReadingsSummary(this.assetCode, this.optedTime);
+        this.plotReadingsGraph(this.assetCode, this.optedTime);
       });
   }
 
-  public getLimitBasedAssetReadingsAndSummary(limit: number = 0) {
-    if (limit == null) {
-      this.optedTime = ASSET_READINGS_TIME_FILTER;
-      this.limit = 0;
-    } else {
-      this.limit = limit;
-      this.optedTime = 0;
-    }
-    this.showAssetReadingsSummary(this.assetCode, this.limit, this.optedTime);
-    this.plotReadingsGraph(this.assetCode, this.limit, this.optedTime);
-  }
-
-  public showAssetReadingsSummary(assetCode, limit: number = 0, time: number = 0) {
-    this.assetService.getAllAssetSummary(assetCode, limit, time).subscribe(
+  public showAssetReadingsSummary(assetCode, time: number = 0) {
+    this.assetService.getAllAssetSummary(assetCode, time).subscribe(
       (data: any) => {
         this.assetReadingSummary = data.map(o => {
           const k = Object.keys(o)[0];
@@ -134,20 +99,11 @@ export class ReadingsGraphComponent implements OnDestroy {
       });
   }
 
-  public plotReadingsGraph(assetCode, limit = null, time = null) {
+  public plotReadingsGraph(assetCode, time = null) {
     if (assetCode === '') {
       return false;
     }
-    this.isInvalidLimit = false;
-    if (limit === undefined || limit === null || limit === '' || limit === 0) {
-      limit = 0;
-    } else if (!Number.isInteger(+limit) || +limit < 0 || +limit > this.MAX_RANGE) { // max limit of int in c++
-      this.isInvalidLimit = true;
-      return;
-    }
-
-    this.limit = limit;
-    this.assetService.getAssetReadings(encodeURIComponent(assetCode), +limit, time).
+    this.assetService.getAssetReadings(encodeURIComponent(assetCode), time).
       subscribe(
         (data: any[]) => {
           if (data.length === 0) {

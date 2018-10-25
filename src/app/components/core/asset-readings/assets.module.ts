@@ -12,6 +12,7 @@ import { NumberInputDebounceModule } from '../../common/number-input-debounce/nu
 import { PaginationModule } from '../../common/pagination/pagination.module';
 import { ReadingsGraphComponent } from '../asset-readings/readings-graph/readings-graph.component';
 import { SeriesGraphComponent } from '../asset-readings/series-graph/series-graph.component';
+import { ReadingSeriesGraphComponent } from '../asset-readings/reading-series-graph/reading-series-graph.component';
 import { AssetsComponent } from './assets/assets.component';
 
 const routes: Routes = [
@@ -26,7 +27,8 @@ const routes: Routes = [
   declarations: [
     AssetsComponent,
     ReadingsGraphComponent,
-    SeriesGraphComponent
+    SeriesGraphComponent,
+    ReadingSeriesGraphComponent
   ],
   imports: [
     FormsModule,
