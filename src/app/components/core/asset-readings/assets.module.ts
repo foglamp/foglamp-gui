@@ -11,7 +11,7 @@ import { ChartModule } from '../../common/chart';
 import { NumberInputDebounceModule } from '../../common/number-input-debounce/number-input-debounce.module';
 import { PaginationModule } from '../../common/pagination/pagination.module';
 import { ReadingsGraphComponent } from '../asset-readings/readings-graph/readings-graph.component';
-import { SeriesGraphComponent } from '../asset-readings/series-graph/series-graph.component';
+import { AverageGraphComponent } from '../asset-readings/average-graph/average-graph.component';
 import { ReadingSeriesGraphComponent } from '../asset-readings/reading-series-graph/reading-series-graph.component';
 import { AssetsComponent } from './assets/assets.component';
 
@@ -27,7 +27,7 @@ const routes: Routes = [
   declarations: [
     AssetsComponent,
     ReadingsGraphComponent,
-    SeriesGraphComponent,
+    AverageGraphComponent,
     ReadingSeriesGraphComponent
   ],
   imports: [

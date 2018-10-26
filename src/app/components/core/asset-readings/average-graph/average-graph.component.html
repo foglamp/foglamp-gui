@@ -1,13 +1,4 @@
-<section class="modal-card-body">
-  <div class="columns is-mobile">
-    <div class="field">
-      <div *ngIf='readings' class="select is-small">
-        <select #selectedKey (change)="setReading(selectedKey.value)">
-          <option *ngFor="let reading of readings" [value]='reading' [selected]="readingKey == reading">{{reading}}</option>
-        </select>
-      </div>
-    </div>
-  </div>
+<section>
   <div *ngIf="showSpinner" class="app-loading">
     &nbsp;
     <svg class="spinner" viewBox="0 0 100 100">

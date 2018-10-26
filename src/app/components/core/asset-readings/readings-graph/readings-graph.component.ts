@@ -5,7 +5,7 @@ import { Chart } from 'chart.js';
 
 import { DateFormatterPipe } from '../../../../pipes/date-formatter-pipe';
 import { AlertService, AssetsService, PingService } from '../../../../services';
-import Utils, { ASSET_READINGS_TIME_FILTER, MAX_INT_SIZE, POLLING_INTERVAL } from '../../../../utils';
+import Utils, { ASSET_READINGS_TIME_FILTER, POLLING_INTERVAL } from '../../../../utils';
 import ReadingsValidator from '../assets/readings-validator';
 
 @Component({

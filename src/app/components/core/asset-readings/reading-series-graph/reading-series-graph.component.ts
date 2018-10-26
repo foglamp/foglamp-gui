@@ -5,7 +5,7 @@ import { AlertService, AssetsService, PingService } from '../../../../services';
 import { POLLING_INTERVAL } from '../../../../utils';
 import { MAX_INT_SIZE } from '../../../../utils';
 import { ReadingsGraphComponent } from '../readings-graph/readings-graph.component';
-import { SeriesGraphComponent } from '../series-graph/series-graph.component';
+import { AverageGraphComponent } from '../average-graph/average-graph.component';
 
 @Component({
   selector: 'app-reading-series-graph',
@@ -25,7 +25,7 @@ export class ReadingSeriesGraphComponent implements OnDestroy {
 
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild(ReadingsGraphComponent) readingsGraphComponent: ReadingsGraphComponent;
-  @ViewChild(SeriesGraphComponent) seriesGraphComponent: SeriesGraphComponent;
+  @ViewChild(AverageGraphComponent) averageGraphComponent: AverageGraphComponent;
   @ViewChild('assetChart') assetChart: Chart;
 
   constructor(private alertService: AlertService, private assetService: AssetsService, private ping: PingService) {
@@ -65,6 +65,9 @@ export class ReadingSeriesGraphComponent implements OnDestroy {
           return false;
         }
         this.readings = Object.keys(data[0].reading);
+        console.log('readings', this.readings);
+        this.averageGraphComponent.readings = this.readings;
+        this.averageGraphComponent.plotSeriesGraph(assetCode);
       },
       error => {
         if (error.status === 0) {
@@ -77,14 +80,13 @@ export class ReadingSeriesGraphComponent implements OnDestroy {
 
   setReading(reading) {
     this.readingKey = reading;
-    this.readingsGraphComponent.plotReadingsGraph(this.assetCode);
-    // this.seriesGraphComponent.plotSeriesGraph(this.assetCode);
+    this.averageGraphComponent.setReading(reading, this.assetCode);
   }
 
   setGroup(group) {
     this.optedGroup = group;
     this.readingsGraphComponent.getTimeBasedAssetReadingsAndSummary(this.timeValue, this.optedGroup);
-    // this.seriesGraphComponent.plotSeriesGraph(this.assetCode);
+    this.averageGraphComponent.setGroup(group, this.assetCode);
   }
 
   setTimeValue(time) {
@@ -99,14 +101,14 @@ export class ReadingSeriesGraphComponent implements OnDestroy {
     }
     this.timeValue = time;
     this.readingsGraphComponent.getTimeBasedAssetReadingsAndSummary(this.timeValue, this.optedGroup);
-    // this.seriesGraphComponent.plotSeriesGraph(this.assetCode);
+    this.averageGraphComponent.setTimeValue(this.timeValue, this.assetCode);
   }
 
   public getGraph(assetCode) {
     this.assetCode = assetCode;
     this.getAssetReadings(assetCode);
     this.readingsGraphComponent.getReadingsGraph(assetCode);
-    // this.seriesGraphComponent.getSeriesGraph(assetCode);
+    this.averageGraphComponent.getSeriesGraph(assetCode);
   }
 
   public ngOnDestroy(): void {
