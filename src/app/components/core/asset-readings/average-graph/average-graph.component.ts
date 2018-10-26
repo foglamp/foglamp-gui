@@ -54,28 +54,6 @@ export class AverageGraphComponent implements OnDestroy {
       this.showSpinner = false;
     }
 
-    // public toggleModal(shouldOpen: Boolean) {
-    //   const series_graph = <HTMLDivElement>document.getElementById('series_graph');
-    //   if (shouldOpen) {
-    //     series_graph.classList.add('is-active');
-    //     return;
-    //   }
-    //   if (this.graphRefreshInterval === -1) {
-    //     this.notify.emit(false);
-    //   } else {
-    //     this.notify.emit(true);
-    //   }
-    //   this.isAlive = false;
-    //   // reset showGraph variable to default state
-    //   this.showGraph = true;
-    //   this.readingKey = '';
-    //   this.optedGroup = 'minutes';
-    //   this.timeValue = 10;
-    //   this.isOutOfRange = false;
-    //   series_graph.classList.remove('is-active');
-    //   sessionStorage.removeItem(this.assetCode);
-    // }
-
     setReading(reading, assetCode) {
       this.readingKey = reading;
       this.plotSeriesGraph(assetCode);
@@ -114,28 +92,6 @@ export class AverageGraphComponent implements OnDestroy {
                 this.plotSeriesGraph(this.assetCode);
             });
     }
-
-    // public getAssetReadings(assetCode) {
-    //   this.showLoadingSpinner();
-    //   this.assetService.getAssetReadings(encodeURIComponent(assetCode)).subscribe(
-    //     (data: any[]) => {
-    //       if (data.length === 0) {
-    //         this.readings = [];
-    //         return false;
-    //       }
-    //       this.readings = Object.keys(data[0].reading);
-    //       this.plotSeriesGraph(assetCode);
-    //       this.hideLoadingSpinner();
-    //     },
-    //     error => {
-    //       this.showLoadingSpinner();
-    //       if (error.status === 0) {
-    //         console.log('service down ', error);
-    //       } else {
-    //         this.alertService.error(error.statusText);
-    //       }
-    //     });
-    // }
 
     public plotSeriesGraph(assetCode) {
         if (assetCode === '' || this.readings === '') {

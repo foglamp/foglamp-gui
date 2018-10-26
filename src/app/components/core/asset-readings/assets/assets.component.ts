@@ -4,8 +4,6 @@ import { interval } from 'rxjs';
 
 import { AlertService, AssetsService, PingService } from '../../../../services';
 import { MAX_INT_SIZE, POLLING_INTERVAL } from '../../../../utils';
-// import { ReadingsGraphComponent } from '../readings-graph/readings-graph.component';
-// import { SeriesGraphComponent } from '../series-graph/series-graph.component';
 import { ReadingSeriesGraphComponent } from '../reading-series-graph/reading-series-graph.component';
 
 @Component({
@@ -22,8 +20,6 @@ export class AssetsComponent implements OnInit, OnDestroy {
   public showSpinner = false;
   private isAlive: boolean;
 
-  // @ViewChild(ReadingsGraphComponent) readingsGraphComponent: ReadingsGraphComponent;
-  // @ViewChild(SeriesGraphComponent) seriesGraphComponent: SeriesGraphComponent;
   @ViewChild(ReadingSeriesGraphComponent) readingSeriesGraphComponent: ReadingSeriesGraphComponent;
 
   constructor(private assetService: AssetsService,
@@ -76,13 +72,6 @@ export class AssetsComponent implements OnInit, OnDestroy {
     this.readingSeriesGraphComponent.getGraph(assetCode);
     this.readingSeriesGraphComponent.toggleModal(true);
   }
-
-  /**
-  * Open series graph modal dialog
-  */
-  // public showSeriesGraph(assetCode) {
-  //   this.seriesGraphComponent.toggleModal(true);
-  // }
 
   public showLoadingSpinner() {
     this.showSpinner = true;
