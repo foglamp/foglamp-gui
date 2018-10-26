@@ -1,7 +1,7 @@
-import { Component, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { Chart } from 'chart.js';
 
-import { AlertService, AssetsService, PingService } from '../../../../services';
+import { AlertService, AssetsService } from '../../../../services';
 import { POLLING_INTERVAL } from '../../../../utils';
 import { MAX_INT_SIZE } from '../../../../utils';
 import { ReadingsGraphComponent } from '../readings-graph/readings-graph.component';
@@ -12,11 +12,10 @@ import { AverageGraphComponent } from '../average-graph/average-graph.component'
   templateUrl: './reading-series-graph.component.html',
   styleUrls: ['./reading-series-graph.component.css']
 })
-export class ReadingSeriesGraphComponent implements OnDestroy {
+export class ReadingSeriesGraphComponent {
   public assetCode: string;
   public optedGroup = 'minutes';
   public timeValue = 10;
-  public isAlive: boolean;
   public graphRefreshInterval = POLLING_INTERVAL;
   public isOutOfRange = false;
   public readingKey = '';
@@ -28,14 +27,7 @@ export class ReadingSeriesGraphComponent implements OnDestroy {
   @ViewChild(AverageGraphComponent) averageGraphComponent: AverageGraphComponent;
   @ViewChild('assetChart') assetChart: Chart;
 
-  constructor(private alertService: AlertService, private assetService: AssetsService, private ping: PingService) {
-    this.ping.pingIntervalChanged.subscribe((timeInterval: number) => {
-      if (timeInterval === -1) {
-        this.isAlive = false;
-      }
-      this.graphRefreshInterval = timeInterval;
-    });
-  }
+  constructor(private alertService: AlertService, private assetService: AssetsService) {}
 
   public toggleModal(shouldOpen: Boolean) {
     const graph_modal = <HTMLDivElement>document.getElementById('graph_modal');
@@ -48,7 +40,6 @@ export class ReadingSeriesGraphComponent implements OnDestroy {
     } else {
       this.notify.emit(true);
     }
-    this.isAlive = false;
     // reset showGraph variable to default state
     this.optedGroup = 'minutes';
     this.timeValue = 10;
@@ -110,9 +101,4 @@ export class ReadingSeriesGraphComponent implements OnDestroy {
     this.readingsGraphComponent.getReadingsGraph(assetCode);
     this.averageGraphComponent.getSeriesGraph(assetCode);
   }
-
-  public ngOnDestroy(): void {
-    this.isAlive = false;
-  }
 }
-
