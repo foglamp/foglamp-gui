@@ -54,7 +54,6 @@ export class ReadingsGraphComponent implements OnDestroy {
       time = time * 60;
     }
     this.optedTime = time;
-    this.showAssetReadingsSummary(this.assetCode, this.optedTime);
     this.plotReadingsGraph(this.assetCode, this.optedTime);
   }
 
@@ -68,12 +67,10 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.assetCode = assetCode;
     if (this.optedTime !== 0) {
       this.plotReadingsGraph(assetCode, this.optedTime);
-      this.showAssetReadingsSummary(assetCode, this.optedTime);
     }
     interval(this.graphRefreshInterval)
       .takeWhile(() => this.isAlive) // only fires when component is alive
       .subscribe(() => {
-        this.showAssetReadingsSummary(this.assetCode, this.optedTime);
         this.plotReadingsGraph(this.assetCode, this.optedTime);
       });
   }
