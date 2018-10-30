@@ -54,17 +54,17 @@ export class AverageGraphComponent {
     this.showSpinner = false;
   }
 
-  setReading(reading, assetCode) {
+  setReading(reading) {
     this.readingKey = reading;
-    this.plotSeriesGraph(assetCode);
+    this.plotSeriesGraph();
   }
 
-  setGroup(group, assetCode) {
+  setGroup(group) {
     this.optedGroup = group;
-    this.plotSeriesGraph(assetCode);
+    this.plotSeriesGraph();
   }
 
-  setTimeValue(time, assetCode) {
+  setTimeValue(time) {
     if (time === null || time === undefined) {
       time = 10;
     }
@@ -75,10 +75,13 @@ export class AverageGraphComponent {
       return;
     }
     this.timeValue = time;
-    this.plotSeriesGraph(assetCode);
   }
 
-  public getSeriesGraph(assetCode) {
+  public getSeriesGraph(assetCode, readingKey, timeValue) {
+    this.timeValue = timeValue;
+    this.assetCode = assetCode;
+    this.readingKey = readingKey;
+    this.plotSeriesGraph();
     this.notify.emit(false);
     if (this.graphRefreshInterval === -1) {
       this.isAlive = false;
@@ -89,17 +92,11 @@ export class AverageGraphComponent {
     interval(this.graphRefreshInterval)
       .takeWhile(() => this.isAlive) // only fires when component is alive
       .subscribe(() => {
-        this.plotSeriesGraph(this.assetCode);
+        this.plotSeriesGraph();
       });
   }
 
-  public plotSeriesGraph(assetCode) {
-    if (assetCode === '' || this.readings === '') {
-      return false;
-    }
-    if (this.readingKey === '') {
-      this.readingKey = this.readings[0];
-    }
+  public plotSeriesGraph() {
     this.assetService.getAssetAverage(this.assetCode, this.readingKey, this.optedGroup, this.timeValue).
       subscribe(
         (data: any[]) => {

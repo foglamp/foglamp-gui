@@ -32,12 +32,10 @@ export class ReadingSeriesGraphComponent {
 
   public toggleModal() {
     this.isModalActive = !this.isModalActive;
-    if (!this.isModalActive) {
-      this.stopInterval();
-    }
-    if (this.graphRefreshInterval === -1) {
+    if (this.isModalActive) {
       this.notify.emit(false);
     } else {
+      this.stopInterval();
       this.notify.emit(true);
     }
     // reset showGraph variable to default state
@@ -55,9 +53,9 @@ export class ReadingSeriesGraphComponent {
           return false;
         }
         this.readings = Object.keys(data[0].reading);
-        console.log('readings', this.readings);
         this.averageGraphComponent.readings = this.readings;
-        this.averageGraphComponent.plotSeriesGraph(assetCode);
+        this.averageGraphComponent.getSeriesGraph(assetCode, this.readings[0], this.timeValue);
+        this.readingsGraphComponent.getReadingsGraph(assetCode, this.timeValue, this.optedGroup);
       },
       error => {
         if (error.status === 0) {
@@ -70,16 +68,17 @@ export class ReadingSeriesGraphComponent {
 
   setReading(reading) {
     this.readingKey = reading;
-    this.averageGraphComponent.setReading(reading, this.assetCode);
+    this.averageGraphComponent.setReading(reading);
   }
 
   setGroup(group) {
     this.optedGroup = group;
     this.readingsGraphComponent.getTimeBasedAssetReadingsAndSummary(this.timeValue, this.optedGroup);
-    this.averageGraphComponent.setGroup(group, this.assetCode);
+    this.averageGraphComponent.setGroup(group);
   }
 
   stopInterval() {
+    this.readings = [];
     this.readingsGraphComponent.stopInterval();
     this.averageGraphComponent.stopInterval();
   }
@@ -96,13 +95,11 @@ export class ReadingSeriesGraphComponent {
     }
     this.timeValue = time;
     this.readingsGraphComponent.getTimeBasedAssetReadingsAndSummary(this.timeValue, this.optedGroup);
-    this.averageGraphComponent.setTimeValue(this.timeValue, this.assetCode);
+    this.averageGraphComponent.setTimeValue(this.timeValue);
   }
 
   public getGraph(assetCode) {
     this.assetCode = assetCode;
     this.getAssetReadings(assetCode);
-    this.readingsGraphComponent.getReadingsGraph(assetCode);
-    this.averageGraphComponent.getSeriesGraph(assetCode);
   }
 }

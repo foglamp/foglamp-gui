@@ -57,7 +57,17 @@ export class ReadingsGraphComponent {
     this.plotReadingsGraph(this.assetCode, this.optedTime);
   }
 
-  public getReadingsGraph(assetCode) {
+  public getReadingsGraph(assetCode, timeValue, optedGroup) {
+    if (optedGroup === 'hours') {
+      this.optedTime = timeValue * 3600;
+    }
+    if (optedGroup === 'minutes') {
+      this.optedTime = timeValue * 60;
+    }
+
+    if (optedGroup === 'seconds') {
+      this.optedTime = timeValue;
+    }
     this.notify.emit(false);
     if (this.graphRefreshInterval === -1) {
       this.isAlive = false;
@@ -65,9 +75,7 @@ export class ReadingsGraphComponent {
       this.isAlive = true;
     }
     this.assetCode = assetCode;
-    if (this.optedTime !== 0) {
-      this.plotReadingsGraph(assetCode, this.optedTime);
-    }
+    this.plotReadingsGraph(assetCode, this.optedTime);
     interval(this.graphRefreshInterval)
       .takeWhile(() => this.isAlive) // only fires when component is alive
       .subscribe(() => {
@@ -97,9 +105,6 @@ export class ReadingsGraphComponent {
   }
 
   public plotReadingsGraph(assetCode, time = null) {
-    if (assetCode === '') {
-      return false;
-    }
     this.assetService.getAssetReadings(encodeURIComponent(assetCode), time).
       subscribe(
         (data: any[]) => {
