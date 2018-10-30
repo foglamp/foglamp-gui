@@ -114,6 +114,7 @@ export class ReadingsGraphComponent {
           }
           const validRecord = ReadingsValidator.validate(data);
           if (validRecord) {
+            this.showGraph = true;
             this.getAssetTimeReading(data);
           } else {
             this.showGraph = false;

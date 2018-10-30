@@ -82,7 +82,6 @@ export class AssetsComponent implements OnInit, OnDestroy {
   }
 
   onNotify(event) {
-    console.log('notify', event);
     this.isAlive = event;
     interval(this.refreshInterval)
       .takeWhile(() => this.isAlive) // only fires when component is alive
