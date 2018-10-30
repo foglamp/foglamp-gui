@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { orderBy } from 'lodash';
 import { interval } from 'rxjs';
 import { Chart } from 'chart.js';
@@ -13,7 +13,7 @@ import ReadingsValidator from '../assets/readings-validator';
   templateUrl: './readings-graph.component.html',
   styleUrls: ['./readings-graph.component.css']
 })
-export class ReadingsGraphComponent implements OnDestroy {
+export class ReadingsGraphComponent {
   public assetCode: string;
   public assetChartType: string;
   public assetReadingValues: any;
@@ -228,7 +228,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     };
   }
 
-  public ngOnDestroy(): void {
+  stopInterval() {
     this.isAlive = false;
   }
 }

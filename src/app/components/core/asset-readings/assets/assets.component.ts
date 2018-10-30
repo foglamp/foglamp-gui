@@ -70,7 +70,7 @@ export class AssetsComponent implements OnInit, OnDestroy {
   */
   public showAssetChart(assetCode) {
     this.readingSeriesGraphComponent.getGraph(assetCode);
-    this.readingSeriesGraphComponent.toggleModal(true);
+    this.readingSeriesGraphComponent.toggleModal();
   }
 
   public showLoadingSpinner() {

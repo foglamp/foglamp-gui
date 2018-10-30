@@ -22,18 +22,18 @@ export class ReadingSeriesGraphComponent {
   public MAX_RANGE = MAX_INT_SIZE;
   public readings: any;
 
+  isModalActive = false;
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild(ReadingsGraphComponent) readingsGraphComponent: ReadingsGraphComponent;
   @ViewChild(AverageGraphComponent) averageGraphComponent: AverageGraphComponent;
   @ViewChild('assetChart') assetChart: Chart;
 
-  constructor(private alertService: AlertService, private assetService: AssetsService) {}
+  constructor(private alertService: AlertService, private assetService: AssetsService) { }
 
-  public toggleModal(shouldOpen: Boolean) {
-    const graph_modal = <HTMLDivElement>document.getElementById('graph_modal');
-    if (shouldOpen) {
-      graph_modal.classList.add('is-active');
-      return;
+  public toggleModal() {
+    this.isModalActive = !this.isModalActive;
+    if (!this.isModalActive) {
+      this.stopInterval();
     }
     if (this.graphRefreshInterval === -1) {
       this.notify.emit(false);
@@ -44,7 +44,6 @@ export class ReadingSeriesGraphComponent {
     this.optedGroup = 'minutes';
     this.timeValue = 10;
     this.isOutOfRange = false;
-    graph_modal.classList.remove('is-active');
     sessionStorage.removeItem(this.assetCode);
   }
 
@@ -78,6 +77,11 @@ export class ReadingSeriesGraphComponent {
     this.optedGroup = group;
     this.readingsGraphComponent.getTimeBasedAssetReadingsAndSummary(this.timeValue, this.optedGroup);
     this.averageGraphComponent.setGroup(group, this.assetCode);
+  }
+
+  stopInterval() {
+    this.readingsGraphComponent.stopInterval();
+    this.averageGraphComponent.stopInterval();
   }
 
   setTimeValue(time) {
