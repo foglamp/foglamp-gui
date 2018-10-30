@@ -82,7 +82,6 @@ export class AssetsComponent implements OnInit, OnDestroy {
   }
 
   onNotify(event) {
-    console.log('event', event);
     this.isAlive = event;
   }
 
