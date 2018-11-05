@@ -3,8 +3,10 @@ import { FormControl } from '@angular/forms';
 import { isEmpty } from 'lodash';
 import { NgProgress } from 'ngx-progressbar';
 
-import { AlertService, ConfigurationService, SchedulesService } from '../../../../services';
+import { AlertService, ConfigurationService, SchedulesService, ServicesHealthService } from '../../../../services';
+import { ConfigChildrenComponent } from '../../configuration-manager/config-children/config-children.component';
 import { ViewConfigItemComponent } from '../../configuration-manager/view-config-item/view-config-item.component';
+import { AlertDialogComponent } from '../../../common/alert-dialog/alert-dialog.component';
 
 @Component({
   selector: 'app-south-service-modal',
@@ -16,15 +18,32 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
   public category: any;
   public useProxy: 'true';
   public isEnabled = false;
+  public isAdvanceConfig = false;
+  public advanceConfigButtonText = 'Show Advanced Config';
   svcCheckbox: FormControl = new FormControl();
+
+  public childConfiguration;
+  public changedChildConfig = [];
+
+  // Object to hold data of south service to delete
+  public shutDownServiceData = {
+    port: '',
+    protocol: '',
+    name: '',
+    message: '',
+    key: ''
+  };
 
   @Input() service: { service: any };
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild(ViewConfigItemComponent) viewConfigItemComponent: ViewConfigItemComponent;
+  @ViewChild(ConfigChildrenComponent) configChildrenComponent: ConfigChildrenComponent;
+  @ViewChild(AlertDialogComponent) child: AlertDialogComponent;
 
   constructor(private configService: ConfigurationService,
     private alertService: AlertService,
     public ngProgress: NgProgress,
+    private servicesHealthService: ServicesHealthService,
     private schedulesService: SchedulesService) { }
 
   ngOnInit() {
@@ -36,6 +55,7 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
   ngOnChanges() {
     if (this.service !== undefined) {
       this.getCategory();
+      this.checkIfAdvanceConfig(this.service['name']);
     }
   }
   public toggleModal(isOpen: Boolean) {
@@ -45,6 +65,8 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
       modalWindow.classList.add('is-active');
       return;
     }
+    this.isAdvanceConfig = true;
+    this.getAdvanceConfig(null);
     modalWindow.classList.remove('is-active');
   }
 
@@ -97,7 +119,6 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
           this.ngProgress.done();
           this.notify.emit();
           this.alertService.success(data['message'], true);
-          // this.toggleModal(false);
         },
         error => {
           /** request completed */
@@ -119,7 +140,6 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
           /** request completed */
           this.ngProgress.done();
           this.notify.emit();
-          // this.toggleModal(false);
           this.alertService.success(data['message'], true);
         },
         error => {
@@ -138,7 +158,6 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
     if (!this.svcCheckbox.dirty && !this.svcCheckbox.touched) {
       return false;
     }
-    console.log('Action on service schedule, enable: ', this.isEnabled);
     if (this.isEnabled) {
       this.enableSchedule(serviceName);
       this.svcCheckbox.reset(true);
@@ -148,11 +167,132 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
     }
   }
 
+  checkIfAdvanceConfig(categoryName) {
+    this.configService.getCategoryConfigChildren(categoryName).
+      subscribe(
+        (data: any) => {
+          this.childConfiguration = data.categories[0];
+        },
+        error => {
+          console.log('error ', error);
+        }
+      );
+  }
+
+  getAdvanceConfig(childConfig) {
+    if (!this.isAdvanceConfig) {
+      this.isAdvanceConfig = true;
+      this.advanceConfigButtonText = 'Hide Advanced Config';
+      this.configChildrenComponent.getAdvanceConfig(childConfig, this.isAdvanceConfig);
+    } else {
+      this.isAdvanceConfig = false;
+      this.advanceConfigButtonText = 'Show Advanced Config';
+    }
+  }
+
+  /**
+   * Get edited configuration from child config page
+   * @param changedConfig changed configuration of a selected plugin
+   */
+  getChangedConfig(changedConfig) {
+    changedConfig = changedConfig.filter(e => {
+      return e.value !== null;
+    });
+    this.changedChildConfig = changedConfig;
+  }
+
   proxy() {
     document.getElementById('vci-proxy').click();
     if (this.viewConfigItemComponent !== undefined && !this.viewConfigItemComponent.isValidForm) {
       return false;
+    } else {
+      this.changedChildConfig.forEach(changedItem => {
+        this.saveConfigValue(changedItem.key, changedItem.value, changedItem.type);
+      });
     }
     document.getElementById('ss').click();
   }
+
+  public saveConfigValue(configItem: string, value: string, type: string) {
+    /** request started */
+    this.ngProgress.start();
+    this.configService.saveConfigItem(this.childConfiguration.key, configItem, value.toString(), type).
+      subscribe(
+        () => {
+          /** request completed */
+          this.ngProgress.done();
+          this.alertService.success('Configuration updated successfully.');
+        },
+        error => {
+          /** request completed */
+          this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
+        });
+  }
+
+  /**
+   * Open delete modal
+   * @param message   message to show on alert
+   * @param action here action is 'shutdownService'
+   */
+  openDeleteModal(port, protocol, name, message, action) {
+    this.shutDownServiceData = {
+      port: port,
+      protocol: protocol,
+      name: name,
+      message: message,
+      key: action
+    };
+    // call child component method to toggle modal
+    this.child.toggleModal(true);
+  }
+
+  shutdownService(svcInfo) {
+    if (this.isEnabled === false) {
+      this.deleteService(svcInfo.name);
+    } else {
+      this.servicesHealthService.shutDownService(svcInfo)
+        .subscribe(
+          () => {
+            setTimeout(() => {
+              this.deleteService(svcInfo.name);
+            }, 500);
+          },
+          (error) => {
+            if (error.status === 0) {
+              console.log('service down ', error);
+            } else {
+              this.alertService.error(error.statusText);
+            }
+          });
+    }
+  }
+
+  deleteService(svc) {
+    this.ngProgress.start();
+    this.servicesHealthService.deleteService(svc)
+      .subscribe(
+        (data) => {
+          this.ngProgress.done();
+          this.alertService.success(data['result'], true);
+          this.toggleModal(false);
+          setTimeout(() => {
+            this.notify.emit();
+          }, 6000);
+        },
+        (error) => {
+          this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
+        });
+  }
 }
+
+
