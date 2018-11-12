@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { interval } from 'rxjs';
 import { Chart } from 'chart.js';
 
@@ -9,11 +9,11 @@ import ReadingsValidator from '../assets/readings-validator';
 import { MAX_INT_SIZE } from '../../../../utils';
 
 @Component({
-  selector: 'app-series-graph',
-  templateUrl: './series-graph.component.html',
-  styleUrls: ['./series-graph.component.css']
+  selector: 'app-average-graph',
+  templateUrl: './average-graph.component.html',
+  styleUrls: ['./average-graph.component.css']
 })
-export class SeriesGraphComponent implements OnDestroy {
+export class AverageGraphComponent {
   public assetCode: string;
   public assetChartType: string;
   public assetReadingValues: any;
@@ -36,7 +36,6 @@ export class SeriesGraphComponent implements OnDestroy {
 
   constructor(private assetService: AssetsService, private alertService: AlertService,
     private ping: PingService) {
-    this.showLoadingSpinner();
     this.assetChartType = 'line';
     this.assetReadingValues = [];
     this.ping.pingIntervalChanged.subscribe((timeInterval: number) => {
@@ -47,39 +46,12 @@ export class SeriesGraphComponent implements OnDestroy {
     });
   }
 
-  public roundTo(num, to) {
-    const _to = Math.pow(10, to);
-    return Math.round(num * _to) / _to;
-  }
-
   public showLoadingSpinner() {
     this.showSpinner = true;
   }
 
   public hideLoadingSpinner() {
     this.showSpinner = false;
-  }
-
-  public toggleModal(shouldOpen: Boolean) {
-    const series_graph = <HTMLDivElement>document.getElementById('series_graph');
-    if (shouldOpen) {
-      series_graph.classList.add('is-active');
-      return;
-    }
-    if (this.graphRefreshInterval === -1) {
-      this.notify.emit(false);
-    } else {
-      this.notify.emit(true);
-    }
-    this.isAlive = false;
-    // reset showGraph variable to default state
-    this.showGraph = true;
-    this.readingKey = '';
-    this.optedGroup = 'minutes';
-    this.timeValue = 10;
-    this.isOutOfRange = false;
-    series_graph.classList.remove('is-active');
-    sessionStorage.removeItem(this.assetCode);
   }
 
   setReading(reading) {
@@ -103,10 +75,13 @@ export class SeriesGraphComponent implements OnDestroy {
       return;
     }
     this.timeValue = time;
-    this.plotSeriesGraph();
   }
 
-  public getSeriesGraph(assetCode, autoRefresh = true) {
+  public getSeriesGraph(assetCode, readingKey, timeValue) {
+    this.timeValue = timeValue;
+    this.assetCode = assetCode;
+    this.readingKey = readingKey;
+    this.plotSeriesGraph();
     this.notify.emit(false);
     if (this.graphRefreshInterval === -1) {
       this.isAlive = false;
@@ -114,9 +89,6 @@ export class SeriesGraphComponent implements OnDestroy {
       this.isAlive = true;
     }
     this.assetCode = assetCode;
-    if (autoRefresh === false) {
-      this.getAssetReadings(this.assetCode);
-    }
     interval(this.graphRefreshInterval)
       .takeWhile(() => this.isAlive) // only fires when component is alive
       .subscribe(() => {
@@ -124,35 +96,7 @@ export class SeriesGraphComponent implements OnDestroy {
       });
   }
 
-  public getAssetReadings(assetCode) {
-    this.showLoadingSpinner();
-    this.assetService.getAssetReadings(encodeURIComponent(assetCode)).subscribe(
-      (data: any[]) => {
-        if (data.length === 0) {
-          this.readings = [];
-          return false;
-        }
-        this.readings = Object.keys(data[0].reading);
-        this.plotSeriesGraph();
-        this.hideLoadingSpinner();
-      },
-      error => {
-        this.showLoadingSpinner();
-        if (error.status === 0) {
-          console.log('service down ', error);
-        } else {
-          this.alertService.error(error.statusText);
-        }
-      });
-  }
-
   public plotSeriesGraph() {
-    if (this.assetCode === '' || this.readings === '') {
-      return false;
-    }
-    if (this.readingKey === '') {
-      this.readingKey = this.readings[0];
-    }
     this.assetService.getAssetAverage(this.assetCode, this.readingKey, this.optedGroup, this.timeValue).
       subscribe(
         (data: any[]) => {
@@ -293,7 +237,7 @@ export class SeriesGraphComponent implements OnDestroy {
     };
   }
 
-  public ngOnDestroy(): void {
+  stopInterval() {
     this.isAlive = false;
   }
 }

@@ -1,0 +1,12 @@
+<section>
+  <div *ngIf="showSpinner" class="app-loading">
+    &nbsp;
+    <svg class="spinner" viewBox="0 0 100 100">
+      <circle class="path" cx="50%" cy="50%" r="10" fill="none" stroke-width="2" stroke-miterlimit="10" />
+    </svg>
+  </div>
+  <p *ngIf='isOutOfRange' class='help is-danger'>Time must be in range 1 - {{MAX_RANGE}}</p>
+  <p *ngIf='!showGraph'> Not Available </p>
+  <app-chart *ngIf='!showSpinner && showGraph' [type]="assetChartType" [data]="assetReadingValues" [options]="assetChartOptions"
+    #assetChart></app-chart>
+</section>

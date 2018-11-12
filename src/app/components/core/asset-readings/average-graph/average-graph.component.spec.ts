@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SeriesGraphComponent } from './series-graph.component';
+import { AverageGraphComponent } from './average-graph.component';
 
-describe('SeriesGraphComponent', () => {
-  let component: SeriesGraphComponent;
-  let fixture: ComponentFixture<SeriesGraphComponent>;
+describe('AverageGraphComponent', () => {
+  let component: AverageGraphComponent;
+  let fixture: ComponentFixture<AverageGraphComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SeriesGraphComponent ]
+      declarations: [ AverageGraphComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SeriesGraphComponent);
+    fixture = TestBed.createComponent(AverageGraphComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

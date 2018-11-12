@@ -1,0 +1,10 @@
+.divider {
+    border-right:0.2px solid #dbdbdb;
+    position:inherit;
+}
+
+@media screen and (min-width: 769px){
+  .modal-card {
+      width: 900px !important;
+  }
+}
