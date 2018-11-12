@@ -58,11 +58,18 @@ export class AssetsService {
       catchError((error: Response) => observableThrowError(error)));
   }
 
+  public getReadings(assetCode: string) {
+    return this.http.get(this.GET_ASSET + '/' + encodeURIComponent(assetCode)).pipe(
+      map(response => response),
+      catchError((error: Response) => observableThrowError(error)));
+  }
 
-  // TODO: Not in use yet
-  public getAssetAverage(assetObject: any) {
-    // TODO: time based readings average;
-    return this.http.get(this.GET_ASSET + '/' + encodeURIComponent(assetObject.assetCode) + '/' + assetObject.reading + '/series').pipe(
+  public getAssetAverage(assetCode: string, reading: string, group, time) {
+    let params = new HttpParams();
+    params = params.append('group', group);
+    params = params.append(group, time);
+    return this.http.get(this.GET_ASSET + '/' + encodeURIComponent(assetCode) + '/' + encodeURIComponent(reading) + '/series',
+    { params: params }).pipe(
       map(response => response),
       catchError((error: Response) => observableThrowError(error)));
   }
