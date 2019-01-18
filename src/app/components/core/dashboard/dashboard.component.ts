@@ -101,7 +101,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         for (const graph of this.selectedGraphsList) {
           const selectedGraph = this.statistics.filter(value => value['key'] === graph.key);
           this.statisticsKeys.map((item) => item.key === graph.key ? item.checked = true : false);
-          this.graphsToShow.push(selectedGraph[0]);
+          if (selectedGraph[0] !== undefined) {
+            this.graphsToShow.push(selectedGraph[0]);
+          }
         }
         this.getStatisticsHistory(localStorage.getItem('STATS_HISTORY_TIME_FILTER'));
       },
