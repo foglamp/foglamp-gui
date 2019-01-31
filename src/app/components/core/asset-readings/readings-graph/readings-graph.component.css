@@ -11,3 +11,14 @@
 [hidden] {
   display: none !important;
 }
+
+.summary {
+  width: auto;
+  height: auto;
+  max-height: 25vh;
+  overflow-y: auto;
+}
+
+.modal-card {
+  width: 70%;
+}
