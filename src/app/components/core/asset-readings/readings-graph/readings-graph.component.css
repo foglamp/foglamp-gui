@@ -14,7 +14,7 @@
 
 .summary {
   width: auto;
-  height: auto;
+  min-height: 15vh;
   max-height: 25vh;
   overflow-y: scroll;
   padding-top: 3px;

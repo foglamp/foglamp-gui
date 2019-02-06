@@ -301,12 +301,10 @@ export class ReadingsGraphComponent implements OnDestroy {
 
   public showLoadingSpinner() {
     this.showSpinner = true;
-    console.log('showLoadingSpinner');
   }
 
   public hideLoadingSpinner() {
     this.showSpinner = false;
-    console.log('hideLoadingSpinner');
   }
 
   public isNumber(val) {
