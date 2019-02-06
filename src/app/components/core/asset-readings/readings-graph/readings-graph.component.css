@@ -17,8 +17,6 @@
   height: auto;
   max-height: 25vh;
   overflow-y: scroll;
-  border-bottom: 1px solid #dbdbdb;
-  border-top: 1px solid #dbdbdb;
   padding-top: 3px;
   padding-bottom: 3px;
 }
