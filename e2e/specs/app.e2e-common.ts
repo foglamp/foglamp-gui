@@ -2,12 +2,16 @@ import { AdminLogin } from '../po/app.admin';
 import { SkipLogin } from '../po/app.skip';
 import { NonAdminLogin } from '../po/app.non-admin';
 import { environment } from '../environment';
+import { SouthPage } from "../po/south.page";
 
 describe('FogLAMP gui', () => {
   let skipLogin: SkipLogin;
   let adminLogin: AdminLogin;
   let nonAdminLogin: NonAdminLogin;
   let isSetupInstance = false;
+
+  const southPage = new SouthPage();
+
   skipLogin = new SkipLogin();
   adminLogin = new AdminLogin();
   nonAdminLogin = new NonAdminLogin();
@@ -35,16 +39,36 @@ describe('FogLAMP gui', () => {
       expect(skipLogin.isGraphDropdownPresent()).toEqual(true);
     });
 
-      // TODO: Test data required to pass below tests.
-      // it('Should Display Assets & Readings', () => {
-      // skipLogin.navToAssetReadings();
-      // expect(skipLogin.getAssetTableHeader()).toEqual('Asset');
-      // expect(skipLogin.getReadingsTableHeader()).toEqual('Readings');
+    it('Should display south service page', () => {
+      southPage.navToSouthPage();
+      expect(southPage.getSouthPageTitle()).toEqual('South Services');
+    });
 
-      // skipLogin.clickChartIcon();
-      // expect(skipLogin.isChartDisplayed()).toEqual(true);
-      // skipLogin.closeChartModal();
-      // });
+    it('Should display added south service', () => {
+      southPage.navToSouthPage();
+      southPage.clickAddServiceButton();
+      southPage.addSouthService();
+      expect(southPage.getServiceName()).toEqual('demo-service');
+    });
+
+    it('Should display added filter in south service', () => {
+      southPage.navToSouthPage();
+      southPage.openSouthServiceModal();
+      southPage.openFilterWizard();
+      southPage.addFilter();
+      expect(southPage.getAddedFilterName()).toEqual(' Test');
+    });
+
+    // TODO: Test data required to pass below tests.
+    // it('Should Display Assets & Readings', () => {
+    // skipLogin.navToAssetReadings();
+    // expect(skipLogin.getAssetTableHeader()).toEqual('Asset');
+    // expect(skipLogin.getReadingsTableHeader()).toEqual('Readings');
+
+    // skipLogin.clickChartIcon();
+    // expect(skipLogin.isChartDisplayed()).toEqual(true);
+    // skipLogin.closeChartModal();
+    // });
 
     it('Should Display Audits Logs', () => {
       skipLogin.navToAuditLogs();
