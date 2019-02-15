@@ -11,7 +11,7 @@ export class SouthPage {
 
   getSouthPageTitle() {
     browser.ignoreSynchronization = true;
-    return element(by.css('#scheduled-process .title')).getText();
+    return element(by.css('#south-service .title')).getText();
   }
 
   clickAddServiceButton() {
