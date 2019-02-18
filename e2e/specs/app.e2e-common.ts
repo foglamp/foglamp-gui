@@ -2,17 +2,12 @@ import { AdminLogin } from '../po/app.admin';
 import { SkipLogin } from '../po/app.skip';
 import { NonAdminLogin } from '../po/app.non-admin';
 import { environment } from '../environment';
-import { SouthPage } from '../po/south.page';
-import { Filters } from '../po/app.filters';
 
 describe('FogLAMP gui', () => {
   let skipLogin: SkipLogin;
   let adminLogin: AdminLogin;
   let nonAdminLogin: NonAdminLogin;
   let isSetupInstance = false;
-
-  const southPage = new SouthPage();
-  const filters = new Filters();
 
   skipLogin = new SkipLogin();
   adminLogin = new AdminLogin();
@@ -39,26 +34,6 @@ describe('FogLAMP gui', () => {
     it('Should Display Dashboard', () => {
       expect(skipLogin.isSelectTagPresent()).toEqual(true);
       expect(skipLogin.isGraphDropdownPresent()).toEqual(true);
-    });
-
-    it('Should display south service page', () => {
-      southPage.navToSouthPage();
-      expect(southPage.getSouthPageTitle()).toEqual('South Services');
-    });
-
-    it('Should display added south service', () => {
-      southPage.navToSouthPage();
-      southPage.clickAddServiceButton();
-      southPage.addSouthService('guiE2eService #1'); // pass south service name
-      expect(southPage.getServiceName()).toEqual('guiE2eService #1');
-    });
-
-    it('Should display added filter in south service', () => {
-      southPage.navToSouthPage();
-      southPage.openSouthServiceModal();
-      filters.openFilterWizard();
-      filters.addFilter('guiE2eFilter #1');
-      expect(filters.getAddedFilterName()).toEqual(' guiE2eFilter #1');
     });
 
     // TODO: Test data required to pass below tests.
