@@ -80,7 +80,7 @@ export class SkipLogin {
 
   clickChartIcon() {
     browser.ignoreSynchronization = true;
-    return element(by.css('app-assets .table.is-striped > tbody:nth-child(2) > tr:nth-child(1) .fa-line-chart')).click();
+    return element(by.css('app-assets .table.is-striped > tbody:nth-child(2) > tr:nth-child(1) .fa-chart-line')).click();
   }
 
   isChartDisplayed() {
@@ -249,6 +249,13 @@ export class SkipLogin {
     return browser.get('/#/backup-restore');
   }
 
+  clickRequestBackup() {
+    browser.ignoreSynchronization = true;
+    element(by.css('app-backup-restore .fix-pad')).click();
+    // wait
+    browser.wait(this.EC.visibilityOf(element(by.css('app-backup-restore table thead tr'))), 6000);
+  }
+
   getBackupRestoreTitle() {
     browser.ignoreSynchronization = true;
     return element(by.css('app-backup-restore header p')).getText();
@@ -262,6 +269,19 @@ export class SkipLogin {
   getRequestBackup() {
     browser.ignoreSynchronization = true;
     return element(by.css('app-backup-restore header a')).getText();
+  }
+
+  deleteBackup() {
+    browser.ignoreSynchronization = true;
+    element(by.css('app-backup-restore .button.is-text')).click();
+    browser.wait(this.EC.visibilityOf(element(by.css('.modal-card footer button.is-info'))), 2000);
+    element(by.css('.modal-card footer button.is-info')).click();
+    browser.wait(this.EC.visibilityOf(element(by.css('app-backup-restore .no-rec'))), 3000);
+  }
+
+  noBackupRecord() {
+    browser.ignoreSynchronization = true;
+    return element(by.css('app-backup-restore .no-rec')).getText();
   }
 
   navToSupportBundles() {
