@@ -1,0 +1,23 @@
+{
+  "dirty": false,
+  "raw": "v1.4.0-383-gec919fd",
+  "hash": "gec919fd",
+  "distance": 383,
+  "tag": "v1.4.0",
+  "semver": {
+    "options": {
+      "loose": false,
+      "includePrerelease": false
+    },
+    "loose": false,
+    "raw": "v1.4.0",
+    "major": 1,
+    "minor": 4,
+    "patch": 0,
+    "prerelease": [],
+    "build": [],
+    "version": "1.4.0"
+  },
+  "suffix": "383-gec919fd",
+  "semverString": "1.4.0+383.gec919fd"
+}
