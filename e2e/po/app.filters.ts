@@ -21,7 +21,6 @@ export class Filters {
       element(by.id('name')).sendKeys(filterName); // supply filter name
       element(by.id('next')).click();
       element(by.id('next')).click();
-      browser.wait(this.EC.visibilityOf(element(by.css('.accordion.card.cdk-drag'))), this.DETERMINISTIC_WAIT);
     })
       .catch((error) => {
         if (this.retryAttempts <= 5) {
@@ -42,6 +41,7 @@ export class Filters {
 
   getAddedFilterName() {
     browser.ignoreSynchronization = true;
+    browser.wait(this.EC.visibilityOf(element(by.css('.accordion.card.cdk-drag'))), this.DETERMINISTIC_WAIT);
     return element(by.css('.accordion.card.cdk-drag')).getText();
   }
 }

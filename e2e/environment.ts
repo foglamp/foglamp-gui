@@ -1,5 +1,5 @@
 export const environment = {
-  HOST: 'localhost',
+  HOST: '192.168.1.11',
   SERVICE_PORT: '8081',
   AUTH_OPTIONAL: true
 };

@@ -1,7 +1,7 @@
 import { browser, by, element, ExpectedConditions, promise, By } from 'protractor';
 
 export class SouthPage {
-  DETERMINISTIC_WAIT = 3000; // in milliseconds
+  DETERMINISTIC_WAIT = 2000; // in milliseconds
   retryAttempts = 0;
   EC = browser.ExpectedConditions;
 
@@ -30,9 +30,9 @@ export class SouthPage {
       element(by.id('next')).click();
       element(by.id('next')).click();
       element(by.id('next')).click();
-      browser.wait(this.EC.visibilityOf(element(by.css('#scheduled-process .title'))), this.DETERMINISTIC_WAIT);
     })
       .catch((error) => {
+        console.log('error', error);
         if (this.retryAttempts < 5) {
           console.log('Retrying load service.');
           this.addSouthService(serviceName);
@@ -51,7 +51,8 @@ export class SouthPage {
 
   getServiceName() {
     browser.ignoreSynchronization = true;
-    return element(by.css('.content table tr:nth-child(1) .button')).getText();
+    browser.wait(this.EC.visibilityOf(element(by.css('tr:nth-child(1) .button'))), this.DETERMINISTIC_WAIT);
+    return element(by.css('#south-service-list tr:nth-child(1) .button')).getText();
   }
 
   openSouthServiceModal() {
