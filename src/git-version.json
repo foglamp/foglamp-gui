@@ -1,8 +1,8 @@
 {
   "dirty": true,
-  "raw": "v1.4.0-383-ge10735e-dirty",
-  "hash": "ge10735e",
-  "distance": 383,
+  "raw": "v1.4.0-384-g676dd5c-dirty",
+  "hash": "g676dd5c",
+  "distance": 384,
   "tag": "v1.4.0",
   "semver": {
     "options": {
@@ -18,6 +18,6 @@
     "build": [],
     "version": "1.4.0"
   },
-  "suffix": "383-ge10735e-dirty",
-  "semverString": "1.4.0+383.ge10735e"
+  "suffix": "384-g676dd5c-dirty",
+  "semverString": "1.4.0+384.g676dd5c"
 }

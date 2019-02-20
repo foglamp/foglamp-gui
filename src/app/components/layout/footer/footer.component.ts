@@ -1,13 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import * as data from '../../../../git-version.json';
-import { version as appVersion } from '../../../../../package.json';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-footer',
   templateUrl: 'footer.component.html'
 })
 
-export class FooterComponent {
-  public appVersion: string = appVersion;
+export class FooterComponent implements OnInit {
+  public appVersion: string = environment.VERSION;
   public git = data['default'];
+
+  ngOnInit() {
+    console.log(this.appVersion);
+
+  }
 }
