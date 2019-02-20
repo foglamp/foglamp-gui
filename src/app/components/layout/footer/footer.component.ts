@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
-import * as data from '../../../../git-version.json';
+import { Router } from '@angular/router';
+
 import { environment } from '../../../../environments/environment';
+import * as data from '../../../../git-version.json';
 
 @Component({
   selector: 'app-footer',
@@ -10,4 +12,6 @@ import { environment } from '../../../../environments/environment';
 export class FooterComponent {
   public appVersion: string = environment.VERSION;
   public git = data['default'];
+
+  constructor(public router: Router) {}
 }
