@@ -2,8 +2,10 @@
     position: fixed;
     left: 0;
     bottom: 0;
+    height: 120px;
     width: 100%;
     text-align: center;
     border-top: 1px solid #e7e7e7;
-    padding: 2rem 1.5rem 2rem !important;
+    padding: 1rem 1.5rem 1rem !important;
+    z-index: 9;
  }
