@@ -1,4 +1,4 @@
-import { browser, by, element, ExpectedConditions, promise, By } from 'protractor';
+import { browser, by, element, ExpectedConditions, promise } from 'protractor';
 
 export class Filters {
   DETERMINISTIC_WAIT = 3000; // in milliseconds

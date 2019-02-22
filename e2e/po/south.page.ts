@@ -1,4 +1,4 @@
-import { browser, by, element, ExpectedConditions, promise, By, ElementFinder } from 'protractor';
+import { browser, by, element, ExpectedConditions, promise } from 'protractor';
 
 export class SouthPage {
   DETERMINISTIC_WAIT = 2000; // in milliseconds
