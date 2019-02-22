@@ -1,7 +1,7 @@
 import { SouthPage } from '../po/south.page';
 import { Filters } from '../po/app.filters';
 
-describe('FogLAMP gui', () => {
+describe('FogLAMP South Page tests', () => {
   const southPage = new SouthPage();
   const filters = new Filters();
 
@@ -23,5 +23,12 @@ describe('FogLAMP gui', () => {
     filters.openFilterWizard();
     filters.addFilter('guiE2eFilter #1');
     expect(filters.getAddedFilterName()).toEqual(' guiE2eFilter #1');
+  });
+
+  it('Should display asset count on south service', () => {
+    southPage.navToSouthPage();
+    southPage.getAssetCount().then(value => {
+      expect(+value).toBeGreaterThanOrEqual(1);
+    });
   });
 });

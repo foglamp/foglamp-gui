@@ -47,72 +47,72 @@ describe('FogLAMP gui', () => {
     // skipLogin.closeChartModal();
     // });
 
-    it('Should Display Audits Logs', () => {
-      skipLogin.navToAuditLogs();
-      expect(skipLogin.getAuditLogsTitle()).toEqual('Audit Logs');
-      expect(skipLogin.auditLogCount()).toContain('Count');
-      expect(skipLogin.isAuditLogRefreshIcon()).toEqual(true);
-      expect(skipLogin.getAuditLogsSelectTag()).toEqual(2);
-      expect(skipLogin.getAuditLogsInputTag()).toEqual(2);
-    });
+    // it('Should Display Audits Logs', () => {
+    //   skipLogin.navToAuditLogs();
+    //   expect(skipLogin.getAuditLogsTitle()).toEqual('Audit Logs');
+    //   expect(skipLogin.auditLogCount()).toContain('Count');
+    //   expect(skipLogin.isAuditLogRefreshIcon()).toEqual(true);
+    //   expect(skipLogin.getAuditLogsSelectTag()).toEqual(2);
+    //   expect(skipLogin.getAuditLogsInputTag()).toEqual(2);
+    // });
 
-    it('Should Display System Logs', () => {
-      skipLogin.navToSystemLogs();
-      expect(skipLogin.getSystemLogTitle()).toEqual('SysLog');
-      expect(skipLogin.systemLogCount()).toContain('Count');
-      expect(skipLogin.getSysLogRefreshButton()).toEqual(true);
-      expect(skipLogin.getSystemtLogSelectTag()).toEqual(2);
-      expect(skipLogin.getSystemLogInputTag()).toEqual(2);
-    });
+    // it('Should Display System Logs', () => {
+    //   skipLogin.navToSystemLogs();
+    //   expect(skipLogin.getSystemLogTitle()).toEqual('SysLog');
+    //   expect(skipLogin.systemLogCount()).toContain('Count');
+    //   expect(skipLogin.getSysLogRefreshButton()).toEqual(true);
+    //   expect(skipLogin.getSystemtLogSelectTag()).toEqual(2);
+    //   expect(skipLogin.getSystemLogInputTag()).toEqual(2);
+    // });
 
-    it('Should Display Scheduled Tasks', () => {
-      skipLogin.navToScheduledTasks();
-      expect(skipLogin.getSchedulesTitle()).toContain('Schedules');
-      expect(skipLogin.getSchedulesRefreshButton()).toEqual(true);
-    });
+    // it('Should Display Scheduled Tasks', () => {
+    //   skipLogin.navToScheduledTasks();
+    //   expect(skipLogin.getSchedulesTitle()).toContain('Schedules');
+    //   expect(skipLogin.getSchedulesRefreshButton()).toEqual(true);
+    // });
 
-    it('Should Display Certificate Store', () => {
-      const ColumnsName = [
-        'Name',
-        'Key',
-        'Certificate'
-      ];
-      skipLogin.navToCertificateStore();
-      expect(skipLogin.getCertificateStoreTitle()).toContain('Certificate Store');
-      expect(skipLogin.getCertificateStoreRefreshButton()).toEqual(true);
-      for (const ColumnName in ColumnsName) {
-        expect(skipLogin.getCertificateStoreColNames()).toContain(ColumnsName[ColumnName]);
-      }
-      expect(skipLogin.getCertificateStoreImport()).toContain('Import');
+    // it('Should Display Certificate Store', () => {
+    //   const ColumnsName = [
+    //     'Name',
+    //     'Key',
+    //     'Certificate'
+    //   ];
+    //   skipLogin.navToCertificateStore();
+    //   expect(skipLogin.getCertificateStoreTitle()).toContain('Certificate Store');
+    //   expect(skipLogin.getCertificateStoreRefreshButton()).toEqual(true);
+    //   for (const ColumnName in ColumnsName) {
+    //     expect(skipLogin.getCertificateStoreColNames()).toContain(ColumnsName[ColumnName]);
+    //   }
+    //   expect(skipLogin.getCertificateStoreImport()).toContain('Import');
 
-      expect(skipLogin.isKeyPresent()).toEqual(true);
-      expect(skipLogin.isCertificatePresent()).toEqual(true);
-    });
+    //   expect(skipLogin.isKeyPresent()).toEqual(true);
+    //   expect(skipLogin.isCertificatePresent()).toEqual(true);
+    // });
 
-    it('Should Display Backup & Restore', () => {
-      const ColumnsName = [
-        'Date & Time',
-        'Status'
-      ];
-      skipLogin.navToBackupRestore();
-      skipLogin.clickRequestBackup();
-      expect(skipLogin.getBackupRestoreTitle()).toContain('Backup');
-      for (const ColumnName in ColumnsName) {
-        expect(skipLogin.getBackupRestoreColNames()).toContain(ColumnsName[ColumnName]);
-      }
-      expect(skipLogin.getRequestBackup()).toContain('Backup');
-      // Delete backup
-      skipLogin.deleteBackup();
-      expect(skipLogin.noBackupRecord()).toContain('No Record');
-    });
+    // it('Should Display Backup & Restore', () => {
+    //   const ColumnsName = [
+    //     'Date & Time',
+    //     'Status'
+    //   ];
+    //   skipLogin.navToBackupRestore();
+    //   skipLogin.clickRequestBackup();
+    //   expect(skipLogin.getBackupRestoreTitle()).toContain('Backup');
+    //   for (const ColumnName in ColumnsName) {
+    //     expect(skipLogin.getBackupRestoreColNames()).toContain(ColumnsName[ColumnName]);
+    //   }
+    //   expect(skipLogin.getRequestBackup()).toContain('Backup');
+    //   // Delete backup
+    //   skipLogin.deleteBackup();
+    //   expect(skipLogin.noBackupRecord()).toContain('No Record');
+    // });
 
-    it('Should Display Support Bundles', () => {
-      skipLogin.navToSupportBundles();
-      expect(skipLogin.getSupportBundlesTitle()).toContain('Support Bundles');
-      expect(skipLogin.getSupportBundlesRefreshButton()).toEqual(true);
-      expect(skipLogin.getRequestNewBundle()).toContain('Request New');
-      expect(skipLogin.requestNewBundle()).toContain('Support bundle created successfully');
-    });
+    // it('Should Display Support Bundles', () => {
+    //   skipLogin.navToSupportBundles();
+    //   expect(skipLogin.getSupportBundlesTitle()).toContain('Support Bundles');
+    //   expect(skipLogin.getSupportBundlesRefreshButton()).toEqual(true);
+    //   expect(skipLogin.getRequestNewBundle()).toContain('Request New');
+    //   expect(skipLogin.requestNewBundle()).toContain('Support bundle created successfully');
+    // });
 
     it('Should Display Settings', () => {
       skipLogin.navToSettings();

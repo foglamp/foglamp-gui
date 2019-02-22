@@ -5,11 +5,21 @@ export class Filters {
   retryAttempts = 0;
   EC = browser.ExpectedConditions;
 
+  /**
+   * open filter wizard
+   */
   openFilterWizard() {
     browser.ignoreSynchronization = true;
     return element(by.css('.add-application a')).click();
   }
 
+  /**
+   * Add a filter in south service pipeline
+   * @prerequisite A south service should be added in the FogLAMP.
+   * A filter should be installed and discoverable at FogLAMP side.
+   * @param filterName {string} filter name
+   * @param {string}   filter plugin name
+   */
   addFilter(filterName: string) {
     browser.ignoreSynchronization = true;
     this.waitForFilterPluginsToLoad(this.DETERMINISTIC_WAIT).then(() => {
@@ -18,7 +28,9 @@ export class Filters {
         .then(options => {
           options[0].click();  // select first plugin in select box
         });
-      element(by.id('name')).sendKeys(filterName); // supply filter name
+      // supply filter name
+      element(by.id('name')).sendKeys(filterName);
+      // click next button twice
       element(by.id('next')).click();
       element(by.id('next')).click();
     })
@@ -34,11 +46,18 @@ export class Filters {
     this.retryAttempts++;
   }
 
+  /**
+   * Wait for filter plugin visibility
+   * @param timeOut wait time
+   */
   waitForFilterPluginsToLoad(timeOut?: number): promise.Promise<{}> {
     const isDataVisible = ExpectedConditions.visibilityOf(element(by.name('type')).element(by.tagName('option')));
     return browser.wait(ExpectedConditions.and(isDataVisible), timeOut);
   }
 
+  /**
+   *  Get filter name
+   */
   getAddedFilterName() {
     browser.ignoreSynchronization = true;
     browser.wait(this.EC.visibilityOf(element(by.css('.accordion.card.cdk-drag'))), this.DETERMINISTIC_WAIT);
