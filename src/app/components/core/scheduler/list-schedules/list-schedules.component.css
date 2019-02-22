@@ -1,5 +1,13 @@
-table.scroll {
-  height: 300px;
+@media screen and (min-width: 769px) {
+  table.scroll {
+    max-height: 60vh;
+  }
+}
+
+@media screen and (max-width: 769px) {
+  table.scroll {
+    max-height: 50vh;
+  }
 }
 
 .fa-minus-circle {

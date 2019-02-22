@@ -15,6 +15,17 @@
 
 .pagination-section {
   padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
+@media screen and (min-width: 769px) {
+  .card-content {
+    max-height: 65vh;
+  }
+}
 
+@media screen and (max-width: 769px) {
+  .card-content {
+    max-height: 55vh;
+  }
+}

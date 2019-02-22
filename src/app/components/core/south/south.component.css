@@ -1,5 +1,15 @@
-
 .align-content {
   vertical-align: middle;
 }
 
+@media screen and (min-width: 769px) {
+  table.scroll {
+    max-height: 60vh;
+  }
+}
+
+@media screen and (max-width: 769px) {
+  table.scroll {
+    max-height: 50vh;
+  }
+}

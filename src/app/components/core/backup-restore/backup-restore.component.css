@@ -1,1 +1,11 @@
-
+@media screen and (min-width: 769px) {
+    table.scroll {
+      max-height: 65vh;
+    }
+}
+  
+@media screen and (max-width: 769px) {
+    table.scroll {
+      max-height: 55vh;
+    }
+}
