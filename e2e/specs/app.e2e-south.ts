@@ -23,6 +23,7 @@ describe('FogLAMP South Page tests', () => {
     filters.openFilterWizard();
     filters.addFilter('guiE2eFilter #1');
     expect(filters.getAddedFilterName()).toEqual(' guiE2eFilter #1');
+    southPage.closeSouthServiceModal();
   });
 
   it('Should display asset count on south service', () => {

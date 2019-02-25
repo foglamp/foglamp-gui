@@ -2,7 +2,8 @@ import { browser, by, element, ExpectedConditions, promise } from 'protractor';
 
 export class Filters {
   DETERMINISTIC_WAIT = 3000; // in milliseconds
-  retryAttempts = 5;
+  RETRY_ATTEMPTS = 5;
+  addFilterRetryAttempts = 5;
   EC = browser.ExpectedConditions;
 
   /**
@@ -35,15 +36,15 @@ export class Filters {
       element(by.id('next')).click();
     })
       .catch((error) => {
-        if (this.retryAttempts > 0) {
+        if (this.addFilterRetryAttempts > 0) {
           console.log('Retrying load filter plugin.');
           this.addFilter(filterName);
         } else {
-          console.log('Rejecting the promise after ' + this.retryAttempts + ' attempts.');
+          console.log('Rejecting the promise after ' + this.RETRY_ATTEMPTS + ' attempts.');
           return Promise.reject(error);
         }
       });
-    this.retryAttempts--;
+    this.addFilterRetryAttempts--;
   }
 
   /**

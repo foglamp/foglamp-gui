@@ -2,7 +2,8 @@ import { browser, by, element, ExpectedConditions, promise } from 'protractor';
 
 export class SouthPage {
   DETERMINISTIC_WAIT = 2000; // in milliseconds
-  retryAttempts = 5;
+  RETRY_ATTEMPTS = 5;
+  addServiceRetryAttempts = 5;
   fetchAssetRetryAttempts = 5;
   EC = browser.ExpectedConditions;
 
@@ -52,15 +53,15 @@ export class SouthPage {
       element(by.id('next')).click();
     })
       .catch((error) => {
-        if (this.retryAttempts > 0) {
+        if (this.addServiceRetryAttempts > 0) {
           console.log('Retrying load service.');
           this.addSouthService(serviceName);
         } else {
-          console.log('Rejecting the promise after ' + this.retryAttempts + ' attempts.');
+          console.log('Rejecting the promise after ' + this.RETRY_ATTEMPTS + ' attempts.');
           return Promise.reject(error);
         }
       });
-    this.retryAttempts--;
+    this.addServiceRetryAttempts--;
   }
 
   /**
@@ -103,7 +104,7 @@ export class SouthPage {
           console.log('Retrying to load asset readings.');
           this.getAssetCount();
         } else {
-          console.log('Rejecting the promise after ' + this.fetchAssetRetryAttempts + ' attempts.');
+          console.log('Rejecting the promise after ' + this.RETRY_ATTEMPTS + ' attempts.');
           return Promise.reject(error);
         }
       });
@@ -120,5 +121,12 @@ export class SouthPage {
     const isDataVisible = ExpectedConditions.visibilityOf(element
       (by.css('#south-service-list tr:nth-child(1) td:nth-child(3) table tr:nth-child(1) td:nth-child(2) small')));
     return browser.wait(ExpectedConditions.and(isDataVisible), timeOut);
+  }
+
+  /**
+   * close south service modal window
+   */
+  closeSouthServiceModal() {
+    element(by.css('#south-service-modal .delete')).click();
   }
 }
