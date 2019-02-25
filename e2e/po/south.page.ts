@@ -2,8 +2,8 @@ import { browser, by, element, ExpectedConditions, promise } from 'protractor';
 
 export class SouthPage {
   DETERMINISTIC_WAIT = 2000; // in milliseconds
-  retryAttempts = 0;
-  fetchAssetRetryAttempts = 0;
+  retryAttempts = 5;
+  fetchAssetRetryAttempts = 5;
   EC = browser.ExpectedConditions;
 
   /**
@@ -52,15 +52,15 @@ export class SouthPage {
       element(by.id('next')).click();
     })
       .catch((error) => {
-        if (this.retryAttempts < 5) {
+        if (this.retryAttempts > 0) {
           console.log('Retrying load service.');
           this.addSouthService(serviceName);
         } else {
-          console.log('Rejecting the promise after 5 attempts.');
+          console.log('Rejecting the promise after ' + this.retryAttempts + ' attempts.');
           return Promise.reject(error);
         }
       });
-    this.retryAttempts++;
+    this.retryAttempts--;
   }
 
   /**
@@ -99,15 +99,15 @@ export class SouthPage {
       return Promise.resolve(found);
     })
       .catch((error) => {
-        if (this.fetchAssetRetryAttempts < 5) {
+        if (this.fetchAssetRetryAttempts > 0) {
           console.log('Retrying to load asset readings.');
           this.getAssetCount();
         } else {
-          console.log('Rejecting the promise after 5 attempts.');
+          console.log('Rejecting the promise after ' + this.fetchAssetRetryAttempts + ' attempts.');
           return Promise.reject(error);
         }
       });
-    this.fetchAssetRetryAttempts++;
+    this.fetchAssetRetryAttempts--;
     return element(by.css('#south-service-list tr:nth-child(1) td:nth-child(3) table tr:nth-child(1) td:nth-child(2) small'))
       .getText();
   }
