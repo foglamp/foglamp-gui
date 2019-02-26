@@ -11,14 +11,12 @@ describe('FogLAMP South Page tests', () => {
   });
 
   it('Should display added south service', () => {
-    southPage.navToSouthPage();
     southPage.clickAddServiceButton();
     southPage.addSouthService('guiE2eService #1'); // pass south service name
     expect(southPage.getServiceName()).toEqual('guiE2eService #1');
   });
 
   it('Should display added filter in south service', () => {
-    southPage.navToSouthPage();
     southPage.openSouthServiceModal();
     filters.openFilterWizard();
     filters.addFilter('guiE2eFilter #1');
@@ -27,7 +25,6 @@ describe('FogLAMP South Page tests', () => {
   });
 
   it('Should display asset count on south service', () => {
-    southPage.navToSouthPage();
     southPage.getAssetCount().then(value => {
       expect(+value).toBeGreaterThanOrEqual(1);
     });
