@@ -1,7 +1,7 @@
 import { browser, by, element, ExpectedConditions, promise } from 'protractor';
 
 export class SouthPage {
-  DETERMINISTIC_WAIT = 2000; // in milliseconds
+  DETERMINISTIC_WAIT = 3000; // in milliseconds
   RETRY_ATTEMPTS = 5;
   addServiceRetryAttempts = 5;
   fetchAssetRetryAttempts = 5;
