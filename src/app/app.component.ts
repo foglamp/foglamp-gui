@@ -36,12 +36,11 @@ export class AppComponent implements OnInit {
     }
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        this.isActive();
+        this.onLaunchAppRedirect();
       }
     });
     this.setPingIntervalOnAppLaunch();
     this.setStasHistoryGraphRefreshIntervalOnAppLaunch();
-    this.onLaunchAppRedirect();
   }
 
   @HostListener('window:resize', ['$event'])
@@ -56,24 +55,16 @@ export class AppComponent implements OnInit {
     }
   }
 
-  isActive() {
+  onLaunchAppRedirect() {
     this.sharedService.isServiceUp.subscribe(isServiceUp => {
       if (!isServiceUp) {
         this.isLoginView = true;
         this.router.navigate(['/setting'], { queryParams: { id: '1' } });
-      } else {
-        this.isLoginView = false;
-      }
-    });
-  }
-
-  onLaunchAppRedirect() {
-    this.sharedService.isServiceUp.subscribe(isServiceUp => {
-      if (!isServiceUp) {
-        this.router.navigate(['/setting'], { queryParams: { id: '1' } });
       } else if (sessionStorage.getItem('token') === null && !JSON.parse(sessionStorage.getItem('LOGIN_SKIPPED'))) {
+        this.isLoginView = true;
         this.router.navigate(['/login']);
       } else {
+        this.isLoginView = false;
         if (location.href.includes('/setting?id=1')) {
           this.router.navigate(['']);
         }
