@@ -57,17 +57,20 @@ export class AppComponent implements OnInit {
 
   onLaunchAppRedirect() {
     this.sharedService.isServiceUp.subscribe(isServiceUp => {
-      if (!isServiceUp) {
+      if (isServiceUp) {
+        if (sessionStorage.getItem('token') === null
+          && !JSON.parse(sessionStorage.getItem('LOGIN_SKIPPED'))) {
+          this.isLoginView = true;
+          this.router.navigate(['/login']);
+        } else {
+          this.isLoginView = false;
+          if (location.href.includes('/setting?id=1')) {
+            this.router.navigate(['']);
+          }
+        }
+      } else {
         this.isLoginView = true;
         this.router.navigate(['/setting'], { queryParams: { id: '1' } });
-      } else if (sessionStorage.getItem('token') === null && !JSON.parse(sessionStorage.getItem('LOGIN_SKIPPED'))) {
-        this.isLoginView = true;
-        this.router.navigate(['/login']);
-      } else {
-        this.isLoginView = false;
-        if (location.href.includes('/setting?id=1')) {
-          this.router.navigate(['']);
-        }
       }
     });
   }

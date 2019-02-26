@@ -187,7 +187,7 @@
                   <b *ngIf="pingData['hostName']  && pingData['serviceName']">{{pingInfo.hostName}}/{{pingData['serviceName']}}</b>
                 </a>
               </div>
-              <div class="dropdown-menu" id="dropdown-menu" role="menu">
+              <div *ngIf="showDropDownMenu" class="dropdown-menu" id="dropdown-menu" role="menu">
                 <div class="dropdown-content">
                   <div *ngIf="showSpinner" class="app-loading">
                     &nbsp;

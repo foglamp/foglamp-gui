@@ -11,8 +11,10 @@ import {
 } from '@angular/core';
 import { sortBy } from 'lodash';
 import { Router } from '@angular/router';
-import { AlertService, AuthService, ConnectedServiceStatus, PingService, ServicesHealthService,
-  ProgressBarService } from '../../../services';
+import {
+  AlertService, AuthService, ConnectedServiceStatus, PingService, ServicesHealthService,
+  ProgressBarService
+} from '../../../services';
 import { SharedService } from '../../../services/shared.service';
 import Utils from '../../../utils';
 import { RestartModalComponent } from '../../common/restart-modal/restart-modal.component';
@@ -44,6 +46,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   uptime: any = '';
   viewPort: any = '';
   public showSpinner = false;
+  public showDropDownMenu = false;
 
   @ViewChild(ShutdownModalComponent) child: ShutdownModalComponent;
   @ViewChild(RestartModalComponent) childRestart: RestartModalComponent;
@@ -115,6 +118,11 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public getServiceStatus() {
+    if (this.router.url.includes('/login') || this.router.url.includes('/setting?id=1')) {
+      this.showDropDownMenu = false;
+      return;
+    }
+    this.showDropDownMenu = true;
     this.showLoadingSpinner();
     this.servicesHealthService.getAllServices()
       .subscribe(
