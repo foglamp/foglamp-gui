@@ -38,6 +38,6 @@
 
 @media screen and (max-height: 600px) {
   .card-content {
-    max-height: 40vh;
+    max-height: 42vh;
   }
 }

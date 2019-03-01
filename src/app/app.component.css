@@ -1,3 +1,9 @@
 .column.is-offset-2.is-10 {
   height: 100%;
 }
+
+@media screen and (min-height: 700px) {
+  .fixed-overflow {
+    overflow-y: hidden;
+  }
+}

@@ -7,3 +7,27 @@
   border-left: 1px solid #dbdbdb;
   border-right: 1px solid #dbdbdb;
 }
+
+@media screen and (min-height: 955px) {
+  .card-content {
+    max-height: 72vh;
+  }
+}
+
+@media screen and (min-height: 800px) and (max-width: 770px) {
+  .card-content {
+    max-height: 58vh;
+  }
+}
+
+@media screen and (min-height: 600px) and (max-height: 800px) {
+  .card-content {
+    max-height: 69vh;
+  }
+}
+
+@media screen and (max-height: 600px) {
+  .card-content {
+    max-height: 35vh;
+  }
+}
