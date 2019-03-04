@@ -1,0 +1,32 @@
+<div class="container is-fluid">
+  <div>
+    <p class="notification is-warning" *ngIf="!isNotificationServiceAvailable">
+      Notification service is not configured
+      and enabled. <a (click)="addNotificationService()"> Enable Now</a></p>
+    <p class="notification is-warning" *ngIf="isNotificationServiceAvailable && !isNotificationServiceEnabled">
+      Notification service is not enabled. <a (click)="enableNotificationService()"> Enable Now</a></p>
+  </div>
+
+  <div class="card">
+    <header class="card-header">
+      <div id="notification-service" class="card-header-title">
+        <div class="media-content">
+          <p class="title is-5">
+            Notifications
+          </p>
+        </div>
+      </div>
+      <a id="add_notification_instance" class="fix-pad button is-light" (click)="addNotificationInstance()">Add notification
+        instance &nbsp;
+        <i class="fa fa-plus" aria-hidden="true"></i>
+      </a>
+    </header>
+    <div class="card-content">
+      <div class="content">
+        <p class="help">
+          Notifications
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
