@@ -14,8 +14,7 @@
 }
 
 .pagination-section {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding: 1.5rem;
 }
 
 @media screen and (min-height: 955px) {
@@ -26,7 +25,7 @@
 
 @media screen and (min-height: 800px) and (max-height: 955px) {
   .card-content {
-    max-height: 56vh;
+    max-height: 60vh;
   }
 }
 
