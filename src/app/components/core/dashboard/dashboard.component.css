@@ -17,7 +17,3 @@
 .columns:not(:last-child) {
    margin-bottom: 0% !important;
 }
-
-.fixed-overflow {
-  overflow-y: scroll !important;
-}

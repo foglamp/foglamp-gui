@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { map } from 'lodash';
 import { interval } from 'rxjs';
 import 'rxjs/add/operator/takeWhile';
@@ -10,8 +10,7 @@ import { GRAPH_REFRESH_INTERVAL, STATS_HISTORY_TIME_FILTER } from '../../../util
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./dashboard.component.css']
 })
 
 export class DashboardComponent implements OnInit, OnDestroy {

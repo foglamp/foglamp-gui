@@ -6,10 +6,6 @@ body,
   height: 100%;
 }
 
-html {
-  overflow-y: hidden;
-}
-
 html,
 .footer {
   background-color: #f5f5f5 !important;

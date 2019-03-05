@@ -16,27 +16,3 @@
 .pagination-section {
   padding: 0.5rem;
 }
-
-@media screen and (min-height: 955px) {
-  .card-content {
-    max-height: 67vh;
-  }
-}
-
-@media screen and (min-height: 800px) and (max-height: 955px) {
-  .card-content {
-    max-height: 60vh;
-  }
-}
-
-@media screen and (min-height: 600px) and (max-height: 800px) {
-  .card-content {
-    max-height: 54vh;
-  }
-}
-
-@media screen and (max-height: 600px) {
-  .card-content {
-    max-height: 42vh;
-  }
-}
