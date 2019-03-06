@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ServicesHealthService, ProgressBarService, AlertService, SchedulesService } from '../../../services';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-notifications',
@@ -16,7 +17,8 @@ export class NotificationsComponent implements OnInit {
   constructor(public servicesHealthService: ServicesHealthService,
     public schedulesService: SchedulesService,
     public ngProgress: ProgressBarService,
-    public alertService: AlertService) { }
+    public alertService: AlertService,
+    public router: Router) { }
 
   ngOnInit() {
     this.getService();
@@ -49,7 +51,7 @@ export class NotificationsComponent implements OnInit {
 
   addNotificationService() {
     const payload = {
-      name: 'NotificationServer',
+      name: 'Notifications',
       type: 'notification',
       enabled: true
     };
@@ -116,6 +118,6 @@ export class NotificationsComponent implements OnInit {
   }
 
   addNotificationInstance() {
-    console.log('Not implemented yet');
+    this.router.navigate(['/notification/add']);
   }
 }

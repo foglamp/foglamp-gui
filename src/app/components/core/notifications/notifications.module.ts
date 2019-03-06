@@ -10,19 +10,26 @@ import { SharedModule } from '../../../shared.module';
 import { AlertDialogModule } from '../../common/alert-dialog/alert-dialog.module';
 import { FilterModule } from '../filter/filter.module';
 import { NotificationsComponent } from './notifications.component';
-import { ServicesHealthService } from '../../../services';
+import { ServicesHealthService, NotificationsService } from '../../../services';
+import { AddNotificationWizardComponent } from './add-notification-wizard/add-notification-wizard.component';
 
 const routes: Routes = [
   {
     path: '',
     component: NotificationsComponent,
     canActivate: [AuthCheckGuard]
+  },
+  {
+    path: 'add',
+    component: AddNotificationWizardComponent,
+    canActivate: [AuthCheckGuard]
   }
 ];
 
 @NgModule({
   declarations: [
-   NotificationsComponent
+    NotificationsComponent,
+    AddNotificationWizardComponent
   ],
   imports: [
     FormsModule,
@@ -35,6 +42,6 @@ const routes: Routes = [
     FilterModule,
     SharedModule
   ],
-  providers: [ServicesHealthService],
+  providers: [ServicesHealthService, NotificationsService],
 })
 export class NotificationsModule { }
