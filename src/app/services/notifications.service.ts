@@ -11,6 +11,12 @@ export class NotificationsService {
 
   constructor(private http: HttpClient) { }
 
+  getNotificationInstance() {
+    return this.http.get(this.GET_NOTIFICATION_URL).pipe(
+      map(response => response),
+      catchError((error: Response) => observableThrowError(error)));
+  }
+
   getNotificationPlugins() {
     return this.http.get(this.GET_NOTIFICATION_URL + '/plugin').pipe(
       map(response => response),

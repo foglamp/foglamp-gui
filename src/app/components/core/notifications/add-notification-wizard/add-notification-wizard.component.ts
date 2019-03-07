@@ -345,6 +345,7 @@ export class AddNotificationWizardComponent implements OnInit {
     });
 
     // convert finalConfig array in object of objects to pass in add service
+    console.log('finalConfig', finalConfig);
     return finalConfig = reduce(finalConfig, function (memo, current) { return assign(memo, current); }, {});
     // this.payload.config = finalConfig;
     // console.log('payload', this.payload);
@@ -356,6 +357,7 @@ export class AddNotificationWizardComponent implements OnInit {
         (data: []) => {
           console.log('data', data);
           this.notificationTypeList = data['notification_type'];
+          this.notificationForm.controls['type'].setValue(this.notificationTypeList[0]);
         },
         (error) => {
           if (error.status === 0) {

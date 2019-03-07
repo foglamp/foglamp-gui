@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { ServicesHealthService, ProgressBarService, AlertService, SchedulesService } from '../../../services';
+import {
+  ServicesHealthService, ProgressBarService, AlertService,
+  SchedulesService, NotificationsService
+} from '../../../services';
 import { Router } from '@angular/router';
+
+import { sortBy } from 'lodash';
 
 @Component({
   selector: 'app-notifications',
@@ -13,15 +18,20 @@ export class NotificationsComponent implements OnInit {
   isNotificationServiceAvailable = false;
   isNotificationServiceEnabled = false;
   notificationServiceName: string;
+  notificationInstances = [];
+
+  public showSpinner = false;
 
   constructor(public servicesHealthService: ServicesHealthService,
     public schedulesService: SchedulesService,
+    public notificationService: NotificationsService,
     public ngProgress: ProgressBarService,
     public alertService: AlertService,
     public router: Router) { }
 
   ngOnInit() {
     this.getService();
+    this.getNotificationInstance();
   }
 
 
@@ -46,7 +56,6 @@ export class NotificationsComponent implements OnInit {
             this.alertService.error(error.statusText);
           }
         });
-
   }
 
   addNotificationService() {
@@ -61,7 +70,7 @@ export class NotificationsComponent implements OnInit {
         () => {
           /** request done */
           this.ngProgress.done();
-          this.alertService.success('Service added successfully.', true);
+          this.alertService.success('Notification service added successfully.', true);
           this.isNotificationServiceAvailable = true;
           this.isNotificationServiceEnabled = true;
         },
@@ -115,6 +124,35 @@ export class NotificationsComponent implements OnInit {
             this.alertService.error(error.statusText);
           }
         });
+  }
+
+  public getNotificationInstance() {
+    this.notificationService.getNotificationInstance().
+      subscribe(
+        (data: any) => {
+          this.notificationInstances = data['notifications'];
+          this.hideLoadingSpinner();
+        },
+        error => {
+          this.hideLoadingSpinner();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
+        });
+  }
+
+  public showLoadingSpinner() {
+    this.showSpinner = true;
+  }
+
+  public hideLoadingSpinner() {
+    this.showSpinner = false;
+  }
+
+  openSouthServiceModal(instance) {
+    console.log(instance);
   }
 
   addNotificationInstance() {

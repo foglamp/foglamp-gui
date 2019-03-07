@@ -16,16 +16,67 @@
           </p>
         </div>
       </div>
-      <a id="add_notification_instance" class="fix-pad button is-light" (click)="addNotificationInstance()">Add notification
+      <a id="add_notification_instance" class="fix-pad button is-light" (click)="addNotificationInstance()">Add
+        notification
         instance &nbsp;
         <i class="fa fa-plus" aria-hidden="true"></i>
       </a>
     </header>
     <div class="card-content">
       <div class="content">
-        <p class="help">
-          Notifications
-        </p>
+        <div *ngIf="showSpinner" class="app-loading">
+          &nbsp;
+          <svg class="spinner" viewBox="0 0 100 100">
+            <circle class="path" cx="50%" cy="50%" r="10" fill="none" stroke-width="2" stroke-miterlimit="10" />
+          </svg>
+        </div>
+        <ng-container *ngIf="!showSpinner">
+          <div class="has-text-centered" *ngIf="notificationInstances != undefined && notificationInstances.length === 0">
+            <small class="no-rec">No Record</small>
+          </div>
+          <ng-container *ngIf="notificationInstances!= undefined && notificationInstances.length > 0">
+            <table id="south-service-list" class="table is-fullwidth scroll is-responsive" cellpadding="0"
+              cellspacing="0">
+              <thead>
+                <tr>
+                  <th class="align-content">Name</th>
+                  <th class="align-content">Channel</th>
+                  <th class="align-content">Rule</th>
+                  <th class="align-content">Type</th>
+                  <th class="align-content">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let instance of notificationInstances">
+                  <td class="align-content">
+                    <a class="button is-text" (click)="openNotificationInstanceModal(instance)">{{instance.name}}</a>
+                  </td>
+                  <td class="align-content">
+                    {{instance.channel}}
+                  </td>
+                  <td class="align-content">
+                    {{instance.rule}}
+                  </td>
+                  <td class="align-content">
+                    {{instance.notificationType}}
+                  </td>
+                  <td class="align-content">
+                    <div class="tags has-addons">
+                      <ng-container *ngIf="!instance.enabled">
+                        <span class="tag">disabled</span> <!-- This also take care of shutdown status-->
+                      </ng-container>
+                      <ng-container *ngIf="instance.enabled">
+                        <span *ngIf="instance.status == 'running'" class="tag is-success">enabled</span>
+                        <span *ngIf="instance.status == 'failed'" class="tag is-danger">{{svc.status}}</span>
+                        <span *ngIf="instance.status == 'unresponsive'" class="tag is-warning">{{svc.status}}</span>
+                      </ng-container>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </ng-container>
+        </ng-container>
       </div>
     </div>
   </div>
