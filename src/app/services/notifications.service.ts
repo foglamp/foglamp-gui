@@ -18,12 +18,14 @@ export class NotificationsService {
   }
 
   getNotificationTypeList() {
-    return [
-      'one shot',
-      'retriggered',
-      'toggled'];
-    // return this.http.get(this.GET_NOTIFICATION_URL + '/plugin').pipe(
-    //   map(response => response),
-    //   catchError((error: Response) => observableThrowError(error)));
+    return this.http.get(this.GET_NOTIFICATION_URL + '/type').pipe(
+      map(response => response),
+      catchError((error: Response) => observableThrowError(error)));
+  }
+
+  addNotificationInstance(payload: any) {
+    return this.http.post(this.GET_NOTIFICATION_URL, payload).pipe(
+      map(response => response),
+      catchError((error: Response) => observableThrowError(error)));
   }
 }
