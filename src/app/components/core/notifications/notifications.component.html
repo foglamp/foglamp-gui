@@ -67,8 +67,8 @@
                       </ng-container>
                       <ng-container *ngIf="instance.enabled">
                         <span *ngIf="instance.status == 'running'" class="tag is-success">enabled</span>
-                        <span *ngIf="instance.status == 'failed'" class="tag is-danger">{{svc.status}}</span>
-                        <span *ngIf="instance.status == 'unresponsive'" class="tag is-warning">{{svc.status}}</span>
+                        <span *ngIf="instance.status == 'failed'" class="tag is-danger">{{instance.status}}</span>
+                        <span *ngIf="instance.status == 'unresponsive'" class="tag is-warning">{{instance.status}}</span>
                       </ng-container>
                     </div>
                   </td>

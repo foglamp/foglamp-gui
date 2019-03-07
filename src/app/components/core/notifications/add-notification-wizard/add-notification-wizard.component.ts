@@ -27,8 +27,13 @@ export class AddNotificationWizardComponent implements OnInit {
   public isNotificationEnabled = false;
 
   public payload: any = {};
+
   public rulePluginConfigurationData: any;
+  public rulePluginChangedConfig: any;
+
   public deliveryPluginConfigurationData: any;
+  public deliveryPluginChangedConfig: any;
+
   public useProxy: string;
 
   notificationForm = new FormGroup({
@@ -263,7 +268,6 @@ export class AddNotificationWizardComponent implements OnInit {
   */
   private getRulePluginConfiguration(): void {
     const config = this.notificationRulePlugins.map(p => {
-      console.log('p', p, this.payload.rule);
       if (p.name === this.payload.rule) {
         return p.config;
       }
@@ -277,7 +281,6 @@ export class AddNotificationWizardComponent implements OnInit {
 
   private getDeliveryPluginConfiguration(): void {
     const config = this.notificationDeliveryPlugins.map(d => {
-      console.log('d', d, this.payload.channel);
       if (d.name === this.payload.channel) {
         return d.config;
       }
@@ -375,6 +378,8 @@ export class AddNotificationWizardComponent implements OnInit {
    * @param previousButton button to go previous
    */
   public addNotificationInstance(payload: any) {
+    console.log('this.deliveryPluginChangedConfig', this.deliveryPluginChangedConfig);
+    console.log('this.rulePluginChangedConfig', this.rulePluginChangedConfig);
     /** request started */
     this.ngProgress.start();
     this.notificationService.addNotificationInstance(payload)

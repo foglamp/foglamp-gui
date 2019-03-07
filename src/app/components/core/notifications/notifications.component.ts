@@ -5,8 +5,6 @@ import {
 } from '../../../services';
 import { Router } from '@angular/router';
 
-import { sortBy } from 'lodash';
-
 @Component({
   selector: 'app-notifications',
   templateUrl: './notifications.component.html',
@@ -33,7 +31,6 @@ export class NotificationsComponent implements OnInit {
     this.getService();
     this.getNotificationInstance();
   }
-
 
   getService() {
     this.servicesHealthService.getAllServices().
@@ -151,7 +148,7 @@ export class NotificationsComponent implements OnInit {
     this.showSpinner = false;
   }
 
-  openSouthServiceModal(instance) {
+  openNotificationInstanceModal(instance: any) {
     console.log(instance);
   }
 
