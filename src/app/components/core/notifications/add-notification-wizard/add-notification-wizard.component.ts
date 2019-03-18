@@ -4,9 +4,8 @@ import { Router } from '@angular/router';
 
 import { assign, cloneDeep, reduce, sortBy, map } from 'lodash';
 
-import { NotificationsService, ProgressBarService, AlertService, ServicesHealthService } from '../../../../services/index';
+import { NotificationsService, ProgressBarService, AlertService, ServicesHealthService, ConfigurationService } from '../../../../services/index';
 import { ViewConfigItemComponent } from '../../configuration-manager/view-config-item/view-config-item.component';
-
 
 @Component({
   selector: 'app-add-notification-wizard',
@@ -22,9 +21,10 @@ export class AddNotificationWizardComponent implements OnInit {
   public notificationTypeList = [];
 
   public isValidName = true;
-  public isValidPlugin = true;
+  public isRulePlugin = true;
+  public isDeliveryPlugin = true;
   public isSinglePlugin = true;
-  public isNotificationEnabled = false;
+  public isNotificationEnabled = true;
 
   public payload: any = {};
 
@@ -35,6 +35,8 @@ export class AddNotificationWizardComponent implements OnInit {
   public deliveryPluginChangedConfig: any;
 
   public useProxy: string;
+
+  public pageId: number;
 
   notificationForm = new FormGroup({
     name: new FormControl(),
@@ -50,6 +52,7 @@ export class AddNotificationWizardComponent implements OnInit {
     private notificationService: NotificationsService,
     private alertService: AlertService,
     private ngProgress: ProgressBarService,
+    private configService: ConfigurationService,
     private router: Router) { }
 
   ngOnInit() {
@@ -69,7 +72,6 @@ export class AddNotificationWizardComponent implements OnInit {
     this.ngProgress.start();
     this.notificationService.getNotificationPlugins().subscribe(
       (data: any) => {
-        console.log('data', data);
         /** request completed */
         this.ngProgress.done();
         this.notificationRulePlugins = sortBy(data.rules, p => {
@@ -78,9 +80,6 @@ export class AddNotificationWizardComponent implements OnInit {
         this.notificationDeliveryPlugins = sortBy(data.delivery, p => {
           return p.name.toLowerCase();
         });
-
-        console.log('this.notificationRulePlugins', this.notificationRulePlugins);
-        console.log('this.notificationDeliveryPlugins', this.notificationDeliveryPlugins);
       },
       (error) => {
         /** request completed */
@@ -96,7 +95,6 @@ export class AddNotificationWizardComponent implements OnInit {
   movePrevious() {
     const last = <HTMLElement>document.getElementsByClassName('is-active')[0];
     const id = last.getAttribute('id');
-    console.log('previous id', id);
 
     if (+id === 1) {
       this.router.navigate(['/notification']);
@@ -121,29 +119,29 @@ export class AddNotificationWizardComponent implements OnInit {
     const previousButton = <HTMLButtonElement>document.getElementById('previous');
     switch (+id) {
       case 2:
-        console.log('previous', id);
+        this.pageId = +id - 2;
         nxtButton.textContent = 'Next';
         previousButton.textContent = 'Back';
         nxtButton.disabled = false;
         break;
       case 3:
-        console.log('previous', id);
+        this.pageId = +id - 2;
         nxtButton.textContent = 'Next';
         previousButton.textContent = 'Back';
         nxtButton.disabled = false;
         break;
       case 4:
-        console.log('previous', id);
+        this.pageId = +id - 2;
         nxtButton.textContent = 'Next';
         nxtButton.disabled = false;
         break;
       case 5:
-        console.log('previous', id);
+        this.pageId = +id - 2;
         nxtButton.textContent = 'Next';
         nxtButton.disabled = false;
         break;
       case 6:
-        console.log('previous', id);
+        this.pageId = +id - 2;
         nxtButton.textContent = 'Next';
         nxtButton.disabled = false;
         break;
@@ -153,16 +151,17 @@ export class AddNotificationWizardComponent implements OnInit {
   }
 
   moveNext() {
+    this.isRulePlugin = true;
     this.isValidName = true;
+    this.isDeliveryPlugin = true;
     const formValues = this.notificationForm.value;
     const first = <HTMLElement>document.getElementsByClassName('is-active')[0];
     const id = first.getAttribute('id');
-    console.log('next id', id);
     const nxtButton = <HTMLButtonElement>document.getElementById('next');
     const previousButton = <HTMLButtonElement>document.getElementById('previous');
     switch (+id) {
       case 1:
-        console.log('case 1', id);
+        this.pageId = +id;
         if (formValues['name'].trim() === '') {
           this.isValidName = false;
           return;
@@ -187,8 +186,17 @@ export class AddNotificationWizardComponent implements OnInit {
         }
         break;
       case 2:
-        console.log('case 2', id);
-        // create payload to pass in add service
+        this.pageId = +id;
+        if (formValues['rule'] === '') {
+          this.isRulePlugin = false;
+          return;
+        }
+
+        if (formValues['rule'].length > 1) {
+          this.isSinglePlugin = false;
+          return;
+        }
+
         if (formValues['rule'].length > 0) {
           this.payload.rule = formValues['rule'][0];
         }
@@ -197,8 +205,7 @@ export class AddNotificationWizardComponent implements OnInit {
         previousButton.textContent = 'Previous';
         break;
       case 3:
-        console.log('case 3', id);
-
+        this.pageId = +id;
         this.viewConfigItemComponent.callFromWizard();
         document.getElementById('vci-proxy').click();
         if (this.viewConfigItemComponent !== undefined && !this.viewConfigItemComponent.isValidForm) {
@@ -208,17 +215,26 @@ export class AddNotificationWizardComponent implements OnInit {
         previousButton.textContent = 'Previous';
         break;
       case 4:
+        this.pageId = +id;
+        if (formValues['delivery'] === '') {
+          this.isDeliveryPlugin = false;
+          return;
+        }
+        if (formValues['delivery'].length > 1) {
+          this.isSinglePlugin = false;
+          return;
+        }
+
         if (formValues['delivery'].length > 0) {
           this.payload.channel = formValues['delivery'][0];
         }
-        console.log('case 4', id);
         // create payload to pass in add service
         nxtButton.textContent = 'Next';
         previousButton.textContent = 'Previous';
         this.getDeliveryPluginConfiguration();
         break;
       case 5:
-        console.log('case 5', id);
+        this.pageId = +id;
         this.viewConfigItemComponent.callFromWizard();
         document.getElementById('vci-proxy').click();
         if (this.viewConfigItemComponent !== undefined && !this.viewConfigItemComponent.isValidForm) {
@@ -228,12 +244,11 @@ export class AddNotificationWizardComponent implements OnInit {
         previousButton.textContent = 'Previous';
         break;
       case 6:
-        console.log('case 6', id);
-        console.log('formValues notificationType', formValues['type']);
+        this.pageId = +id;
         if (formValues['type'].length > 0) {
           this.payload.notification_type = formValues['type'];
         }
-        console.log('this.payload', this.payload);
+        this.payload.enabled = this.isNotificationEnabled;
         this.addNotificationInstance(this.payload);
         break;
       default:
@@ -275,8 +290,13 @@ export class AddNotificationWizardComponent implements OnInit {
 
     // array to hold data to display on configuration page
     this.rulePluginConfigurationData = { value: config };
-    console.log('this.rulePluginConfigurationData', this.rulePluginConfigurationData);
     this.useProxy = 'true';
+  }
+
+  isPluginSelected() {
+    this.isSinglePlugin = true;
+    this.isRulePlugin = true;
+    this.isDeliveryPlugin = true;
   }
 
   private getDeliveryPluginConfiguration(): void {
@@ -288,7 +308,6 @@ export class AddNotificationWizardComponent implements OnInit {
 
     // array to hold data to display on configuration page
     this.deliveryPluginConfigurationData = { value: config };
-    console.log('this.deliveryPluginConfigurationData', this.deliveryPluginConfigurationData);
     this.useProxy = 'true';
   }
 
@@ -316,7 +335,7 @@ export class AddNotificationWizardComponent implements OnInit {
    * Get edited configuration from view config child page
    * @param changedConfig changed configuration of a selected plugin
    */
-  getPluginChangedConfig(changedConfig: any, pluginConfigurationData: any) {
+  getPluginChangedConfig(changedConfig: any, pluginConfigurationData: any, pageId: number) {
     const defaultConfig = map(pluginConfigurationData.value[0], (v, key) => ({ key, ...v }));
     // make a copy of matched config items having changed values
     const matchedConfig = defaultConfig.filter(e1 => {
@@ -340,25 +359,24 @@ export class AddNotificationWizardComponent implements OnInit {
     });
 
     // final array to hold changed configuration
-    let finalConfig = [];
+    const finalConfig = [];
     matchedConfigCopy.forEach(item => {
       finalConfig.push({
-        [item.key]: item.type === 'JSON' ? { value: JSON.parse(item.value) } : { value: item.value }
+        [item.key]: item.type === 'JSON' ? JSON.parse(item.value) : item.value
       });
     });
 
-    // convert finalConfig array in object of objects to pass in add service
-    console.log('finalConfig', finalConfig);
-    return finalConfig = reduce(finalConfig, function (memo, current) { return assign(memo, current); }, {});
-    // this.payload.config = finalConfig;
-    // console.log('payload', this.payload);
+    if (pageId === 3) {
+      this.rulePluginChangedConfig = reduce(finalConfig, function (memo, current) { return assign(memo, current); }, {});
+    } else if (pageId === 5) {
+      this.deliveryPluginChangedConfig = reduce(finalConfig, function (memo, current) { return assign(memo, current); }, {});
+    }
   }
 
   getNotificationTypeList() {
     this.notificationService.getNotificationTypeList()
       .subscribe(
         (data: []) => {
-          console.log('data', data);
           this.notificationTypeList = data['notification_type'];
           this.notificationForm.controls['type'].setValue(this.notificationTypeList[0]);
         },
@@ -378,8 +396,6 @@ export class AddNotificationWizardComponent implements OnInit {
    * @param previousButton button to go previous
    */
   public addNotificationInstance(payload: any) {
-    console.log('this.deliveryPluginChangedConfig', this.deliveryPluginChangedConfig);
-    console.log('this.rulePluginChangedConfig', this.rulePluginChangedConfig);
     /** request started */
     this.ngProgress.start();
     this.notificationService.addNotificationInstance(payload)
@@ -388,10 +404,29 @@ export class AddNotificationWizardComponent implements OnInit {
           /** request done */
           this.ngProgress.done();
           this.alertService.success('Notification service added successfully.', true);
+          this.updateConfiguration(`rule${payload.name}`, this.rulePluginChangedConfig);
+          this.updateConfiguration(`delivery${payload.name}`, this.deliveryPluginChangedConfig);
           this.router.navigate(['/notification']);
         },
         (error) => {
           /** request done */
+          this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
+        });
+  }
+
+  updateConfiguration(categoryName: string, config: any) {
+    this.configService.updateBulkConfiguration(categoryName, config).
+      subscribe(
+        (data: any) => {
+          console.log('updated config', data);
+        },
+        error => {
+          /** request completed */
           this.ngProgress.done();
           if (error.status === 0) {
             console.log('service down ', error);

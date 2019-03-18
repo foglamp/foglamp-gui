@@ -12,7 +12,7 @@ import ConfigTypeValidation from '../configuration-type-validation';
 })
 export class ViewConfigItemComponent implements OnInit, OnChanges {
   @Input() categoryConfigurationData: any;
-  @Input() useProxy: string =  'false';
+  @Input() useProxy: string = 'false';
   @Input() useFilterProxy: string = 'false';
   @Input() formId: string = '';
   @Input() pageId: string = 'page';
@@ -79,6 +79,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges {
       this.isValidForm = false;
       return;
     }
+    console.log('value', form.value);
 
     const formData = Object.keys(form.value).map(key => {
       return {
