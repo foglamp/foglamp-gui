@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { sortBy } from 'lodash';
 import {
   ServicesHealthService, ProgressBarService, AlertService,
   SchedulesService, NotificationsService
 } from '../../../services';
 import { Router } from '@angular/router';
+import { NotificationModalComponent } from './notification-modal/notification-modal.component';
 
 @Component({
   selector: 'app-notifications',
@@ -18,9 +19,10 @@ export class NotificationsComponent implements OnInit {
   isNotificationServiceEnabled = false;
   notificationServiceName: string;
   notificationInstances = [];
+  notification: any;
 
   public showSpinner = false;
-
+  @ViewChild(NotificationModalComponent) notificationModal: NotificationModalComponent;
   constructor(public servicesHealthService: ServicesHealthService,
     public schedulesService: SchedulesService,
     public notificationService: NotificationsService,
@@ -146,6 +148,11 @@ export class NotificationsComponent implements OnInit {
         });
   }
 
+  onNotify() {
+    this.getNotificationInstance();
+  }
+
+
   public showLoadingSpinner() {
     this.showSpinner = true;
   }
@@ -156,6 +163,9 @@ export class NotificationsComponent implements OnInit {
 
   openNotificationInstanceModal(instance: any) {
     console.log(instance);
+    this.notification = instance;
+    this.notificationModal.notification = instance;
+    this.notificationModal.toggleModal(true);
   }
 
   addNotificationInstance() {

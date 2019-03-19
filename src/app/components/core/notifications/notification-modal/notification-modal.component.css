@@ -1,0 +1,30 @@
+.box {
+  box-shadow: 0 0 0 0 !important;
+}
+
+.is-hidden {
+  display: none;
+}
+
+.align {
+  vertical-align: middle;
+}
+
+label{
+  width: 12vw !important;
+  margin-right: 2vw;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+a { color: black; }
+
+@media screen and (min-width: 769px) {
+  .view-content {
+    display: block !important;
+  }
+}
+
+

@@ -12,6 +12,7 @@ import { FilterModule } from '../filter/filter.module';
 import { NotificationsComponent } from './notifications.component';
 import { ServicesHealthService, NotificationsService } from '../../../services';
 import { AddNotificationWizardComponent } from './add-notification-wizard/add-notification-wizard.component';
+import { NotificationModalComponent } from './notification-modal/notification-modal.component';
 
 const routes: Routes = [
   {
@@ -29,7 +30,8 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     NotificationsComponent,
-    AddNotificationWizardComponent
+    AddNotificationWizardComponent,
+    NotificationModalComponent
   ],
   imports: [
     FormsModule,
