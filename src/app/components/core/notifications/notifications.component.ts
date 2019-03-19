@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { sortBy } from 'lodash';
 import {
   ServicesHealthService, ProgressBarService, AlertService,
   SchedulesService, NotificationsService
@@ -128,6 +129,11 @@ export class NotificationsComponent implements OnInit {
       subscribe(
         (data: any) => {
           this.notificationInstances = data['notifications'];
+          this.notificationInstances = sortBy(this.notificationInstances, function (svc) {
+            return svc['enable'] === 'false';
+          });
+          console.log(this.notificationInstances);
+
           this.hideLoadingSpinner();
         },
         error => {
