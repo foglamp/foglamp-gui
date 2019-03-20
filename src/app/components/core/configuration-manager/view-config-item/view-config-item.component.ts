@@ -79,7 +79,6 @@ export class ViewConfigItemComponent implements OnInit, OnChanges {
       this.isValidForm = false;
       return;
     }
-    console.log('value', form.value);
 
     const formData = Object.keys(form.value).map(key => {
       return {

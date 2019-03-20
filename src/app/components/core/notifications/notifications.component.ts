@@ -4,8 +4,9 @@ import {
   ServicesHealthService, ProgressBarService, AlertService,
   SchedulesService, NotificationsService
 } from '../../../services';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { NotificationModalComponent } from './notification-modal/notification-modal.component';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-notifications',
@@ -28,34 +29,23 @@ export class NotificationsComponent implements OnInit {
     public notificationService: NotificationsService,
     public ngProgress: ProgressBarService,
     public alertService: AlertService,
+    private route: ActivatedRoute,
     public router: Router) { }
 
   ngOnInit() {
-    this.getService();
-    this.getNotificationInstance();
-  }
-
-  getService() {
-    this.servicesHealthService.getAllServices().
-      subscribe(
-        (data: any) => {
-          data.services.forEach((service: any) => {
-            if (service.type === 'Notification') {
-              this.isNotificationServiceAvailable = true;
-              this.notificationServiceName = service.name;
-              if (service.status === 'running') {
-                this.isNotificationServiceEnabled = true;
-              }
+    this.route.data.pipe(map(data => data['service'].services))
+      .subscribe(res => {
+        res.forEach((service: any) => {
+          if (service.type === 'Notification') {
+            this.isNotificationServiceAvailable = true;
+            this.notificationServiceName = service.name;
+            if (service.status === 'running') {
+              this.isNotificationServiceEnabled = true;
             }
-          });
-        },
-        error => {
-          if (error.status === 0) {
-            console.log('service down ', error);
-          } else {
-            this.alertService.error(error.statusText);
           }
         });
+      });
+    this.getNotificationInstance();
   }
 
   addNotificationService() {

@@ -34,4 +34,10 @@ export class NotificationsService {
       map(response => response),
       catchError((error: Response) => observableThrowError(error)));
   }
+
+  deleteNotification(notificationName: string) {
+    return this.http.delete(this.GET_NOTIFICATION_URL + '/' + encodeURIComponent(notificationName)).pipe(
+      map(response => response),
+      catchError((error: Response) => observableThrowError(error)));
+  }
 }

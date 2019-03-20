@@ -2,9 +2,12 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { assign, cloneDeep, reduce, sortBy, map } from 'lodash';
+import { assign, cloneDeep, reduce, sortBy, map, isEmpty } from 'lodash';
 
-import { NotificationsService, ProgressBarService, AlertService, ServicesHealthService, ConfigurationService } from '../../../../services/index';
+import {
+  NotificationsService, ProgressBarService,
+  AlertService, ConfigurationService
+} from '../../../../services/index';
 import { ViewConfigItemComponent } from '../../configuration-manager/view-config-item/view-config-item.component';
 
 @Component({
@@ -404,8 +407,12 @@ export class AddNotificationWizardComponent implements OnInit {
           /** request done */
           this.ngProgress.done();
           this.alertService.success('Notification service added successfully.', true);
-          this.updateConfiguration(`rule${payload.name}`, this.rulePluginChangedConfig);
-          this.updateConfiguration(`delivery${payload.name}`, this.deliveryPluginChangedConfig);
+          if (!isEmpty(this.rulePluginChangedConfig)) {
+            this.updateConfiguration(`rule${payload.name}`, this.rulePluginChangedConfig);
+          }
+          if (!isEmpty(this.deliveryPluginChangedConfig)) {
+            this.updateConfiguration(`delivery${payload.name}`, this.deliveryPluginChangedConfig);
+          }
           this.router.navigate(['/notification']);
         },
         (error) => {

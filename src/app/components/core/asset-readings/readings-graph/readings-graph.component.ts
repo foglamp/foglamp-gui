@@ -265,7 +265,7 @@ export class ReadingsGraphComponent implements OnDestroy {
           },
           ticks: {
             source: labels,
-            autoSkip: true,
+            autoSkip: true
           },
           bounds: 'ticks'
         }]
