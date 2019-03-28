@@ -50,7 +50,7 @@ export class NotificationsComponent implements OnInit {
 
   addNotificationService() {
     const payload = {
-      name: 'Notifications',
+      name: 'FogLAMP Notification',
       type: 'notification',
       enabled: true
     };
@@ -124,8 +124,6 @@ export class NotificationsComponent implements OnInit {
           this.notificationInstances = sortBy(this.notificationInstances, function (svc) {
             return svc['enable'] === 'false';
           });
-          console.log(this.notificationInstances);
-
           this.hideLoadingSpinner();
         },
         error => {
@@ -152,7 +150,6 @@ export class NotificationsComponent implements OnInit {
   }
 
   openNotificationInstanceModal(instance: any) {
-    console.log(instance);
     this.notification = instance;
     this.notificationModal.notification = instance;
     this.notificationModal.toggleModal(true);

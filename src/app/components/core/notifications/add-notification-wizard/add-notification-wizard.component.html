@@ -126,7 +126,7 @@
               <label class="label">Trigger Notification</label>
             </div>
             <div class="field-body">
-              <div class="select is-fullwidth is-small">
+              <div class="select is-small">
                 <select name="type" formControlName="type" required>
                   <option *ngFor="let type of notificationTypeList" [value]="type"> {{ type }}</option>
                 </select>
@@ -153,7 +153,7 @@
         <button (click)="movePrevious()" data-nav="previous" class="button" id="previous">Back</button>
       </div>
       <div class="steps-action">
-        <button (click)="moveNext()" data-nav="next" class="button is-link" id="next">Add Rule</button>
+        <button (click)="moveNext()" data-nav="next" class="button is-link" id="next">Next</button>
       </div>
     </div>
   </div>

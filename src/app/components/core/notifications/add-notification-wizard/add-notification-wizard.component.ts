@@ -430,7 +430,7 @@ export class AddNotificationWizardComponent implements OnInit {
     this.configService.updateBulkConfiguration(categoryName, config).
       subscribe(
         (data: any) => {
-          console.log('updated config', data);
+          console.log('configuration updated successfully', data);
         },
         error => {
           /** request completed */

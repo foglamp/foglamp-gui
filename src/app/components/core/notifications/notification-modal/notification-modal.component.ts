@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, ViewChild } from '@angular/core';
 
-import { assign, cloneDeep, reduce, map, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 import {
   ConfigurationService, AlertService,
@@ -8,6 +8,7 @@ import {
   NotificationsService
 } from '../../../../services';
 import { AlertDialogComponent } from '../../../common/alert-dialog/alert-dialog.component';
+import { ViewConfigItemComponent } from '../../configuration-manager/view-config-item/view-config-item.component';
 
 @Component({
   selector: 'app-notification-modal',
@@ -19,10 +20,12 @@ export class NotificationModalComponent implements OnInit, OnChanges {
   @Input() notification: { notification: any };
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
 
+  public useRuleProxy: 'true';
+  public useDeliveryProxy: 'true';
+  public useProxy: 'true';
   public category: any;
   public ruleConfiguration: any;
   public deliveryConfiguration: any;
-  public useProxy: 'true';
   public notificationRecord: any;
   public changedChildConfig = [];
 
@@ -31,6 +34,9 @@ export class NotificationModalComponent implements OnInit, OnChanges {
   notificationChangedConfig = [];
 
   @ViewChild(AlertDialogComponent) child: AlertDialogComponent;
+  @ViewChild('notificationConfigView') viewConfigItemComponent: ViewConfigItemComponent;
+  @ViewChild('ruleConfigView') ruleConfigView: ViewConfigItemComponent;
+  @ViewChild('deliveryConfigView') deliveryConfigView: ViewConfigItemComponent;
 
   constructor(private configService: ConfigurationService,
     private alertService: AlertService,
@@ -48,7 +54,6 @@ export class NotificationModalComponent implements OnInit, OnChanges {
   }
 
   public toggleModal(isOpen: Boolean) {
-
     const activeFilterTab = <HTMLElement>document.getElementsByClassName('accordion is-active')[0];
     if (activeFilterTab !== undefined) {
       const activeContentBody = <HTMLElement>activeFilterTab.getElementsByClassName('card-content')[0];
@@ -78,7 +83,7 @@ export class NotificationModalComponent implements OnInit, OnChanges {
           if (!isEmpty(data)) {
             categoryValues.push(data);
             this.ruleConfiguration = { key: `rule${notificationName}`, value: categoryValues };
-            this.useProxy = 'true';
+            this.useRuleProxy = 'true';
           }
         },
         error => {
@@ -100,8 +105,8 @@ export class NotificationModalComponent implements OnInit, OnChanges {
         (data) => {
           if (!isEmpty(data)) {
             categoryValues.push(data);
-            this.deliveryConfiguration = { key: `rule${notificationName}`, value: categoryValues };
-            this.useProxy = 'true';
+            this.deliveryConfiguration = { key: `delivery${notificationName}`, value: categoryValues };
+            this.useDeliveryProxy = 'true';
           }
         },
         error => {
@@ -123,7 +128,7 @@ export class NotificationModalComponent implements OnInit, OnChanges {
         (data) => {
           if (!isEmpty(data)) {
             categoryValues.push(data);
-            this.category = { key: this.notification['name'], value: categoryValues };
+            this.category = { key: notificationName, value: categoryValues };
             this.useProxy = 'true';
           }
           /** request completed */
@@ -177,54 +182,21 @@ export class NotificationModalComponent implements OnInit, OnChanges {
   }
 
   proxy() {
-    document.getElementById('vci-proxy').click();
-  }
-
-  /**
-   * Get edited configuration from view config child page
-   * @param changedConfig changed configuration of a selected plugin
-   */
-  getPluginChangedConfig(changedConfig: any, pluginConfigurationData: any, pageId: number) {
-    const defaultConfig = map(pluginConfigurationData.value[0], (v, key) => ({ key, ...v }));
-    // make a copy of matched config items having changed values
-    const matchedConfig = defaultConfig.filter(e1 => {
-      return changedConfig.some(e2 => {
-        return e1.key === e2.key;
-      });
-    });
-
-    // make a deep clone copy of matchedConfig array to remove extra keys(not required in payload)
-    const matchedConfigCopy = cloneDeep(matchedConfig);
-    /**
-     * merge new configuration with old configuration,
-     * where value key hold changed data in config object
-    */
-    matchedConfigCopy.forEach(e => {
-      changedConfig.forEach(c => {
-        if (e.key === c.key) {
-          e.value = c.value.toString();
-        }
-      });
-    });
-
-    // final array to hold changed configuration
-    const finalConfig = [];
-    matchedConfigCopy.forEach(item => {
-      finalConfig.push({
-        [item.key]: item.type === 'JSON' ? JSON.parse(item.value) : item.value
-      });
-    });
-
-    if (pageId === 1) {
-      this.notificationChangedConfig = reduce(finalConfig, function (memo, current) { return assign(memo, current); }, {});
+    if (this.useProxy) {
+      document.getElementById('vci-proxy').click();
     }
-    if (pageId === 2) {
-      this.rulePluginChangedConfig = reduce(finalConfig, function (memo, current) { return assign(memo, current); }, {});
-    } else if (pageId === 3) {
-      this.deliveryPluginChangedConfig = reduce(finalConfig, function (memo, current) { return assign(memo, current); }, {});
+    if (this.useRuleProxy) {
+      const el = <HTMLCollection>document.getElementsByClassName('vci-proxy-rule');
+      for (const e of <any>el) {
+        e.click();
+      }
     }
-    console.log('rule', this.rulePluginChangedConfig);
-    console.log('delivery', this.deliveryPluginChangedConfig);
-    console.log('notification', this.notificationChangedConfig);
+    if (this.useDeliveryProxy) {
+      const ele = <HTMLCollection>document.getElementsByClassName('vci-proxy-delivery');
+      for (const e of <any>ele) {
+        e.click();
+      }
+      this.toggleModal(false);
+    }
   }
 }
