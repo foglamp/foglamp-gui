@@ -10,7 +10,7 @@
         <app-view-config-item *ngIf="category" [categoryConfigurationData]="category" [useProxy]="useProxy"
           #notificationConfigView>
         </app-view-config-item>
-        <hr>
+        <hr *ngIf="notification != undefined" class="hr-text" [attr.data-content]="'Rule - ' + notification.rule">
         <div class="columns">
           <div class="column">
             <div class="field">
@@ -20,7 +20,7 @@
             </div>
           </div>
         </div>
-        <hr>
+        <hr *ngIf="notification != undefined" class="hr-text" [attr.data-content]="'Delivery Channel - ' + notification.channel">
         <div class="columns">
           <div class="column">
             <div class="field">
@@ -30,7 +30,7 @@
             </div>
           </div>
         </div>
-        <hr>
+        <hr class="hr-text" data-content="">
         <div class="columns">
           <div class="column">
             <div class="field is-grouped is-pulled-right">
@@ -43,7 +43,7 @@
             </div>
           </div>
         </div>
-        <hr>
+        <hr class="hr-text" data-content="">
         <ng-container *ngIf="notification != undefined">
           <p class="buttons is-pulled-right">
             <button (click)="openDeleteModal(notification.name)" class="button is-small">Delete Instance</button>

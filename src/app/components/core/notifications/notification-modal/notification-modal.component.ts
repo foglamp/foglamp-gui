@@ -47,6 +47,7 @@ export class NotificationModalComponent implements OnInit, OnChanges {
 
   ngOnChanges() {
     if (this.notification !== undefined) {
+      console.log(this.notification);
       this.getCategory();
       this.getRuleConfiguration();
       this.getDeliveryConfiguration();
@@ -121,8 +122,11 @@ export class NotificationModalComponent implements OnInit, OnChanges {
     const notificationName = this.notification['name'].substr(this.notification['name'].indexOf(' ') + 1);
     this.configService.getCategory(notificationName).
       subscribe(
-        (data) => {
+        (data: any) => {
           if (!isEmpty(data)) {
+            // TODO FOGL- 2645
+            data.channel['readonly'] = 'true';
+            data.rule['readonly'] = 'true';
             categoryValues.push(data);
             this.category = { key: notificationName, value: categoryValues };
             this.useProxy = 'true';
