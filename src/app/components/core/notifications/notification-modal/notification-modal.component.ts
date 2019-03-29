@@ -63,14 +63,10 @@ export class NotificationModalComponent implements OnInit, OnChanges {
 
     const modalWindow = <HTMLDivElement>document.getElementById('south-service-modal');
     if (isOpen) {
-      // this.notify.emit(false);
-      // this.svcCheckbox.setValue(this.service['schedule_enabled']);
       modalWindow.classList.add('is-active');
       return;
     }
-    // this.notify.emit(false);
-    // this.isAdvanceConfig = true;
-    // this.getAdvanceConfig(null);
+    this.notify.emit(false);
     modalWindow.classList.remove('is-active');
   }
 
@@ -153,7 +149,7 @@ export class NotificationModalComponent implements OnInit, OnChanges {
   openDeleteModal(name: string) {
     this.notificationRecord = {
       name: name,
-      message: 'Warning: Deleting this notification can not be undone. Continue',
+      message: 'Deleting this notification can not be undone. Continue',
       key: 'deleteNotification'
     };
     // call child component method to toggle modal
@@ -196,7 +192,7 @@ export class NotificationModalComponent implements OnInit, OnChanges {
       for (const e of <any>ele) {
         e.click();
       }
-      this.toggleModal(false);
     }
+    this.toggleModal(false);
   }
 }

@@ -154,8 +154,8 @@ export class AddNotificationWizardComponent implements OnInit {
   }
 
   moveNext() {
-    this.isRulePlugin = true;
     this.isValidName = true;
+    this.isRulePlugin = true;
     this.isDeliveryPlugin = true;
     const formValues = this.notificationForm.value;
     const first = <HTMLElement>document.getElementsByClassName('is-active')[0];
@@ -172,17 +172,6 @@ export class AddNotificationWizardComponent implements OnInit {
         nxtButton.textContent = 'Next';
         previousButton.textContent = 'Previous';
 
-        // To verify if service with given name already exist
-        // const isServiceNameExist = false;
-        // this.schedulesName.some(item => {
-        //   return formValues['name'].trim() === item.name;
-        // });
-        // if (isServiceNameExist) {
-        //   this.alertService.error('A south service or north task instance already exists with this name.');
-        //   return false;
-        // }
-
-        // create payload to pass in add service
         if (formValues['name'].trim() !== '') {
           this.payload.name = formValues['name'];
           this.payload.description = this.description.nativeElement.value;
@@ -231,7 +220,7 @@ export class AddNotificationWizardComponent implements OnInit {
         if (formValues['delivery'].length > 0) {
           this.payload.channel = formValues['delivery'][0];
         }
-        // create payload to pass in add service
+
         nxtButton.textContent = 'Next';
         previousButton.textContent = 'Previous';
         this.getDeliveryPluginConfiguration();
@@ -403,10 +392,10 @@ export class AddNotificationWizardComponent implements OnInit {
     this.ngProgress.start();
     this.notificationService.addNotificationInstance(payload)
       .subscribe(
-        () => {
+        (data: any) => {
           /** request done */
           this.ngProgress.done();
-          this.alertService.success('Notification service added successfully.', true);
+          this.alertService.success(data.result, true);
           if (!isEmpty(this.rulePluginChangedConfig)) {
             this.updateConfiguration(`rule${payload.name}`, this.rulePluginChangedConfig);
           }

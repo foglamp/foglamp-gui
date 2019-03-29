@@ -52,8 +52,10 @@ export class ConfigurationManagerComponent implements OnInit {
                 description: element.description
               });
             }
-            this.rootCategories = this.rootCategories.filter(el => el.key.toUpperCase() !== 'SOUTH');
-            this.rootCategories = this.rootCategories.filter(el => el.key.toUpperCase() !== 'NORTH');
+            this.rootCategories = this.rootCategories.filter(el => el.key.toUpperCase() !== 'SOUTH')
+            .filter(el => el.key.toUpperCase() !== 'NORTH')
+            .filter(el => el.key.toUpperCase() !== 'NOTIFICATIONS')
+            .filter(el => el.key.toUpperCase() !== 'FOGLAMP NOTIFICATION');
           });
           if (onLoadingPage === true) {
             this.getChildren(this.selectedRootCategory);

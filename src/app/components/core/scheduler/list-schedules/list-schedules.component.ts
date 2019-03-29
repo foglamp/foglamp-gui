@@ -77,12 +77,14 @@ export class ListSchedulesComponent implements OnInit {
         sn.push(el.key);
       });
     });
+
     const north = allCats.filter(el => el.key.toUpperCase() === 'NORTH');
     north.forEach(n => {
       n.children.forEach(el => {
         sn.push(el.key);
       });
     });
+
     return sn;
   }
 
@@ -96,7 +98,7 @@ export class ListSchedulesComponent implements OnInit {
           //  filter by South and North categories name
           this.scheduleData = [];
           schedules.forEach(sch => {
-            if (!sn.includes(sch.name)) {
+            if (!sn.includes(sch.name) && sch.name.toUpperCase() !== 'FOGLAMP NOTIFICATION') {
               this.scheduleData.push(sch);
             }
           });
