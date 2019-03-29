@@ -97,6 +97,28 @@ export class NotificationsComponent implements OnInit {
         });
   }
 
+  disableNotificationService() {
+    /** request started */
+    this.ngProgress.start();
+    this.schedulesService.disableScheduleByName(this.notificationServiceName).
+      subscribe(
+        (data) => {
+          /** request completed */
+          this.ngProgress.done();
+          this.alertService.success(data['message'], true);
+          this.isNotificationServiceEnabled = false;
+        },
+        error => {
+          /** request completed */
+          this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
+        });
+  }
+
   disabledNotificationService() {
     this.schedulesService.disableScheduleByName(this.notificationServiceName).
       subscribe(
@@ -151,11 +173,25 @@ export class NotificationsComponent implements OnInit {
 
   openNotificationInstanceModal(instance: any) {
     this.notification = instance;
+    this.notification.notificationEnabled = true;
+    if (this.isNotificationServiceAvailable && !this.isNotificationServiceEnabled) {
+      this.notification.notificationEnabled = false;
+    }
     this.notificationModal.notification = instance;
     this.notificationModal.toggleModal(true);
   }
 
   addNotificationInstance() {
     this.router.navigate(['/notification/add']);
+  }
+
+  public closeMessage(isOpen: Boolean) {
+    const modalName = <HTMLElement>document.getElementById('messageDiv');
+    console.log('modalName', modalName);
+    if (isOpen) {
+      modalName.classList.add('is-hidden');
+      return;
+    }
+    modalName.classList.remove('is-hidden');
   }
 }

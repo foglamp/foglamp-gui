@@ -46,7 +46,7 @@
         <hr class="hr-text" data-content="">
         <ng-container *ngIf="notification != undefined">
           <p class="buttons is-pulled-right">
-            <button (click)="openDeleteModal(notification.name)" class="button is-small">Delete Instance</button>
+            <button (click)="openDeleteModal(notification.name)" class="button is-small" [disabled]="!notification.notificationEnabled ? 'disabled' : null">Delete Instance</button>
           </p>
         </ng-container>
       </div>

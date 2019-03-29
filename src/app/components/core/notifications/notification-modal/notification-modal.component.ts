@@ -47,7 +47,7 @@ export class NotificationModalComponent implements OnInit, OnChanges {
 
   ngOnChanges() {
     if (this.notification !== undefined) {
-      console.log(this.notification);
+      console.log('notification', this.notification);
       this.getCategory();
       this.getRuleConfiguration();
       this.getDeliveryConfiguration();
@@ -124,9 +124,11 @@ export class NotificationModalComponent implements OnInit, OnChanges {
       subscribe(
         (data: any) => {
           if (!isEmpty(data)) {
-            // TODO FOGL- 2645
+            // TODO FOGL- 2645 displayName and order
+            // We need to hide rule and channel input fields locally
             data.channel['readonly'] = 'true';
             data.rule['readonly'] = 'true';
+
             categoryValues.push(data);
             this.category = { key: notificationName, value: categoryValues };
             this.useProxy = 'true';

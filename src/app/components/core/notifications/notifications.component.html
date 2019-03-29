@@ -1,10 +1,28 @@
 <div class="container is-fluid">
   <div>
-    <p class="notification is-warning" *ngIf="!isNotificationServiceAvailable">
-      Notification service is not configured
-      and enabled. <a (click)="addNotificationService()"> Enable Now</a></p>
-    <p class="notification is-warning" *ngIf="isNotificationServiceAvailable && !isNotificationServiceEnabled">
-      Notification service is not enabled. <a (click)="enableNotificationService()"> Enable Now</a></p>
+    <ng-container *ngIf="!isNotificationServiceAvailable">
+      <article class="message is-warning">
+        <div class="message-body">
+          Notification service is not configured
+          and enabled. <a (click)="addNotificationService()"><strong>enable now</strong></a>
+        </div>
+      </article>
+    </ng-container>
+    <ng-container *ngIf="isNotificationServiceAvailable && !isNotificationServiceEnabled">
+      <article class="message is-warning">
+        <div class="message-body">
+          Notification service is not enabled. <a (click)="enableNotificationService()"><strong>enable now</strong></a>
+        </div>
+      </article>
+    </ng-container>
+    <ng-container *ngIf="isNotificationServiceAvailable && isNotificationServiceEnabled">
+      <article id='messageDiv' class="message is-info">
+        <div class="message-body">
+          Notification service is configured and enabled. <a (click)="disableNotificationService()">disable now</a>
+          <button class="delete" aria-label="delete" (click)="closeMessage(true)"></button>
+        </div>
+      </article>
+    </ng-container>
   </div>
 
   <div class="card">
@@ -64,7 +82,7 @@
                   <td class="align-content">
                     <div class="tags has-addons">
                       <span *ngIf="instance.enable === 'false'" class="tag">disabled</span>
-                      <span *ngIf="instance.enable === 'true'" class="tag is-success">enabled</span>
+                      <span *ngIf="instance.enable === 'true'" class="tag is-success" [ngClass]="{disableTag: this.isNotificationServiceAvailable && !this.isNotificationServiceEnabled}">enabled</span>
                     </div>
                   </td>
                 </tr>
@@ -77,4 +95,3 @@
   </div>
 </div>
 <app-notification-modal (notify)='onNotify()' [notification]="notification"></app-notification-modal>
-
