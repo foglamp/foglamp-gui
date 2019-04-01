@@ -3,8 +3,8 @@
     <ng-container *ngIf="!isNotificationServiceAvailable">
       <article class="message is-warning">
         <div class="message-body">
-          Notification service is not configured
-          and enabled. <a (click)="addNotificationService()"><strong>configure & enable now</strong></a>
+          Notification service is not added
+          and enabled. <a (click)="addNotificationService()"><strong>add & enable now</strong></a>
         </div>
       </article>
     </ng-container>
@@ -18,7 +18,7 @@
     <ng-container *ngIf="isNotificationServiceAvailable && isNotificationServiceEnabled">
       <article id='messageDiv' class="message is-info">
         <div class="message-body">
-          Notification service is configured and enabled. <a (click)="openAlertModal()">disable now</a>
+          Notification service is added and enabled. <a (click)="openAlertModal()">disable now</a>
           <button class="delete" aria-label="delete" (click)="closeMessage(true)"></button>
         </div>
       </article>

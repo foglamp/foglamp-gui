@@ -1,13 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+
 import { sortBy } from 'lodash';
-import {
-  ServicesHealthService, ProgressBarService, AlertService,
-  SchedulesService, NotificationsService
-} from '../../../services';
-import { Router, ActivatedRoute } from '@angular/router';
-import { NotificationModalComponent } from './notification-modal/notification-modal.component';
 import { map } from 'rxjs/operators';
+
+import {
+  AlertService, NotificationsService, ProgressBarService, SchedulesService, ServicesHealthService
+} from '../../../services';
 import { AlertDialogComponent } from '../../common/alert-dialog/alert-dialog.component';
+import { NotificationModalComponent } from './notification-modal/notification-modal.component';
 
 @Component({
   selector: 'app-notifications',
@@ -39,17 +40,21 @@ export class NotificationsComponent implements OnInit {
   ngOnInit() {
     this.route.data.pipe(map(data => data['service'].services))
       .subscribe(res => {
-        res.forEach((service: any) => {
-          if (service.type === 'Notification') {
-            this.isNotificationServiceAvailable = true;
-            this.notificationServiceName = service.name;
-            if (service.status === 'running') {
-              this.isNotificationServiceEnabled = true;
-            }
+        const serviceFound = res.some((service: any) => service.type === 'Notification' && service.status === 'running');
+        if (serviceFound) {
+          this.isNotificationServiceAvailable = true;
+          this.isNotificationServiceEnabled = true;
+        } else {
+          this.getSchedules();
+        }
+      },
+        (error) => {
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
           }
         });
-        this.getSchedules();
-      });
     this.getNotificationInstance();
   }
 
@@ -59,6 +64,9 @@ export class NotificationsComponent implements OnInit {
       type: 'notification',
       enabled: true
     };
+
+    /** request start */
+    this.ngProgress.start();
 
     this.servicesHealthService.addService(payload)
       .subscribe(
@@ -87,6 +95,7 @@ export class NotificationsComponent implements OnInit {
           const found = data.schedules.some((item: any) => item.name === this.notificationServiceName && item.enabled === false);
           if (found) {
             this.isNotificationServiceAvailable = true;
+            this.isNotificationServiceEnabled = false;
           }
         },
         error => {
