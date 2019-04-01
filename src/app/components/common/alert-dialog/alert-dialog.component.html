@@ -12,6 +12,9 @@
     <section *ngIf="notificationRecord" class="modal-card-body">
       {{notificationRecord.message}}?
     </section>
+    <section *ngIf="notificationServiceRecord" class="modal-card-body">
+      {{notificationServiceRecord.message}}?
+    </section>
     <section *ngIf="deleteTaskData" class="modal-card-body">
       {{deleteTaskData.message}}?
     </section>
@@ -21,6 +24,7 @@
       <button class="button is-small" (click)="toggleModal(false)">Cancel</button>
       <button *ngIf="serviceRecord" class="button is-small is-danger" (click)="triggerAction()">Delete</button>
       <button *ngIf="notificationRecord" class="button is-small is-danger" (click)="triggerAction()">Delete</button>
+      <button *ngIf="notificationServiceRecord" class="button is-small is-warning" (click)="triggerAction()">Disable</button>
       <button *ngIf="deleteTaskData" class="button is-small is-danger" (click)="triggerAction()">Delete</button>
     </footer>
   </div>

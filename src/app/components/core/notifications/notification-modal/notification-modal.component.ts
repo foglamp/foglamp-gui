@@ -155,7 +155,7 @@ export class NotificationModalComponent implements OnInit, OnChanges {
   openDeleteModal(name: string) {
     this.notificationRecord = {
       name: name,
-      message: 'Deleting this notification can not be undone. Continue',
+      message: 'Deleting this notification instance can not be undone. Continue',
       key: 'deleteNotification'
     };
     // call child component method to toggle modal

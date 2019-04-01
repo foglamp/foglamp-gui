@@ -7,6 +7,7 @@ import {
 import { Router, ActivatedRoute } from '@angular/router';
 import { NotificationModalComponent } from './notification-modal/notification-modal.component';
 import { map } from 'rxjs/operators';
+import { AlertDialogComponent } from '../../common/alert-dialog/alert-dialog.component';
 
 @Component({
   selector: 'app-notifications',
@@ -18,12 +19,15 @@ export class NotificationsComponent implements OnInit {
 
   isNotificationServiceAvailable = false;
   isNotificationServiceEnabled = false;
-  notificationServiceName: string;
+  notificationServiceName = 'FogLAMP Notifications';
   notificationInstances = [];
   notification: any;
+  public notificationServiceRecord: any;
 
   public showSpinner = false;
   @ViewChild(NotificationModalComponent) notificationModal: NotificationModalComponent;
+  @ViewChild(AlertDialogComponent) child: AlertDialogComponent;
+
   constructor(public servicesHealthService: ServicesHealthService,
     public schedulesService: SchedulesService,
     public notificationService: NotificationsService,
@@ -44,13 +48,14 @@ export class NotificationsComponent implements OnInit {
             }
           }
         });
+        this.getSchedules();
       });
     this.getNotificationInstance();
   }
 
   addNotificationService() {
     const payload = {
-      name: 'FogLAMP Notification',
+      name: this.notificationServiceName,
       type: 'notification',
       enabled: true
     };
@@ -67,6 +72,24 @@ export class NotificationsComponent implements OnInit {
         (error) => {
           /** request done */
           this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
+        });
+  }
+
+  public getSchedules(): void {
+    this.schedulesService.getSchedules().
+      subscribe(
+        (data: any) => {
+          const found = data.schedules.some((item: any) => item.name === this.notificationServiceName && item.enabled === false);
+          if (found) {
+            this.isNotificationServiceAvailable = true;
+          }
+        },
+        error => {
           if (error.status === 0) {
             console.log('service down ', error);
           } else {
@@ -162,7 +185,6 @@ export class NotificationsComponent implements OnInit {
     this.getNotificationInstance();
   }
 
-
   public showLoadingSpinner() {
     this.showSpinner = true;
   }
@@ -187,11 +209,20 @@ export class NotificationsComponent implements OnInit {
 
   public closeMessage(isOpen: Boolean) {
     const modalName = <HTMLElement>document.getElementById('messageDiv');
-    console.log('modalName', modalName);
     if (isOpen) {
       modalName.classList.add('is-hidden');
       return;
     }
     modalName.classList.remove('is-hidden');
+  }
+
+  openAlertModal() {
+    this.notificationServiceRecord = {
+      name: this.notificationServiceName,
+      message: `Do you really want to disable ${this.notificationServiceName}`,
+      key: 'disableNotification'
+    };
+    // call child component method to toggle modal
+    this.child.toggleModal(true);
   }
 }

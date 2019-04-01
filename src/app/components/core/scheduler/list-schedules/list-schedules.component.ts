@@ -98,7 +98,7 @@ export class ListSchedulesComponent implements OnInit {
           //  filter by South and North categories name
           this.scheduleData = [];
           schedules.forEach(sch => {
-            if (!sn.includes(sch.name) && sch.name.toUpperCase() !== 'FOGLAMP NOTIFICATION') {
+            if (!sn.includes(sch.name) && sch.name.toUpperCase() !== 'FOGLAMP NOTIFICATIONS') {
               this.scheduleData.push(sch);
             }
           });

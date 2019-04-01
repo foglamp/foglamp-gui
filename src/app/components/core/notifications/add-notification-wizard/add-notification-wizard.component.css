@@ -1,3 +1,8 @@
 [hidden] {
   display: none !important;
 }
+
+ #c-6 > div > .field-label {
+  flex-basis: auto !important;
+  flex-grow: 0 !important;
+}
