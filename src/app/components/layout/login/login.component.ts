@@ -76,6 +76,7 @@ export class LoginComponent implements OnInit {
 
   public setupInstance() {
     this.router.navigate(['/setting'], { queryParams: { id: '1' } });
+    this.sharedService.isServiceUp.next(false);
   }
 
   getUser(id) {

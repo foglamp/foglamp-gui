@@ -46,6 +46,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   uptime: any = '';
   viewPort: any = '';
   public showSpinner = false;
+  public showDropDownMenu = false;
 
   @ViewChild(ShutdownModalComponent) child: ShutdownModalComponent;
   @ViewChild(RestartModalComponent) childRestart: RestartModalComponent;
@@ -117,6 +118,11 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public getServiceStatus() {
+    if (this.router.url.includes('/login') || this.router.url.includes('/setting?id=1')) {
+      this.showDropDownMenu = false;
+      return;
+    }
+    this.showDropDownMenu = true;
     this.showLoadingSpinner();
     this.servicesHealthService.getAllServices()
       .subscribe(

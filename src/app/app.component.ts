@@ -36,12 +36,11 @@ export class AppComponent implements OnInit {
     }
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        this.isActive(event.url);
+        this.onLaunchAppRedirect();
       }
     });
     this.setPingIntervalOnAppLaunch();
     this.setStasHistoryGraphRefreshIntervalOnAppLaunch();
-    this.onLaunchAppRedirect();
   }
 
   @HostListener('window:resize', ['$event'])
@@ -56,24 +55,22 @@ export class AppComponent implements OnInit {
     }
   }
 
-  isActive(href) {
-    if (href === '/login' || href === '/setting?id=1' || href.indexOf('user/reset-password') >= 0) {
-      return this.isLoginView = true;
-    } else {
-      return this.isLoginView = false;
-    }
-  }
-
   onLaunchAppRedirect() {
     this.sharedService.isServiceUp.subscribe(isServiceUp => {
-      if (!isServiceUp) {
-        this.router.navigate(['/setting'], { queryParams: { id: '1' } });
-      } else if (sessionStorage.getItem('token') === null && !JSON.parse(sessionStorage.getItem('LOGIN_SKIPPED'))) {
-        this.router.navigate(['/login']);
-      } else {
-        if (location.href.includes('/setting?id=1')) {
-          this.router.navigate(['']);
+      if (isServiceUp) {
+        if (sessionStorage.getItem('token') === null
+          && !JSON.parse(sessionStorage.getItem('LOGIN_SKIPPED'))) {
+          this.isLoginView = true;
+          this.router.navigate(['/login']);
+        } else {
+          this.isLoginView = false;
+          if (location.href.includes('/setting?id=1')) {
+            this.router.navigate(['']);
+          }
         }
+      } else {
+        this.isLoginView = true;
+        this.router.navigate(['/setting'], { queryParams: { id: '1' } });
       }
     });
   }
