@@ -54,8 +54,7 @@ export class ConfigurationManagerComponent implements OnInit {
             }
             this.rootCategories = this.rootCategories.filter(el => el.key.toUpperCase() !== 'SOUTH')
             .filter(el => el.key.toUpperCase() !== 'NORTH')
-            .filter(el => el.key.toUpperCase() !== 'NOTIFICATIONS')
-            .filter(el => el.key.toUpperCase() !== 'FOGLAMP NOTIFICATIONS');
+            .filter(el => el.key.toUpperCase() !== 'NOTIFICATIONS');
           });
           if (onLoadingPage === true) {
             this.getChildren(this.selectedRootCategory);
