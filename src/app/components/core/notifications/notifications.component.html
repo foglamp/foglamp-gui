@@ -22,7 +22,7 @@
           <button class="delete" aria-label="delete" (click)="closeMessage(true)"></button>
         </div>
       </article>
-      <app-alert-dialog *ngIf="!isModalOpen" (disableNotificationService)='disableNotificationService()' [notificationServiceRecord]='notificationServiceRecord'>
+      <app-alert-dialog *ngIf="!isNotificationModalOpen" (disableNotificationService)='disableNotificationService()' [notificationServiceRecord]='notificationServiceRecord'>
       </app-alert-dialog>
     </ng-container>
   </div>
