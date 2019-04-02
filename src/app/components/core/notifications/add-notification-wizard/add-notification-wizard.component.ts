@@ -36,6 +36,8 @@ export class AddNotificationWizardComponent implements OnInit {
 
   public deliveryPluginConfigurationData: any;
   public deliveryPluginChangedConfig: any;
+  public selectedRulePluginDescription: string;
+  public selectedDeliveryPluginDescription: string;
 
   public useProxy: string;
 
@@ -285,10 +287,18 @@ export class AddNotificationWizardComponent implements OnInit {
     this.useProxy = 'true';
   }
 
-  isPluginSelected() {
+  isPluginSelected(selectedPlugin, pluginType: string) {
     this.isSinglePlugin = true;
     this.isRulePlugin = true;
     this.isDeliveryPlugin = true;
+    const plugin = (selectedPlugin.slice(3).trim()).replace(/'/g, '');
+    if (pluginType === 'notificationRule') {
+      this.selectedRulePluginDescription = this.notificationRulePlugins
+        .find(p => p.config.plugin.default === plugin).config.plugin.description;
+    } else {
+      this.selectedDeliveryPluginDescription = this.notificationDeliveryPlugins
+        .find(p => p.config.plugin.default === plugin).config.plugin.description;
+    }
   }
 
   private getDeliveryPluginConfiguration(): void {

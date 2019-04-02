@@ -76,21 +76,23 @@
             </div>
             <div class="field-body">
               <div class="select is-multiple">
-                <select multiple name="type" #selectedPlugin formControlName="rule" (change)="isPluginSelected()" required>
+                <select multiple name="type" #selectedPlugin formControlName="rule"
+                  (change)="isPluginSelected(selectedPlugin.value, notificationRulePlugins[0].type)" required>
                   <option *ngFor="let p of notificationRulePlugins" [value]="p.name"> {{ p.name }}</option>
                 </select>
               </div>
               &nbsp;
-              <small *ngIf="selectedPluginDescription && isValidPlugin && isSinglePlugin"
-                class="help description level-left">{{
-              selectedPluginDescription }}</small>
+              <small *ngIf="selectedRulePluginDescription && notificationRulePlugins.length > 0"
+                class="help description level-left">
+                {{selectedRulePluginDescription }}</small>
               <small *ngIf="!isRulePlugin" class="help is-danger level-left">* Please select a valid plugin</small>
               <small *ngIf="!isSinglePlugin" class="help is-danger level-left">* Please select a single plugin</small>
             </div>
           </div>
         </div>
         <div class="box step-content" id="c-3">
-          <app-view-config-item *ngIf="pageId == 2" [categoryConfigurationData]="rulePluginConfigurationData" [useProxy]="useProxy"
+          <app-view-config-item *ngIf="pageId == 2" [categoryConfigurationData]="rulePluginConfigurationData"
+            [useProxy]="useProxy"
             (onConfigChanged)="getPluginChangedConfig($event, rulePluginConfigurationData, pageId)" [pageId]="'wizard'">
           </app-view-config-item>
         </div>
@@ -105,19 +107,26 @@
             </div>
             <div class="field-body">
               <div class="select is-multiple">
-                <select multiple name="type" #selectedDeliveryPlugin formControlName="delivery" (change)="isPluginSelected()" required>
+                <select multiple name="type" #selectedDeliveryPlugin formControlName="delivery"
+                  (change)="isPluginSelected(selectedDeliveryPlugin.value, notificationDeliveryPlugins[0].type)"
+                  required>
                   <option *ngFor="let d of notificationDeliveryPlugins" [value]="d.name"> {{ d.name }}</option>
                 </select>
               </div>
+              &nbsp;
+              <small *ngIf="selectedDeliveryPluginDescription && notificationDeliveryPlugins.length > 0"
+                class="help description level-left">
+                {{selectedDeliveryPluginDescription }}</small>
               <small *ngIf="!isDeliveryPlugin" class="help is-danger level-left">* Please select a valid plugin</small>
               <small *ngIf="!isSinglePlugin" class="help is-danger level-left">* Please select a single plugin</small>
             </div>
           </div>
         </div>
         <div class="box step-content" id="c-5">
-          <app-view-config-item *ngIf="pageId == 4"
-            [categoryConfigurationData]="deliveryPluginConfigurationData" [useProxy]="useProxy"
-            (onConfigChanged)="getPluginChangedConfig($event, deliveryPluginConfigurationData, pageId)" [pageId]="'wizard'">
+          <app-view-config-item *ngIf="pageId == 4" [categoryConfigurationData]="deliveryPluginConfigurationData"
+            [useProxy]="useProxy"
+            (onConfigChanged)="getPluginChangedConfig($event, deliveryPluginConfigurationData, pageId)"
+            [pageId]="'wizard'">
           </app-view-config-item>
         </div>
         <div class="box step-content" id="c-6">
