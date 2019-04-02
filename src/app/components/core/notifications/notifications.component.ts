@@ -26,6 +26,7 @@ export class NotificationsComponent implements OnInit {
   public notificationServiceRecord: any;
 
   public showSpinner = false;
+  isNotificationModalOpen = false;
   @ViewChild(NotificationModalComponent) notificationModal: NotificationModalComponent;
   @ViewChild(AlertDialogComponent) child: AlertDialogComponent;
 
@@ -40,10 +41,18 @@ export class NotificationsComponent implements OnInit {
   ngOnInit() {
     this.route.data.pipe(map(data => data['service'].services))
       .subscribe(res => {
-        const serviceFound = res.some((service: any) => service.type === 'Notification' && service.status === 'running');
-        if (serviceFound) {
+        const service = res.find((svc: any) => {
+          if (svc.type === 'Notification') {
+            return svc;
+          }
+        });
+        if (service) {
+          this.notificationServiceName = service.name;
           this.isNotificationServiceAvailable = true;
           this.isNotificationServiceEnabled = true;
+          if (service.status.toLowerCase() === 'shutdown') {
+            this.isNotificationServiceEnabled = false;
+          }
         } else {
           this.getSchedules();
         }
@@ -92,8 +101,13 @@ export class NotificationsComponent implements OnInit {
     this.schedulesService.getSchedules().
       subscribe(
         (data: any) => {
-          const found = data.schedules.some((item: any) => item.name === this.notificationServiceName && item.enabled === false);
-          if (found) {
+          const schedule = data.schedules.find((item: any) => {
+            if (item.processName === 'notification_c' && item.enabled === false) {
+              return item;
+            }
+          });
+          if (schedule !== undefined) {
+            this.notificationServiceName = schedule.name;
             this.isNotificationServiceAvailable = true;
             this.isNotificationServiceEnabled = false;
           }
@@ -151,25 +165,6 @@ export class NotificationsComponent implements OnInit {
         });
   }
 
-  disabledNotificationService() {
-    this.schedulesService.disableScheduleByName(this.notificationServiceName).
-      subscribe(
-        (data) => {
-          /** request completed */
-          this.ngProgress.done();
-          this.alertService.success(data['message'], true);
-        },
-        error => {
-          /** request completed */
-          this.ngProgress.done();
-          if (error.status === 0) {
-            console.log('service down ', error);
-          } else {
-            this.alertService.error(error.statusText);
-          }
-        });
-  }
-
   public getNotificationInstance() {
     this.notificationService.getNotificationInstance().
       subscribe(
@@ -191,7 +186,10 @@ export class NotificationsComponent implements OnInit {
   }
 
   onNotify() {
-    this.getNotificationInstance();
+    this.isNotificationModalOpen = false;
+    setTimeout(() => {
+      this.getNotificationInstance();
+    }, 2000);
   }
 
   public showLoadingSpinner() {
@@ -203,6 +201,7 @@ export class NotificationsComponent implements OnInit {
   }
 
   openNotificationInstanceModal(instance: any) {
+    this.isNotificationModalOpen = true;
     this.notification = instance;
     this.notification.notificationEnabled = true;
     if (this.isNotificationServiceAvailable && !this.isNotificationServiceEnabled) {

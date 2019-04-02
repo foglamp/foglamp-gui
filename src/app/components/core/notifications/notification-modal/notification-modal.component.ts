@@ -55,14 +55,7 @@ export class NotificationModalComponent implements OnInit, OnChanges {
   }
 
   public toggleModal(isOpen: Boolean) {
-    const activeFilterTab = <HTMLElement>document.getElementsByClassName('accordion is-active')[0];
-    if (activeFilterTab !== undefined) {
-      const activeContentBody = <HTMLElement>activeFilterTab.getElementsByClassName('card-content')[0];
-      activeFilterTab.classList.remove('is-active');
-      activeContentBody.hidden = true;
-    }
-
-    const modalWindow = <HTMLDivElement>document.getElementById('south-service-modal');
+    const modalWindow = <HTMLDivElement>document.getElementById('notification-instance-modal');
     if (isOpen) {
       modalWindow.classList.add('is-active');
       return;
@@ -199,6 +192,7 @@ export class NotificationModalComponent implements OnInit, OnChanges {
         e.click();
       }
     }
+    this.notify.emit();
     this.toggleModal(false);
   }
 }
