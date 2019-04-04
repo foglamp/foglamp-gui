@@ -267,9 +267,6 @@ export class ViewConfigItemComponent implements OnInit, OnChanges {
     return configItem.key;
   }
 
-  /**
-   * name
-   */
   public checkButtonProxy() {
     if (this.useProxy === 'false'
       && this.useFilterProxy === 'false'
