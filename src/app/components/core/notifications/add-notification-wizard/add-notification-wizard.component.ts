@@ -186,8 +186,9 @@ export class AddNotificationWizardComponent implements OnInit {
           return;
         }
 
-        if (formValues['rule'].length > 1) {
+        if (formValues['rule'].length !== 1) {
           this.isSinglePlugin = false;
+          this.selectedRulePluginDescription = '';
           return;
         }
 
@@ -214,8 +215,9 @@ export class AddNotificationWizardComponent implements OnInit {
           this.isDeliveryPlugin = false;
           return;
         }
-        if (formValues['delivery'].length > 1) {
+        if (formValues['delivery'].length !== 1) {
           this.isSinglePlugin = false;
+          this.selectedDeliveryPluginDescription = '';
           return;
         }
 
@@ -288,6 +290,13 @@ export class AddNotificationWizardComponent implements OnInit {
   }
 
   isPluginSelected(selectedPlugin, pluginType: string) {
+    if (selectedPlugin === '') {
+      this.isSinglePlugin = false;
+      this.selectedRulePluginDescription = '';
+      this.selectedDeliveryPluginDescription = '';
+      return;
+    }
+
     this.isSinglePlugin = true;
     this.isRulePlugin = true;
     this.isDeliveryPlugin = true;
