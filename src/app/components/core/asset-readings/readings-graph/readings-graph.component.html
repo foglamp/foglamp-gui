@@ -2,11 +2,8 @@
   <div class="modal-background"></div>
   <div class="modal-card">
     <header class="modal-card-head">
-      <p class="modal-card-title is-size-5">{{assetCode}}
-      </p>
-      <div class="close">
-        <button class="delete" aria-label="close" (click)="toggleModal(false)"></button>
-      </div>
+      <p class="modal-card-title is-size-5">{{assetCode}}</p>
+      <button class="delete" aria-label="close" (click)="toggleModal(false)"></button>
     </header>
     <section class="modal-card-body">
       <ng-container *ngIf='showGraph'>
