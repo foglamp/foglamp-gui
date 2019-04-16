@@ -22,7 +22,6 @@ export class ReadingsGraphComponent implements OnDestroy {
   public isInvalidLimit = false;
   public MAX_RANGE = MAX_INT_SIZE;
   public graphRefreshInterval = POLLING_INTERVAL;
-  public showSpinner = false;
 
   public limit: number;
   public DEFAULT_LIMIT = 100;
@@ -71,7 +70,6 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   getTimeBasedAssetReadingsAndSummary(time) {
-    this.showLoadingSpinner();
     this.optedTime = time;
     if (this.optedTime === 0) {
       this.showAssetReadingsSummary(this.assetCode, this.DEFAULT_LIMIT, this.optedTime);
@@ -81,11 +79,9 @@ export class ReadingsGraphComponent implements OnDestroy {
       this.showAssetReadingsSummary(this.assetCode, this.limit, time);
       this.plotReadingsGraph(this.assetCode, this.limit, this.optedTime);
     }
-    this.hideLoadingSpinner();
   }
 
   public getAssetCode(assetCode) {
-    this.showLoadingSpinner();
     this.notify.emit(false);
     if (this.graphRefreshInterval === -1) {
       this.isAlive = false;
@@ -97,7 +93,6 @@ export class ReadingsGraphComponent implements OnDestroy {
       this.limit = 0;
       this.plotReadingsGraph(assetCode, this.limit, this.optedTime);
       this.showAssetReadingsSummary(assetCode, this.limit, this.optedTime);
-      this.hideLoadingSpinner();
     }
     interval(this.graphRefreshInterval)
       .takeWhile(() => this.isAlive) // only fires when component is alive
@@ -300,14 +295,6 @@ export class ReadingsGraphComponent implements OnDestroy {
         }
       }
     };
-  }
-
-  public showLoadingSpinner() {
-    this.showSpinner = true;
-  }
-
-  public hideLoadingSpinner() {
-    this.showSpinner = false;
   }
 
   public isNumber(val) {

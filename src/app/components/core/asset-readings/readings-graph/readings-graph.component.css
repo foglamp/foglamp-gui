@@ -1,16 +1,3 @@
 [hidden] {
   display: none !important;
 }
-
-.summary {
-  width: auto;
-  min-height: 15vh;
-  max-height: 25vh;
-  overflow-y: scroll;
-  padding-top: 3px;
-  padding-bottom: 3px;
-}
-
-.modal-card {
-  width: 70%;
-}
