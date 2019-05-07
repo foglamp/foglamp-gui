@@ -13,9 +13,12 @@ export class UploadCertificateComponent implements OnInit {
   key;
   cert;
   overwrite = '0';
+  certOnly = '0';
   keyExtension = true;
   certExtension = true;
-  checkedStatus = false;
+  // May be we can just use overwrite and certOnly variables; and xCheckedStatus are redundant
+  overwriteCheckedStatus = false;
+  certOnlyCheckedStatus = false;
 
   @ViewChild('fileInput') fileInput: ElementRef;
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
@@ -29,12 +32,16 @@ export class UploadCertificateComponent implements OnInit {
     this.form = this.formBuilder.group({
       key: null,
       cert: null,
-      overwrite: '0'
+      overwrite: '0',
+      certonly: '0'
     });
 
     // Set default value on form
     this.form.get('overwrite').setValue('0');
-    this.checkedStatus = false;
+    // may be not required
+    this.form.get('certonly').setValue('0');
+    this.overwriteCheckedStatus = false;
+    this.certOnlyCheckedStatus = false;
   }
 
   protected resetForm() {
@@ -43,8 +50,12 @@ export class UploadCertificateComponent implements OnInit {
     this.keyExtension = true;
     this.certExtension = true;
     this.overwrite = '0';
+    this.certOnly = '0';
     this.form.get('overwrite').setValue('0');
-    this.checkedStatus = false;
+    // may be not required
+    this.form.get('certonly').setValue('0');
+    this.overwriteCheckedStatus = false;
+    this.certOnlyCheckedStatus = false;
   }
 
   public toggleModal(isOpen: Boolean) {
@@ -61,7 +72,7 @@ export class UploadCertificateComponent implements OnInit {
     if (event.target.files.length !== 0) {
       const fileName = event.target.files[0].name;
       const ext = fileName.substr(fileName.lastIndexOf('.') + 1);
-      if (ext === 'key') {
+      if (ext === 'key' || ext === 'pem') {
         this.keyExtension = true;
       } else {
         this.keyExtension = false;
@@ -78,7 +89,7 @@ export class UploadCertificateComponent implements OnInit {
     if (event.target.files.length !== 0) {
       const fileName = event.target.files[0].name;
       const ext = fileName.substr(fileName.lastIndexOf('.') + 1);
-      if (ext === 'cert') {
+      if (ext === 'cert' || ext === 'pem' ) {
         this.certExtension = true;
       } else {
         this.certExtension = false;
@@ -90,23 +101,40 @@ export class UploadCertificateComponent implements OnInit {
     }
   }
 
+  onCertOnlyChange(event) {
+    if (event.target.checked) {
+      this.certOnly = '1';
+      this.certOnlyCheckedStatus = true;
+      // disable the key browse option
+      this.form.get('key').disable();
+    } else {
+      this.certOnly = '0';
+      this.certOnlyCheckedStatus = false;
+      this.form.get('key').enable();
+    }
+  }
+
   onOverwriteChange(event) {
     if (event.target.checked) {
       this.overwrite = '1';
-      this.checkedStatus = true;
+      this.overwriteCheckedStatus = true;
     } else {
       this.overwrite = '0';
-      this.checkedStatus = false;
+      this.overwriteCheckedStatus = false;
     }
   }
+
 
   uploadCertificate() {
     if (this.cert && this.key) {
       if (this.certExtension && this.keyExtension) {
         const formData = new FormData();
         formData.append('cert', this.cert, this.cert.name);
-        formData.append('key', this.key, this.key.name);
+        if (this.certOnly !== '1') {
+          formData.append('key', this.key, this.key.name);
+        }
         formData.append('overwrite', this.overwrite);
+        formData.append('certonly', this.certOnly);
 
         /** request started */
         this.ngProgress.start();

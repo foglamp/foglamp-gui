@@ -30,6 +30,7 @@
               <i class="far fa-check-circle fa-lg" style="color:rgb(101, 184, 101)" aria-hidden="true"></i>
             </td>
             <td class="showInCenter" *ngIf="!certificate.key">
+              <!-- extension may be pem; Or key being None is okay if cert is .pem -->
               <i class="far fa-times-circle fa-lg" style="color: rgb(204, 62, 19)" aria-hidden="true"></i>
             </td>
             <td class="showInCenter" *ngIf="certificate.cert">
