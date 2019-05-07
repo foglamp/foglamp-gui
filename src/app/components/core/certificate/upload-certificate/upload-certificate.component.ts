@@ -60,6 +60,8 @@ export class UploadCertificateComponent implements OnInit {
 
   public toggleModal(isOpen: Boolean) {
     this.resetForm();
+    this.form.get('key').enable();
+
     const certificate_modal = <HTMLDivElement>document.getElementById('upload_certificate_modal');
     if (isOpen) {
       certificate_modal.classList.add('is-active');
@@ -90,6 +92,7 @@ export class UploadCertificateComponent implements OnInit {
       const fileName = event.target.files[0].name;
       const ext = fileName.substr(fileName.lastIndexOf('.') + 1);
       if (ext === 'cert' || ext === 'pem' ) {
+        // may be in case of certOnly, it should be pem only
         this.certExtension = true;
       } else {
         this.certExtension = false;
