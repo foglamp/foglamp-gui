@@ -22,10 +22,14 @@ export class CertificateService {
   }
 
   /**
-   *  DELETE | /foglamp/certificate/{name}
+   *  DELETE | /foglamp/certificate/{name with ext}?type={cert|key}
    */
-  public deleteCertificate(cert_name) {
-    return this.http.delete(this.CERTIFICATE_URL + '/' + cert_name).pipe(
+  public deleteCertificate(name: string, type: string) {
+    let url = this.CERTIFICATE_URL + '/' + name;
+    if (type.trim() !== '') {
+      url += '?type=' + type;
+    }
+    return this.http.delete(url).pipe(
       map(response => response),
       catchError(error => throwError(error)));
   }

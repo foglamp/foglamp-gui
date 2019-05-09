@@ -84,14 +84,13 @@ export class UploadCertificateComponent implements OnInit {
         this.key = file;
       }
     }
-
   }
 
   onCertChange(event) {
     if (event.target.files.length !== 0) {
       const fileName = event.target.files[0].name;
       const ext = fileName.substr(fileName.lastIndexOf('.') + 1);
-      if (ext === 'cert' || ext === 'pem' ) {
+      if (ext === 'cert' || ext === 'pem' ||  ext === 'json') {
         // may be in case of certOnly, it should be pem only
         this.certExtension = true;
       } else {
@@ -127,43 +126,37 @@ export class UploadCertificateComponent implements OnInit {
     }
   }
 
-
   uploadCertificate() {
-    if (this.cert && this.key) {
-      if (this.certExtension && this.keyExtension) {
-        const formData = new FormData();
-        formData.append('cert', this.cert, this.cert.name);
-        if (this.certOnly !== '1') {
-          formData.append('key', this.key, this.key.name);
-        }
-        formData.append('overwrite', this.overwrite);
-        formData.append('certonly', this.certOnly);
-
-        /** request started */
-        this.ngProgress.start();
-        this.certificateService.uploadCertificate(formData).
-          subscribe(
-            (data) => {
-              /** request completed */
-              this.ngProgress.done();
-              this.notify.emit();
-              this.toggleModal(false);
-              this.alertService.success(data['result']);
-            },
-            error => {
-              /** request completed */
-              this.ngProgress.done();
-              if (error.status === 0) {
-                console.log('service down ', error);
-              } else {
-                this.alertService.error(error.statusText);
-              }
-            });
-      } else {
-        this.alertService.error('Please upload files with correct format and extension');
-      }
-    } else {
-      this.alertService.error('Key or Certificate file is missing');
+    const formData = new FormData();
+    formData.append('cert', this.cert, this.cert.name);
+    if (this.certOnly !== '1') {
+      formData.append('key', this.key, this.key.name);
     }
+    const ext = this.cert.name.substr(this.cert.name.lastIndexOf('.') + 1);
+    if (this.certOnly === '1' && ext === 'cert') {
+      this.alertService.error('Accepted file extensions are .pem or .json');
+      return;
+    }
+    formData.append('overwrite', this.overwrite);
+    /** request started */
+    this.ngProgress.start();
+    this.certificateService.uploadCertificate(formData).
+      subscribe(
+        (data) => {
+          /** request completed */
+          this.ngProgress.done();
+          this.notify.emit();
+          this.toggleModal(false);
+          this.alertService.success(data['result']);
+        },
+        error => {
+          /** request completed */
+          this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
+        });
   }
 }

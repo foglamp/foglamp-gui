@@ -28,7 +28,7 @@
                   </div>
                 </div>
               </div>
-              <small *ngIf="!keyExtension" class="help is-danger level-left">Not a 'key' or 'pem' file.</small>
+              <small *ngIf="!keyExtension" class="help is-danger level-left">should be a .key or .pem file</small>
             </div>
           </div>
           <div class="columns">
@@ -52,7 +52,7 @@
                   </div>
                 </div>
               </div>
-              <small *ngIf="!certExtension" class="help is-danger level-left">Not a 'cert' or 'pem' file.</small>
+              <small *ngIf="!certExtension" class="help is-danger level-left">should be a .key, .pem or .json file</small>
             </div>
           </div>
           <div class="columns">
@@ -64,7 +64,7 @@
                     <input *ngIf="!certOnlyCheckedStatus" type="checkbox" ng-model="certonly" (change)="onCertOnlyChange($event)"> Certificate Only 
                   </label>
                 </div>
-                <p class="help">Certificate without (or combined) private key</p>
+                <p class="help">PEM or JSON</p>
               </div>
             </div>
           </div>
@@ -77,7 +77,7 @@
                     <input *ngIf="!overwriteCheckedStatus" type="checkbox" ng-model="overwrite" (change)="onOverwriteChange($event)"> Overwrite
                   </label>
                 </div>
-                <p class="help">Overwrite allows to replace the existing certificate</p>
+                <p class="help">Overwrite allows to replace the existing key or certificate</p>
               </div>
             </div>
           </div>

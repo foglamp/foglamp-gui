@@ -10,7 +10,8 @@ import { UploadCertificateComponent } from '../upload-certificate/upload-certifi
   styleUrls: ['./certificate-store.component.css']
 })
 export class CertificateStoreComponent implements OnInit {
-  public certificatesData = [];
+  public keys = [];
+  public certificates = [];
   public certificateName = '';
 
   // Object to hold data of certificate to delete
@@ -48,7 +49,8 @@ export class CertificateStoreComponent implements OnInit {
         (data) => {
           /** request completed */
           this.ngProgress.done();
-          this.certificatesData = data['certificates'];
+          this.keys = data['keys'];
+          this.certificates = data['certs'];
         },
         error => {
           /** request completed */
@@ -91,12 +93,12 @@ export class CertificateStoreComponent implements OnInit {
 
   /**
    * Delete Certificate
-   * @param cert_name name of the certificate to delete
+   * @param name name of the certificate or key to delete
    */
-  deleteCertificate(cert_name) {
+  deleteCertificate(name, type) {
     /** request started */
     this.ngProgress.start();
-    this.certService.deleteCertificate(cert_name).
+    this.certService.deleteCertificate(name, type).
       subscribe(
         (data) => {
           /** request completed */
