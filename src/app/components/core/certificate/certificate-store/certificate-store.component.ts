@@ -69,9 +69,7 @@ export class CertificateStoreComponent implements OnInit {
   }
 
   public getName(nameWithExtension) {
-    if (nameWithExtension) {
       return nameWithExtension.substr(0, nameWithExtension.indexOf('.'));
-    }
   }
 
   /**
