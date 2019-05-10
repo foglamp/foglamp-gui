@@ -106,6 +106,9 @@ export class UploadCertificateComponent implements OnInit {
       this.certOnly = '1';
       // disable the key browse option
       this.form.get('key').disable();
+      this.key = '';
+      this.form.get('key').setValue('');
+      this.keyExtension = true;
     } else {
       this.certOnly = '0';
       this.form.get('key').enable();
