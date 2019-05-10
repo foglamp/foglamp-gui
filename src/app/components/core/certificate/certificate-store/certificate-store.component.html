@@ -25,9 +25,10 @@
           </thead>
           <tbody>
             <tr *ngFor="let key of keys">
-              <td>{{key}}</td>
-              <td>{{key.split(".")[1]}}</td>
-              <td><a (click)="openDeleteModal(key, 'Are you sure, you want to delete the key', 'deleteKey', 'Delete')"
+              <td class="showInCenter">{{getName(key)}}</td>
+              <td class="showInCenter">{{key.split(".")[1]}}</td>
+              <td class="showInCenter"><a *ngIf="getName(key) != 'foglamp'"
+                  (click)="openDeleteModal(key, 'Are you sure, you want to delete the key', 'deleteKey')"
                   class="button is-text">
                   delete
                 </a></td>
@@ -46,11 +47,10 @@
           </thead>
           <tbody>
             <tr *ngFor="let cert of certificates">
-            <td>{{cert}}</td>
-            <td>{{cert.split(".")[1]}}</td>
-
-              <td><a
-                  (click)="openDeleteModal(certificate, 'Are you sure, you want to delete the Certificate', 'deleteCertificate', 'Delete')"
+              <td class="showInCenter">{{getName(cert)}}</td>
+              <td class="showInCenter">{{cert.split(".")[1]}}</td>
+              <td class="showInCenter"><a *ngIf="getName(cert) != 'foglamp'"
+                  (click)="openDeleteModal(cert, 'Are you sure, you want to delete the Certificate', 'deleteCertificate')"
                   class="button is-text">
                   delete
                 </a></td>

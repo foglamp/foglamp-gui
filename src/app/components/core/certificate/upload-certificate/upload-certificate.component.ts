@@ -16,9 +16,6 @@ export class UploadCertificateComponent implements OnInit {
   certOnly = '0';
   keyExtension = true;
   certExtension = true;
-  // May be we can just use overwrite and certOnly variables; and xCheckedStatus are redundant
-  overwriteCheckedStatus = false;
-  certOnlyCheckedStatus = false;
 
   @ViewChild('fileInput') fileInput: ElementRef;
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
@@ -38,10 +35,7 @@ export class UploadCertificateComponent implements OnInit {
 
     // Set default value on form
     this.form.get('overwrite').setValue('0');
-    // may be not required
     this.form.get('certonly').setValue('0');
-    this.overwriteCheckedStatus = false;
-    this.certOnlyCheckedStatus = false;
   }
 
   protected resetForm() {
@@ -51,11 +45,10 @@ export class UploadCertificateComponent implements OnInit {
     this.certExtension = true;
     this.overwrite = '0';
     this.certOnly = '0';
+    this.cert = '';
+    this.key = '';
     this.form.get('overwrite').setValue('0');
-    // may be not required
     this.form.get('certonly').setValue('0');
-    this.overwriteCheckedStatus = false;
-    this.certOnlyCheckedStatus = false;
   }
 
   public toggleModal(isOpen: Boolean) {
@@ -71,6 +64,9 @@ export class UploadCertificateComponent implements OnInit {
   }
 
   onKeyChange(event) {
+    if (this.key) {
+      this.key = '';
+    }
     if (event.target.files.length !== 0) {
       const fileName = event.target.files[0].name;
       const ext = fileName.substr(fileName.lastIndexOf('.') + 1);
@@ -87,11 +83,13 @@ export class UploadCertificateComponent implements OnInit {
   }
 
   onCertChange(event) {
+    if (this.cert) {
+      this.cert = '';
+    }
     if (event.target.files.length !== 0) {
       const fileName = event.target.files[0].name;
       const ext = fileName.substr(fileName.lastIndexOf('.') + 1);
-      if (ext === 'cert' || ext === 'pem' ||  ext === 'json') {
-        // may be in case of certOnly, it should be pem only
+      if (ext === 'cert' || ext === 'pem' || ext === 'json') {
         this.certExtension = true;
       } else {
         this.certExtension = false;
@@ -106,12 +104,10 @@ export class UploadCertificateComponent implements OnInit {
   onCertOnlyChange(event) {
     if (event.target.checked) {
       this.certOnly = '1';
-      this.certOnlyCheckedStatus = true;
       // disable the key browse option
       this.form.get('key').disable();
     } else {
       this.certOnly = '0';
-      this.certOnlyCheckedStatus = false;
       this.form.get('key').enable();
     }
   }
@@ -119,44 +115,54 @@ export class UploadCertificateComponent implements OnInit {
   onOverwriteChange(event) {
     if (event.target.checked) {
       this.overwrite = '1';
-      this.overwriteCheckedStatus = true;
     } else {
       this.overwrite = '0';
-      this.overwriteCheckedStatus = false;
     }
   }
 
   uploadCertificate() {
-    const formData = new FormData();
-    formData.append('cert', this.cert, this.cert.name);
-    if (this.certOnly !== '1') {
-      formData.append('key', this.key, this.key.name);
-    }
-    const ext = this.cert.name.substr(this.cert.name.lastIndexOf('.') + 1);
-    if (this.certOnly === '1' && ext === 'cert') {
-      this.alertService.error('Accepted file extensions are .pem or .json');
+    if (this.certOnly === '1' && !this.cert) {
+      this.alertService.error('Certificate is missing');
       return;
     }
-    formData.append('overwrite', this.overwrite);
-    /** request started */
-    this.ngProgress.start();
-    this.certificateService.uploadCertificate(formData).
-      subscribe(
-        (data) => {
-          /** request completed */
-          this.ngProgress.done();
-          this.notify.emit();
-          this.toggleModal(false);
-          this.alertService.success(data['result']);
-        },
-        error => {
-          /** request completed */
-          this.ngProgress.done();
-          if (error.status === 0) {
-            console.log('service down ', error);
-          } else {
-            this.alertService.error(error.statusText);
-          }
-        });
+    if (this.certOnly === '0' && (!this.cert || !this.key)) {
+      this.alertService.error('Key or Certificate file is missing');
+      return;
+    }
+    if (this.certExtension && this.keyExtension) {
+      const formData = new FormData();
+      formData.append('cert', this.cert, this.cert.name);
+      if (this.certOnly === '0') {
+        formData.append('key', this.key, this.key.name);
+      }
+      const ext = this.cert.name.substr(this.cert.name.lastIndexOf('.') + 1);
+      if (this.certOnly === '1' && ext === 'cert') {
+        this.alertService.error('Accepted file extensions are .pem or .json');
+        return;
+      }
+      formData.append('overwrite', this.overwrite);
+      /** request started */
+      this.ngProgress.start();
+      this.certificateService.uploadCertificate(formData).
+        subscribe(
+          (data) => {
+            /** request completed */
+            this.ngProgress.done();
+            this.notify.emit();
+            this.toggleModal(false);
+            this.alertService.success(data['result']);
+          },
+          error => {
+            /** request completed */
+            this.ngProgress.done();
+            if (error.status === 0) {
+              console.log('service down ', error);
+            } else {
+              this.alertService.error(error.statusText);
+            }
+          });
+    } else {
+      this.alertService.error('Please upload files with correct format and extension');
+    }
   }
 }

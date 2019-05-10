@@ -52,7 +52,7 @@
                   </div>
                 </div>
               </div>
-              <small *ngIf="!certExtension" class="help is-danger level-left">should be a .key, .pem or .json file</small>
+              <small *ngIf="!certExtension" class="help is-danger level-left">should be a .cert, .pem or .json file</small>
             </div>
           </div>
           <div class="columns">
@@ -60,8 +60,8 @@
               <div class="field">
                 <div class="control">
                   <label class="checkbox">
-                    <input *ngIf="certOnlyCheckedStatus" checked type="checkbox" ng-model="certonly" (change)="onCertOnlyChange($event)">
-                    <input *ngIf="!certOnlyCheckedStatus" type="checkbox" ng-model="certonly" (change)="onCertOnlyChange($event)"> Certificate Only 
+                    <input *ngIf="certOnly == '1'" checked type="checkbox" ng-model="certonly" (change)="onCertOnlyChange($event)">
+                    <input *ngIf="certOnly == '0'" type="checkbox" ng-model="certonly" (change)="onCertOnlyChange($event)"> Certificate Only 
                   </label>
                 </div>
                 <p class="help">PEM or JSON</p>
@@ -73,8 +73,8 @@
               <div class="field">
                 <div class="control">
                   <label class="checkbox">
-                    <input *ngIf="overwriteCheckedStatus" checked type="checkbox" ng-model="overwrite" (change)="onOverwriteChange($event)">
-                    <input *ngIf="!overwriteCheckedStatus" type="checkbox" ng-model="overwrite" (change)="onOverwriteChange($event)"> Overwrite
+                    <input *ngIf="overwrite == '1'" checked type="checkbox" ng-model="overwrite" (change)="onOverwriteChange($event)">
+                    <input *ngIf="overwrite == '0'" type="checkbox" ng-model="overwrite" (change)="onOverwriteChange($event)"> Overwrite
                   </label>
                 </div>
                 <p class="help">Overwrite allows to replace the existing key or certificate</p>
