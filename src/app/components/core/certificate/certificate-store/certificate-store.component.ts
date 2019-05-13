@@ -54,41 +54,18 @@ export class CertificateStoreComponent implements OnInit {
           this.keys = sortBy(data['keys'], function (obj) {
             return obj.split('.')[1] + obj.substr(0, obj.indexOf('.'));
           });
-          for (let i = 0; i < 3; i++) {
-            if (i === 0) {
-              data['certs'].forEach(c => {
-                if (c.split('.')[1] === 'cert') {
-                  this.certificates.push(c);
-                }
-              });
-              this.certificates = sortBy(this.certificates, function (obj) {
-                return obj.substr(0, obj.indexOf('.'));
-              });
-            }
-            if (i === 1) {
-              let pemCert = [];
-              data['certs'].forEach(c => {
-                if (c.split('.')[1] === 'pem') {
-                  pemCert.push(c);
-                }
-              });
-              pemCert = sortBy(pemCert, function (obj) {
-                return obj.substr(0, obj.indexOf('.'));
-              });
-              this.certificates = this.certificates.concat(pemCert);
-            }
-            if (i === 2) {
-              let jsonCert = [];
-              data['certs'].forEach(c => {
-                if (c.split('.')[1] === 'json') {
-                  jsonCert.push(c);
-                }
-              });
-              jsonCert = sortBy(jsonCert, function (obj) {
-                return obj.substr(0, obj.indexOf('.'));
-              });
-              this.certificates = this.certificates.concat(jsonCert);
-            }
+          const certExtensions = ['cert', 'pem', 'json'];
+          for (let i = 0; i < certExtensions.length; i++) {
+            let certificates = [];
+            data['certs'].forEach(c => {
+              if (c.split('.')[1] === certExtensions[i]) {
+                certificates.push(c);
+              }
+            });
+            certificates = sortBy(certificates, function (obj) {
+              return obj.substr(0, obj.indexOf('.'));
+            });
+            this.certificates = this.certificates.concat(certificates);
           }
         },
         error => {
