@@ -1,3 +1,16 @@
+## v1.6.0 [2019-05-22]
+
+#### Added
+
+* Certificate Store allows PEM and JSON certificates
+* More options for elapsed time in readings graph
+* 3D surface graph support for FFT spectrum
+* RPM packaging and support for Redhat
+
+#### Fixed
+
+* Assorted UI/UX issues and Nicer Dropdown
+
 ## v1.5.2 [2019-04-08]
 
 #### Added
