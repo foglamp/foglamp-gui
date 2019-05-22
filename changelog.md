@@ -2,10 +2,10 @@
 
 #### Added
 
+* Red Hat Support and required RPM packaging
+* 3D surface graph support for FFT spectrum
 * Certificate Store allows PEM and JSON certificates
 * More options for elapsed time in readings graph
-* 3D surface graph support for FFT spectrum
-* RPM packaging and support for Redhat
 
 #### Fixed
 
