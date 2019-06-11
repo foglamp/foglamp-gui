@@ -66,7 +66,7 @@ export class SouthPluginModalComponent implements OnInit, OnChanges {
     /** request started */
     this.ngProgress.start();
     const wip: HTMLElement = document.getElementById('wip') as HTMLElement;
-    wip.innerHTML = 'Fetching avaialble plugins ...';
+    wip.innerHTML = 'Fetching available plugins ...';
     this.service.getAvailablePlugins(serviceType).
       subscribe(
         (data: any) => {
