@@ -78,7 +78,11 @@ export class SouthPluginModalComponent implements OnInit, OnChanges {
     this.service.getAvailablePlugins(serviceType).
       subscribe(
         (data: any) => {
-          this.southPlugins = data['plugins'];
+          const pList = [];
+          data['plugins'].forEach(p => {
+            pList.push(p.replace('foglamp-south-', ''));
+          });
+          this.southPlugins = pList;
           this.fetchPluginRequestDone();
         },
         error => {
@@ -95,9 +99,13 @@ export class SouthPluginModalComponent implements OnInit, OnChanges {
   installPlugin() {
     const pluginData = {
       format: 'repository',
-      name: this.selectedPlugin,
+      name: 'foglamp-south-' + this.selectedPlugin,
       version: ''
     };
+
+    // remove me
+    console.log(pluginData);
+
     /** request started */
     this.ngProgress.start();
     this.alertService.activityMessage('installing ...', true);
