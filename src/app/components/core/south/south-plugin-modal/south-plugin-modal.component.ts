@@ -15,7 +15,7 @@ export class SouthPluginModalComponent implements OnInit, OnChanges {
     placeholder: 'Select',
     limitTo: this.southPlugins.length,
     moreText: 'more', // text to be displayed when more than one items are selected like Option 1 + 5 more
-    noResultsFound: 'No plugin available!',
+    noResultsFound: 'No plugin found!',
     searchPlaceholder: 'Search',
   };
 
@@ -39,8 +39,6 @@ export class SouthPluginModalComponent implements OnInit, OnChanges {
     if (this.data.modalState === true) {
       this.toggleModal(true);
       this.getAvailableSouthPlugins(this.data.serviceType);
-      const element: HTMLElement = document.getElementsByClassName('ngx-dropdown-button')[0] as HTMLElement;
-      element.click();
     }
   }
 
@@ -57,15 +55,25 @@ export class SouthPluginModalComponent implements OnInit, OnChanges {
     this.selectedPlugin = event.value;
   }
 
+  doBlah() {
+    const element: HTMLElement = document.getElementsByClassName('ngx-dropdown-button')[0] as HTMLElement;
+    element.click();
+    const wip: HTMLElement = document.getElementById('wip') as HTMLElement;
+    wip.innerHTML = '';
+  }
+
   getAvailableSouthPlugins(serviceType: string) {
     /** request started */
     this.ngProgress.start();
+    const wip: HTMLElement = document.getElementById('wip') as HTMLElement;
+    wip.innerHTML = 'Fetching avaialble plugins ...';
     this.service.getAvailablePlugins(serviceType).
       subscribe(
         (data: any) => {
           /** request done */
           this.ngProgress.done();
-          this.southPlugins = data['plugins']
+          this.southPlugins = data['plugins'];
+          this.doBlah();
         },
         error => {
           /** request done */
