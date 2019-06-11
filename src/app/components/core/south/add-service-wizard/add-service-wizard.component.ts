@@ -1,10 +1,11 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { assign, cloneDeep, reduce, sortBy, map } from 'lodash';
 
 import { AlertService, SchedulesService, ServicesApiService, PluginService, ProgressBarService } from '../../../../services';
 import { ViewConfigItemComponent } from '../../configuration-manager/view-config-item/view-config-item.component';
+import { SouthPluginModalComponent } from '../south-plugin-modal/south-plugin-modal.component';
 
 @Component({
   selector: 'app-add-service-wizard',
@@ -25,6 +26,8 @@ export class AddServiceWizardComponent implements OnInit {
   public payload: any;
   public schedulesName = [];
 
+  public pluginData = {};
+
   serviceForm = new FormGroup({
     name: new FormControl(),
     plugin: new FormControl()
@@ -32,6 +35,9 @@ export class AddServiceWizardComponent implements OnInit {
 
   @Input() categoryConfigurationData;
   @ViewChild(ViewConfigItemComponent) viewConfigItemComponent: ViewConfigItemComponent;
+  @ViewChild(SouthPluginModalComponent) southPluginModalComponent: SouthPluginModalComponent;
+
+  @ViewChild('selectedPlugin') selectedPlugin: ElementRef;
 
   constructor(private formBuilder: FormBuilder,
     private servicesApiService: ServicesApiService,
@@ -103,6 +109,16 @@ export class AddServiceWizardComponent implements OnInit {
     }
   }
 
+  /**
+   * Open south service plugin modal
+   */
+  openSouthServicePluginModal() {
+    this.pluginData = {
+      modalState: true,
+      serviceType: this.serviceType
+    };
+  }
+
   moveNext() {
     this.isValidPlugin = true;
     this.isValidName = true;
@@ -118,7 +134,7 @@ export class AddServiceWizardComponent implements OnInit {
           return;
         }
 
-        if (formValues['plugin'].length !== 1 ) {
+        if (formValues['plugin'].length !== 1) {
           this.isSinglePlugin = false;
           return;
         }
@@ -330,5 +346,10 @@ export class AddServiceWizardComponent implements OnInit {
             this.alertService.error(error.statusText);
           }
         });
+  }
+
+  onNotify(event: any) {
+    this.selectedPlugin.nativeElement.selected = event;
+    this.getInstalledSouthPlugins();
   }
 }

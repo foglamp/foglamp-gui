@@ -1,0 +1,37 @@
+<div id="south-service-plugin-modal" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title is-size-5">South Service Plugins</p>
+      <button class="delete" aria-label="close" (click)="toggleModal(false)"></button>
+    </header>
+    <section class="modal-card-body">
+      <ng-container>
+          <div class="columns">
+            <div class="column">
+              <div class="field is-horizontal">
+                <div class="field-body">
+                  <div class="field">
+                      <ngx-select-dropdown #pluginDropdown (change)="selectionChanged($event)"  [(ngModel)]="dataModel" [config]="config" [options]="southPlugins"></ngx-select-dropdown>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="columns">
+            <div class="column">
+              <div class="field is-grouped is-pulled-right">
+                <p class="control">
+                  <button class="button is-small" (click)="toggleModal(false)">Cancel</button>
+                </p>
+                <p class="control">
+                  <button class="button is-small is-link" (click)="installPlugin()">Install</button>
+                </p>
+              </div>
+            </div>
+          </div>
+      </ng-container>
+
+    </section>
+  </div>
+</div>
