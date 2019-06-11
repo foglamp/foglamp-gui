@@ -55,29 +55,34 @@ export class SouthPluginModalComponent implements OnInit, OnChanges {
     this.selectedPlugin = event.value;
   }
 
-  doBlah() {
-    const element: HTMLElement = document.getElementsByClassName('ngx-dropdown-button')[0] as HTMLElement;
-    element.click();
-    const wip: HTMLElement = document.getElementById('wip') as HTMLElement;
-    wip.innerHTML = '';
+  fetchPluginRequestStarted() {
+     this.ngProgress.start();
+     const requestInProgressEle: HTMLElement = document.getElementById('requestInProgress') as HTMLElement;
+     requestInProgressEle.innerHTML = 'fetching available plugins ...';
+  }
+
+  fetchPluginRequestDone() {
+    this.ngProgress.done();
+
+    if (this.southPlugins.length) {
+      const ddnEle: HTMLElement = document.getElementsByClassName('ngx-dropdown-button')[0] as HTMLElement;
+      ddnEle.click();
+    }
+
+    const requestInProgressEle: HTMLElement = document.getElementById('requestInProgress') as HTMLElement;
+    requestInProgressEle.innerHTML = '';
   }
 
   getAvailableSouthPlugins(serviceType: string) {
-    /** request started */
-    this.ngProgress.start();
-    const wip: HTMLElement = document.getElementById('wip') as HTMLElement;
-    wip.innerHTML = 'Fetching available plugins ...';
+    this.fetchPluginRequestStarted();
     this.service.getAvailablePlugins(serviceType).
       subscribe(
         (data: any) => {
-          /** request done */
-          this.ngProgress.done();
           this.southPlugins = data['plugins'];
-          this.doBlah();
+          this.fetchPluginRequestDone();
         },
         error => {
-          /** request done */
-          this.ngProgress.done();
+          this.fetchPluginRequestDone();
           if (error.status === 0) {
             console.log('service down ', error);
           } else {
@@ -95,7 +100,7 @@ export class SouthPluginModalComponent implements OnInit, OnChanges {
     };
     /** request started */
     this.ngProgress.start();
-    this.alertService.activityMessage('installing...', true);
+    this.alertService.activityMessage('installing ...', true);
     this.service.installPlugin(pluginData).
       subscribe(
         (data: any) => {
