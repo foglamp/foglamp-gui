@@ -159,7 +159,7 @@ export class AddServiceWizardComponent implements OnInit {
         if (formValues['name'].trim() !== '' && formValues['plugin'].length > 0) {
           this.payload = {
             name: formValues['name'],
-            type: this.serviceType,
+            type: this.serviceType.toLowerCase(),
             plugin: formValues['plugin'][0],
             enabled: this.isScheduleEnabled
           };
@@ -297,7 +297,7 @@ export class AddServiceWizardComponent implements OnInit {
   public getInstalledSouthPlugins() {
     /** request started */
     this.ngProgress.start();
-    this.pluginService.getInstalledPlugins('south').subscribe(
+    this.pluginService.getInstalledPlugins(this.serviceType.toLowerCase()).subscribe(
       (data: any) => {
         /** request completed */
         this.ngProgress.done();

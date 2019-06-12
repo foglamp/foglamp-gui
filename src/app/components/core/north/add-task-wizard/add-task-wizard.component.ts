@@ -160,7 +160,7 @@ export class AddTaskWizardComponent implements OnInit {
           this.payload = {
             'name': formValues['name'],
             'plugin': formValues['plugin'][0],
-            'type': 'north',
+            'type': this.taskType.toLowerCase(),
             'schedule_repeat': repeatTime,
             'schedule_type': '3',
             'schedule_enabled': this.isScheduleEnabled
@@ -221,7 +221,7 @@ export class AddTaskWizardComponent implements OnInit {
   private getInstalledNorthPlugins() {
     /** request started */
     this.ngProgress.start();
-    this.pluginService.getInstalledPlugins(this.taskType).subscribe(
+    this.pluginService.getInstalledPlugins(this.taskType.toLowerCase()).subscribe(
       (data: any) => {
         /** request completed */
         this.ngProgress.done();
