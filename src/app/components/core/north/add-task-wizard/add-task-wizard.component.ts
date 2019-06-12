@@ -396,7 +396,7 @@ export class AddTaskWizardComponent implements OnInit {
     return this.taskForm.get('name');
   }
 
-  onNotify(event: any) {
+  onNotify() {
     this.getInstalledNorthPlugins();
   }
 }
