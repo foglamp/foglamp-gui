@@ -20,8 +20,8 @@ export class PluginModalComponent implements OnInit, OnChanges {
   };
 
   @Input() data: {
-    modalState: boolean,
-    serviceType: string
+    state: boolean,
+    type: string
   };
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
 
@@ -32,9 +32,9 @@ export class PluginModalComponent implements OnInit, OnChanges {
   ngOnInit() { }
 
   ngOnChanges() {
-    if (this.data.modalState === true) {
+    if (this.data.state === true) {
       this.toggleModal(true);
-      this.getAvailablePlugins(this.data.serviceType);
+      this.getAvailablePlugins(this.data.type);
     }
   }
 
@@ -65,18 +65,26 @@ export class PluginModalComponent implements OnInit, OnChanges {
     requestInProgressEle.innerHTML = '';
   }
 
-  getAvailablePlugins(serviceType: string) {
+  getAvailablePlugins(type: string) {
     this.fetchPluginRequestStarted();
-    this.service.getAvailablePlugins(serviceType).
+    this.service.getAvailablePlugins(type).
       subscribe(
         (data: any) => {
-          this.plugins = data['plugins'].map((p: string) => p.replace('foglamp-south-', ''));
+          this.plugins = data['plugins'].map((p: string) => {
+            if (p.includes('foglamp-south-')) {
+              return p.replace('foglamp-south-', '');
+            } else if (p.includes('foglamp-north-')) {
+              return p.replace('foglamp-north-', '');
+            }
+          });
           this.fetchPluginRequestDone();
         },
         error => {
           this.fetchPluginRequestDone();
           if (error.status === 0) {
             console.log('service down ', error);
+          } else if (error.status === 404) {
+            this.alertService.error('Make sure package repository is configured / added in FogLAMP');
           } else {
             this.alertService.error(error.statusText);
           }
@@ -84,10 +92,10 @@ export class PluginModalComponent implements OnInit, OnChanges {
       );
   }
 
-  installPlugin(plugin: any) {
+  installPlugin(pluginName: string) {
     const pluginData = {
       format: 'repository',
-      name: 'foglamp-south-' + plugin.value,
+      name: `foglamp-${this.data.type.toLowerCase()}-` + pluginName,
       version: ''
     };
 
@@ -100,7 +108,7 @@ export class PluginModalComponent implements OnInit, OnChanges {
           /** request done */
           this.ngProgress.done();
           this.toggleModal(false);
-          this.notify.emit(plugin.value);
+          this.notify.emit(pluginName);
           this.alertService.closeMessage();
           this.alertService.success(data.message, true);
         },

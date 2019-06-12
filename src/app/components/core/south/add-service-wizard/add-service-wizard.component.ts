@@ -110,12 +110,12 @@ export class AddServiceWizardComponent implements OnInit {
   }
 
   /**
-   * Open south service plugin modal
+   * Open plugin modal
    */
-  openSouthServicePluginModal() {
+  openPluginModal() {
     this.pluginData = {
-      modalState: true,
-      serviceType: this.serviceType
+      state: true,
+      type: this.serviceType
     };
   }
 

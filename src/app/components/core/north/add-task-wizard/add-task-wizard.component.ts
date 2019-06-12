@@ -28,6 +28,10 @@ export class AddTaskWizardComponent implements OnInit {
   public schedulesName = [];
   public selectedPluginDescription = '';
 
+  public pluginData = {};
+
+  public taskType = 'north';
+
   taskForm = new FormGroup({
     name: new FormControl('', Validators.required),
     plugin: new FormControl('', Validators.required),
@@ -204,10 +208,20 @@ export class AddTaskWizardComponent implements OnInit {
     }
   }
 
+  /**
+   * Open plugin modal
+   */
+  openPluginModal() {
+    this.pluginData = {
+      state: true,
+      type: this.taskType
+    };
+  }
+
   private getInstalledNorthPlugins() {
     /** request started */
     this.ngProgress.start();
-    this.pluginService.getInstalledPlugins('north').subscribe(
+    this.pluginService.getInstalledPlugins(this.taskType).subscribe(
       (data: any) => {
         /** request completed */
         this.ngProgress.done();
@@ -380,5 +394,9 @@ export class AddTaskWizardComponent implements OnInit {
 
   get name() {
     return this.taskForm.get('name');
+  }
+
+  onNotify(event: any) {
+    this.getInstalledNorthPlugins();
   }
 }
