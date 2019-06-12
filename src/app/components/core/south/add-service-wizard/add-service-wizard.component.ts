@@ -5,7 +5,7 @@ import { assign, cloneDeep, reduce, sortBy, map } from 'lodash';
 
 import { AlertService, SchedulesService, ServicesApiService, PluginService, ProgressBarService } from '../../../../services';
 import { ViewConfigItemComponent } from '../../configuration-manager/view-config-item/view-config-item.component';
-import { SouthPluginModalComponent } from '../south-plugin-modal/south-plugin-modal.component';
+import { PluginModalComponent } from '../../plugin-modal/plugin-modal.component';
 
 @Component({
   selector: 'app-add-service-wizard',
@@ -35,7 +35,7 @@ export class AddServiceWizardComponent implements OnInit {
 
   @Input() categoryConfigurationData;
   @ViewChild(ViewConfigItemComponent) viewConfigItemComponent: ViewConfigItemComponent;
-  @ViewChild(SouthPluginModalComponent) southPluginModalComponent: SouthPluginModalComponent;
+  @ViewChild(PluginModalComponent) pluginModalComponent: PluginModalComponent;
 
   @ViewChild('selectedPlugin') selectedPlugin: ElementRef;
 

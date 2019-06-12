@@ -1,25 +1,23 @@
-import { Component, OnInit, Input, OnChanges, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
-import { ServicesApiService, AlertService, ProgressBarService } from '../../../../services';
+import { Component, OnInit, Input, OnChanges, Output, EventEmitter } from '@angular/core';
+import { ServicesApiService, AlertService, ProgressBarService } from '../../../services';
 
 @Component({
-  selector: 'app-south-plugin-modal',
-  templateUrl: './south-plugin-modal.component.html',
-  styleUrls: ['./south-plugin-modal.component.css']
+  selector: 'app-plugin-modal',
+  templateUrl: './plugin-modal.component.html',
+  styleUrls: ['./plugin-modal.component.css']
 })
-export class SouthPluginModalComponent implements OnInit, OnChanges {
+export class PluginModalComponent implements OnInit, OnChanges {
 
-  southPlugins = [];
+  plugins = [];
   config = {
     search: true,
     height: '200px',
     placeholder: 'Select',
-    limitTo: this.southPlugins.length,
+    limitTo: this.plugins.length,
     moreText: 'more', // text to be displayed when more than one items are selected like Option 1 + 5 more
     noResultsFound: 'No plugin found!',
     searchPlaceholder: 'Search',
   };
-
-  @ViewChild('pluginDropdown') el: ElementRef;
 
   @Input() data: {
     modalState: boolean,
@@ -38,12 +36,12 @@ export class SouthPluginModalComponent implements OnInit, OnChanges {
   ngOnChanges() {
     if (this.data.modalState === true) {
       this.toggleModal(true);
-      this.getAvailableSouthPlugins(this.data.serviceType);
+      this.getAvailablePlugins(this.data.serviceType);
     }
   }
 
   public toggleModal(isOpen: Boolean) {
-    const modal_name = <HTMLDivElement>document.getElementById('south-service-plugin-modal');
+    const modal_name = <HTMLDivElement>document.getElementById('plugin-modal');
     if (isOpen) {
       modal_name.classList.add('is-active');
       return;
@@ -56,15 +54,15 @@ export class SouthPluginModalComponent implements OnInit, OnChanges {
   }
 
   fetchPluginRequestStarted() {
-     this.ngProgress.start();
-     const requestInProgressEle: HTMLElement = document.getElementById('requestInProgress') as HTMLElement;
-     requestInProgressEle.innerHTML = 'fetching available plugins ...';
+    this.ngProgress.start();
+    const requestInProgressEle: HTMLElement = document.getElementById('requestInProgress') as HTMLElement;
+    requestInProgressEle.innerHTML = 'fetching available plugins ...';
   }
 
   fetchPluginRequestDone() {
     this.ngProgress.done();
 
-    if (this.southPlugins.length) {
+    if (this.plugins.length) {
       const ddnEle: HTMLElement = document.getElementsByClassName('ngx-dropdown-button')[0] as HTMLElement;
       ddnEle.click();
     }
@@ -73,16 +71,12 @@ export class SouthPluginModalComponent implements OnInit, OnChanges {
     requestInProgressEle.innerHTML = '';
   }
 
-  getAvailableSouthPlugins(serviceType: string) {
+  getAvailablePlugins(serviceType: string) {
     this.fetchPluginRequestStarted();
     this.service.getAvailablePlugins(serviceType).
       subscribe(
         (data: any) => {
-          const pList = [];
-          data['plugins'].forEach(p => {
-            pList.push(p.replace('foglamp-south-', ''));
-          });
-          this.southPlugins = pList;
+          this.plugins = data['plugins'].map((p: string) => p.replace('foglamp-south-', ''));
           this.fetchPluginRequestDone();
         },
         error => {
@@ -108,7 +102,7 @@ export class SouthPluginModalComponent implements OnInit, OnChanges {
 
     /** request started */
     this.ngProgress.start();
-    this.alertService.activityMessage('installing ...', true);
+    this.alertService.activityMessage('installing...', true);
     this.service.installPlugin(pluginData).
       subscribe(
         (data: any) => {
@@ -129,7 +123,5 @@ export class SouthPluginModalComponent implements OnInit, OnChanges {
           }
         }
       );
-
   }
-
 }

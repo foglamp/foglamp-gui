@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SouthPluginModalComponent } from './south-plugin-modal.component';
+import { PluginModalComponent } from './plugin-modal.component';
 
-describe('SouthPluginModalComponent', () => {
-  let component: SouthPluginModalComponent;
-  let fixture: ComponentFixture<SouthPluginModalComponent>;
+describe('PluginModalComponent', () => {
+  let component: PluginModalComponent;
+  let fixture: ComponentFixture<PluginModalComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SouthPluginModalComponent ]
+      declarations: [ PluginModalComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SouthPluginModalComponent);
+    fixture = TestBed.createComponent(PluginModalComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

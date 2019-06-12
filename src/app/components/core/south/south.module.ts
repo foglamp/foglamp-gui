@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
-import { SelectDropDownModule } from 'ngx-select-dropdown'
+import { SelectDropDownModule } from 'ngx-select-dropdown';
 
 import { AuthCheckGuard } from '../../../guards';
 import { PipesModule } from '../../../pipes/pipes.module';
@@ -14,7 +14,7 @@ import { FilterModule } from '../filter/filter.module';
 import { AddServiceWizardComponent } from './add-service-wizard/add-service-wizard.component';
 import { SouthServiceModalComponent } from './south-service-modal/south-service-modal.component';
 import { SouthComponent } from './south.component';
-import { SouthPluginModalComponent } from './south-plugin-modal/south-plugin-modal.component';
+import { PluginModalComponent } from '../plugin-modal/plugin-modal.component';
 
 const routes: Routes = [
 
@@ -35,7 +35,7 @@ const routes: Routes = [
     SouthComponent,
     AddServiceWizardComponent,
     SouthServiceModalComponent,
-    SouthPluginModalComponent,
+    PluginModalComponent
   ],
   imports: [
     FormsModule,
