@@ -30,7 +30,7 @@ export class AddTaskWizardComponent implements OnInit {
 
   public pluginData = {};
 
-  public taskType = 'north';
+  public taskType = 'North';
 
   taskForm = new FormGroup({
     name: new FormControl('', Validators.required),

@@ -70,13 +70,7 @@ export class PluginModalComponent implements OnInit, OnChanges {
     this.service.getAvailablePlugins(type).
       subscribe(
         (data: any) => {
-          this.plugins = data['plugins'].map((p: string) => {
-            if (p.includes('foglamp-south-')) {
-              return p.replace('foglamp-south-', '');
-            } else if (p.includes('foglamp-north-')) {
-              return p.replace('foglamp-north-', '');
-            }
-          });
+          this.plugins = data['plugins'].map((p: string) => p.replace(`foglamp-${this.data.type.toLowerCase()}-`, ''));
           this.fetchPluginRequestDone();
         },
         error => {
