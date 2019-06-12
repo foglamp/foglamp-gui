@@ -25,8 +25,6 @@ export class PluginModalComponent implements OnInit, OnChanges {
   };
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
 
-  selectedPlugin: string;
-
   constructor(private service: ServicesApiService,
     private alertService: AlertService,
     private ngProgress: ProgressBarService) { }
@@ -47,10 +45,6 @@ export class PluginModalComponent implements OnInit, OnChanges {
       return;
     }
     modal_name.classList.remove('is-active');
-  }
-
-  selectionChanged(event: any) {
-    this.selectedPlugin = event.value;
   }
 
   fetchPluginRequestStarted() {
@@ -90,15 +84,12 @@ export class PluginModalComponent implements OnInit, OnChanges {
       );
   }
 
-  installPlugin() {
+  installPlugin(plugin: any) {
     const pluginData = {
       format: 'repository',
-      name: 'foglamp-south-' + this.selectedPlugin,
+      name: 'foglamp-south-' + plugin.value,
       version: ''
     };
-
-    // remove me
-    console.log(pluginData);
 
     /** request started */
     this.ngProgress.start();
@@ -109,7 +100,7 @@ export class PluginModalComponent implements OnInit, OnChanges {
           /** request done */
           this.ngProgress.done();
           this.toggleModal(false);
-          this.notify.emit(this.selectedPlugin);
+          this.notify.emit(plugin.value);
           this.alertService.closeMessage();
           this.alertService.success(data.message, true);
         },

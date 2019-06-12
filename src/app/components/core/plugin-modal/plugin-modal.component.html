@@ -12,7 +12,7 @@
               <div class="field is-horizontal">
                 <div class="field-body">
                   <div class="field">
-                      <ngx-select-dropdown #pluginDropdown (change)="selectionChanged($event)" [config]="config" [options]="plugins"></ngx-select-dropdown>
+                      <ngx-select-dropdown #plugin [config]="config" [options]="plugins"></ngx-select-dropdown>
                   </div>
                 </div>
               </div>
@@ -28,7 +28,7 @@
                   <button class="button is-small" (click)="toggleModal(false)">Cancel</button>
                 </p>
                 <p class="control">
-                  <button class="button is-small is-link" (click)="installPlugin()">Install</button>
+                  <button class="button is-small is-link" (click)="installPlugin(plugin)">Install</button>
                 </p>
               </div>
             </div>
