@@ -102,7 +102,7 @@ export class PluginModalComponent implements OnInit, OnChanges {
           /** request done */
           this.ngProgress.done();
           this.toggleModal(false);
-          this.notify.emit(pluginName);
+          this.notify.emit();
           this.alertService.closeMessage();
           this.alertService.success(data.message, true);
         },
