@@ -5,7 +5,6 @@ import { assign, cloneDeep, reduce, sortBy, map } from 'lodash';
 
 import { AlertService, SchedulesService, ServicesApiService, PluginService, ProgressBarService } from '../../../../services';
 import { ViewConfigItemComponent } from '../../configuration-manager/view-config-item/view-config-item.component';
-import { PluginModalComponent } from '../../plugin-modal/plugin-modal.component';
 
 @Component({
   selector: 'app-add-service-wizard',
@@ -26,8 +25,6 @@ export class AddServiceWizardComponent implements OnInit {
   public payload: any;
   public schedulesName = [];
 
-  public pluginData = {};
-
   serviceForm = new FormGroup({
     name: new FormControl(),
     plugin: new FormControl()
@@ -35,8 +32,11 @@ export class AddServiceWizardComponent implements OnInit {
 
   @Input() categoryConfigurationData;
   @ViewChild(ViewConfigItemComponent) viewConfigItemComponent: ViewConfigItemComponent;
-  @ViewChild(PluginModalComponent) pluginModalComponent: PluginModalComponent;
 
+  public pluginData = {
+    state: false,
+    type: this.serviceType
+  };
   constructor(private formBuilder: FormBuilder,
     private servicesApiService: ServicesApiService,
     private pluginService: PluginService,
@@ -346,7 +346,10 @@ export class AddServiceWizardComponent implements OnInit {
         });
   }
 
-  onNotify() {
-    this.getInstalledSouthPlugins();
+  onNotify(state: boolean) {
+    state === true ? this.pluginData.state = true : this.pluginData.state = false;
+    if (state) {
+      this.getInstalledSouthPlugins();
+    }
   }
 }

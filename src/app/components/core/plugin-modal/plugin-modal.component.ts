@@ -23,7 +23,7 @@ export class PluginModalComponent implements OnInit, OnChanges {
     state: boolean,
     type: string
   };
-  @Output() notify: EventEmitter<any> = new EventEmitter<any>();
+  @Output() notify: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   constructor(private service: ServicesApiService,
     private alertService: AlertService,
@@ -41,9 +41,11 @@ export class PluginModalComponent implements OnInit, OnChanges {
   public toggleModal(isOpen: Boolean) {
     const modal_name = <HTMLDivElement>document.getElementById('plugin-modal');
     if (isOpen) {
+      this.notify.emit(true);
       modal_name.classList.add('is-active');
       return;
     }
+    this.notify.emit(false);
     modal_name.classList.remove('is-active');
   }
 
@@ -55,14 +57,17 @@ export class PluginModalComponent implements OnInit, OnChanges {
 
   fetchPluginRequestDone() {
     this.ngProgress.done();
-
     if (this.plugins.length) {
       const ddnEle: HTMLElement = document.getElementsByClassName('ngx-dropdown-button')[0] as HTMLElement;
-      ddnEle.click();
+      if (ddnEle !== undefined) {
+        ddnEle.click();
+      }
     }
 
     const requestInProgressEle: HTMLElement = document.getElementById('requestInProgress') as HTMLElement;
-    requestInProgressEle.innerHTML = '';
+    if (requestInProgressEle !== null) {
+      requestInProgressEle.innerHTML = '';
+    }
   }
 
   getAvailablePlugins(type: string) {
