@@ -347,7 +347,7 @@ export class AddServiceWizardComponent implements OnInit {
   }
 
   onNotify(state: boolean) {
-    state === true ? this.pluginData.state = true : this.pluginData.state = false;
+    this.pluginData.state = state;
     if (state) {
       this.getInstalledSouthPlugins();
     }

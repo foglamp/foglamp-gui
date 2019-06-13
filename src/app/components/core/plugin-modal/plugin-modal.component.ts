@@ -41,7 +41,6 @@ export class PluginModalComponent implements OnInit, OnChanges {
   public toggleModal(isOpen: Boolean) {
     const modal_name = <HTMLDivElement>document.getElementById('plugin-modal');
     if (isOpen) {
-      this.notify.emit(true);
       modal_name.classList.add('is-active');
       return;
     }
