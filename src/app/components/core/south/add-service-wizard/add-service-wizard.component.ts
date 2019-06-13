@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { assign, cloneDeep, reduce, sortBy, map } from 'lodash';
@@ -36,8 +36,6 @@ export class AddServiceWizardComponent implements OnInit {
   @Input() categoryConfigurationData;
   @ViewChild(ViewConfigItemComponent) viewConfigItemComponent: ViewConfigItemComponent;
   @ViewChild(PluginModalComponent) pluginModalComponent: PluginModalComponent;
-
-  @ViewChild('selectedPlugin') selectedPlugin: ElementRef;
 
   constructor(private formBuilder: FormBuilder,
     private servicesApiService: ServicesApiService,
@@ -348,8 +346,7 @@ export class AddServiceWizardComponent implements OnInit {
         });
   }
 
-  onNotify(event: any) {
-    this.selectedPlugin.nativeElement.selected = event;
+  onNotify() {
     this.getInstalledSouthPlugins();
   }
 }
