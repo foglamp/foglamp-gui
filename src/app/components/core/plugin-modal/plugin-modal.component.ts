@@ -46,7 +46,8 @@ export class PluginModalComponent implements OnInit, OnChanges {
     }
     this.notify.emit({
       modalState: false,
-      name: ''
+      name: '',
+      type: this.data.type.toLowerCase()
     });
     modal.classList.remove('is-active');
   }
@@ -127,6 +128,7 @@ export class PluginModalComponent implements OnInit, OnChanges {
         () => {
           this.notify.emit({
             modalState: true,
+            type: this.data.type.toLowerCase(),
             name: pluginName
           });
         });
