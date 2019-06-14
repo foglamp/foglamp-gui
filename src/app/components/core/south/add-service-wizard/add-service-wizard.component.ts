@@ -367,6 +367,7 @@ export class AddServiceWizardComponent implements OnInit {
     const select = <HTMLSelectElement>document.getElementById('pluginSelect');
     for (let i = 0, j = select.options.length; i < j; ++i) {
       if (select.options[i].innerText.toLowerCase() === this.pluginData.pluginName.toLowerCase()) {
+        this.serviceForm.controls['plugin'].setValue([this.plugins[i].name]);
         select.selectedIndex = i;
         break;
       }

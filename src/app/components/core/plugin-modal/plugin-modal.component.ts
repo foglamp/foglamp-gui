@@ -94,6 +94,9 @@ export class PluginModalComponent implements OnInit, OnChanges {
   }
 
   installPlugin(pluginName: string) {
+    if (pluginName === undefined) {
+      return;
+    }
     const pluginData = {
       format: 'repository',
       name: `foglamp-${this.data.type.toLowerCase()}-` + pluginName,
