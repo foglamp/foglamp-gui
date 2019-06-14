@@ -34,8 +34,9 @@ export class AddServiceWizardComponent implements OnInit {
   @ViewChild(ViewConfigItemComponent) viewConfigItemComponent: ViewConfigItemComponent;
 
   public pluginData = {
-    state: false,
-    type: this.serviceType
+    modalState: false,
+    type: this.serviceType,
+    pluginName: ''
   };
   constructor(private formBuilder: FormBuilder,
     private servicesApiService: ServicesApiService,
@@ -112,8 +113,9 @@ export class AddServiceWizardComponent implements OnInit {
    */
   openPluginModal() {
     this.pluginData = {
-      state: true,
-      type: this.serviceType
+      modalState: true,
+      type: this.serviceType,
+      pluginName: ''
     };
   }
 
@@ -311,6 +313,13 @@ export class AddServiceWizardComponent implements OnInit {
         } else {
           this.alertService.error(error.statusText);
         }
+      },
+      () => {
+        setTimeout(() => {
+          if (this.pluginData.modalState) {
+            this.selectInstalledPlugin();
+          }
+        }, 1000);
       });
   }
 
@@ -346,10 +355,21 @@ export class AddServiceWizardComponent implements OnInit {
         });
   }
 
-  onNotify(state: boolean) {
-    this.pluginData.state = state;
-    if (state) {
+  onNotify(event: any) {
+    this.pluginData.modalState = event.modalState;
+    this.pluginData.pluginName = event.name;
+    if (event.modalState) {
       this.getInstalledSouthPlugins();
+    }
+  }
+
+  selectInstalledPlugin() {
+    const select = <HTMLSelectElement>document.getElementById('pluginSelect');
+    for (let i = 0, j = select.options.length; i < j; ++i) {
+      if (select.options[i].innerText.toLowerCase() === this.pluginData.pluginName.toLowerCase()) {
+        select.selectedIndex = i;
+        break;
+      }
     }
   }
 }

@@ -20,10 +20,10 @@ export class PluginModalComponent implements OnInit, OnChanges {
   };
 
   @Input() data: {
-    state: boolean,
+    modalState: boolean,
     type: string
   };
-  @Output() notify: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() notify: EventEmitter<any> = new EventEmitter<any>();
 
   constructor(private service: ServicesApiService,
     private alertService: AlertService,
@@ -32,20 +32,23 @@ export class PluginModalComponent implements OnInit, OnChanges {
   ngOnInit() { }
 
   ngOnChanges() {
-    if (this.data.state === true) {
+    if (this.data.modalState === true) {
       this.toggleModal(true);
       this.getAvailablePlugins(this.data.type);
     }
   }
 
   public toggleModal(isOpen: Boolean) {
-    const modal_name = <HTMLDivElement>document.getElementById('plugin-modal');
+    const modal = <HTMLDivElement>document.getElementById('plugin-modal');
     if (isOpen) {
-      modal_name.classList.add('is-active');
+      modal.classList.add('is-active');
       return;
     }
-    this.notify.emit(false);
-    modal_name.classList.remove('is-active');
+    this.notify.emit({
+      modalState: false,
+      name: ''
+    });
+    modal.classList.remove('is-active');
   }
 
   fetchPluginRequestStarted() {
@@ -106,7 +109,6 @@ export class PluginModalComponent implements OnInit, OnChanges {
           /** request done */
           this.ngProgress.done();
           this.toggleModal(false);
-          this.notify.emit();
           this.alertService.closeMessage();
           this.alertService.success(data.message, true);
         },
@@ -118,7 +120,12 @@ export class PluginModalComponent implements OnInit, OnChanges {
           } else {
             this.alertService.error(error.statusText);
           }
-        }
-      );
+        },
+        () => {
+          this.notify.emit({
+            modalState: true,
+            name: pluginName
+          });
+        });
   }
 }
