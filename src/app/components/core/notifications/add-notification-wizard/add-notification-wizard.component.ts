@@ -520,6 +520,7 @@ export class AddNotificationWizardComponent implements OnInit {
         const nxtButton = <HTMLButtonElement>document.getElementById('next');
         nxtButton.disabled = false;
         select.selectedIndex = i;
+        select.dispatchEvent(new Event('change'));
         break;
       }
     }

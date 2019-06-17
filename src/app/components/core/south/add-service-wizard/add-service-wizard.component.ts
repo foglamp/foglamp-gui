@@ -369,6 +369,7 @@ export class AddServiceWizardComponent implements OnInit {
       if (select.options[i].innerText.toLowerCase() === this.pluginData.pluginName.toLowerCase()) {
         this.serviceForm.controls['plugin'].setValue([this.plugins[i].name]);
         select.selectedIndex = i;
+        select.dispatchEvent(new Event('change'));
         break;
       }
     }

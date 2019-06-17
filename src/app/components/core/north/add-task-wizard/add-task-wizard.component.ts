@@ -422,6 +422,7 @@ export class AddTaskWizardComponent implements OnInit {
       if (select.options[i].innerText.toLowerCase() === this.pluginData.pluginName.toLowerCase()) {
         this.taskForm.controls['plugin'].setValue([this.plugins[i].name]);
         select.selectedIndex = i;
+        select.dispatchEvent(new Event('change'));
         break;
       }
     }
