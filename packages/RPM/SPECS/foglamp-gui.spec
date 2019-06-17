@@ -37,7 +37,7 @@ start_nginx () {
   systemctl status nginx | grep "Active:"
 }
 
-cp /usr/share/nginx/html/foglamp.html/usr/share/nginx/html/index.html
+cp /usr/share/nginx/html/foglamp.html /usr/share/nginx/html/index.html
 start_nginx
 
 %postun
