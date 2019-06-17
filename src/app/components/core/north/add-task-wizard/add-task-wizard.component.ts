@@ -42,8 +42,9 @@ export class AddTaskWizardComponent implements OnInit {
   @ViewChild(ViewConfigItemComponent) viewConfigItemComponent: ViewConfigItemComponent;
 
   public pluginData = {
-    state: false,
-    type: this.taskType
+    modalState: false,
+    type: this.taskType,
+    pluginName: ''
   };
 
   constructor(private pluginService: PluginService,
@@ -216,8 +217,9 @@ export class AddTaskWizardComponent implements OnInit {
    */
   openPluginModal() {
     this.pluginData = {
-      state: true,
-      type: this.taskType
+      modalState: true,
+      type: this.taskType,
+      pluginName: ''
     };
   }
 
@@ -240,6 +242,13 @@ export class AddTaskWizardComponent implements OnInit {
         } else {
           this.alertService.error(error.statusText);
         }
+      },
+      () => {
+        setTimeout(() => {
+          if (this.pluginData.modalState) {
+            this.selectInstalledPlugin();
+          }
+        }, 1000);
       });
   }
 
@@ -399,10 +408,22 @@ export class AddTaskWizardComponent implements OnInit {
     return this.taskForm.get('name');
   }
 
-  onNotify(state: boolean) {
-    state === true ? this.pluginData.state = true : this.pluginData.state = false;
-    if (state) {
+  onNotify(event: any) {
+    this.pluginData.modalState = event.modalState;
+    this.pluginData.pluginName = event.name;
+    if (event.modalState) {
       this.getInstalledNorthPlugins();
+    }
+  }
+
+  selectInstalledPlugin() {
+    const select = <HTMLSelectElement>document.getElementById('pluginSelect');
+    for (let i = 0, j = select.options.length; i < j; ++i) {
+      if (select.options[i].innerText.toLowerCase() === this.pluginData.pluginName.toLowerCase()) {
+        this.taskForm.controls['plugin'].setValue([this.plugins[i].name]);
+        select.selectedIndex = i;
+        break;
+      }
     }
   }
 }
