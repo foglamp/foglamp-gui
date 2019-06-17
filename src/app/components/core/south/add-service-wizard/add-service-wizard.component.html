@@ -35,7 +35,7 @@
             </div>
             <div class="field-body">
               <div class="select is-multiple">
-                <select multiple name="type" #selectedPlugin formControlName="plugin"
+                <select multiple name="type" #selectedPlugin formControlName="plugin" id="pluginSelect"
                   (change)="getDescription(selectedPlugin.value)" required>
                   <option *ngFor="let p of plugins" [value]="p.name"> {{ p.name }}</option>
                 </select>
@@ -58,7 +58,7 @@
                   <ng-container *ngIf="plugins.length">
                     <a class="button is-text" (click)="openPluginModal(true)">available plugins</a>
                   </ng-container>
-                  <app-plugin-modal (notify)="onNotify()" [data]="pluginData"></app-plugin-modal>
+                  <app-plugin-modal *ngIf="pluginData.modalState" (notify)="onNotify($event)" [data]="pluginData"></app-plugin-modal>
                 </div>
               </div>
             </div>

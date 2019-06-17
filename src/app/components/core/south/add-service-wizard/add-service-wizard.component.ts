@@ -5,7 +5,6 @@ import { assign, cloneDeep, reduce, sortBy, map } from 'lodash';
 
 import { AlertService, SchedulesService, ServicesApiService, PluginService, ProgressBarService } from '../../../../services';
 import { ViewConfigItemComponent } from '../../configuration-manager/view-config-item/view-config-item.component';
-import { PluginModalComponent } from '../../plugin-modal/plugin-modal.component';
 
 @Component({
   selector: 'app-add-service-wizard',
@@ -26,8 +25,6 @@ export class AddServiceWizardComponent implements OnInit {
   public payload: any;
   public schedulesName = [];
 
-  public pluginData = {};
-
   serviceForm = new FormGroup({
     name: new FormControl(),
     plugin: new FormControl()
@@ -35,8 +32,12 @@ export class AddServiceWizardComponent implements OnInit {
 
   @Input() categoryConfigurationData;
   @ViewChild(ViewConfigItemComponent) viewConfigItemComponent: ViewConfigItemComponent;
-  @ViewChild(PluginModalComponent) pluginModalComponent: PluginModalComponent;
 
+  public pluginData = {
+    modalState: false,
+    type: this.serviceType,
+    pluginName: ''
+  };
   constructor(private formBuilder: FormBuilder,
     private servicesApiService: ServicesApiService,
     private pluginService: PluginService,
@@ -112,8 +113,9 @@ export class AddServiceWizardComponent implements OnInit {
    */
   openPluginModal() {
     this.pluginData = {
-      state: true,
-      type: this.serviceType
+      modalState: true,
+      type: this.serviceType,
+      pluginName: ''
     };
   }
 
@@ -311,6 +313,13 @@ export class AddServiceWizardComponent implements OnInit {
         } else {
           this.alertService.error(error.statusText);
         }
+      },
+      () => {
+        setTimeout(() => {
+          if (this.pluginData.modalState) {
+            this.selectInstalledPlugin();
+          }
+        }, 1000);
       });
   }
 
@@ -346,7 +355,23 @@ export class AddServiceWizardComponent implements OnInit {
         });
   }
 
-  onNotify() {
-    this.getInstalledSouthPlugins();
+  onNotify(event: any) {
+    this.pluginData.modalState = event.modalState;
+    this.pluginData.pluginName = event.name;
+    if (event.modalState) {
+      this.getInstalledSouthPlugins();
+    }
+  }
+
+  selectInstalledPlugin() {
+    const select = <HTMLSelectElement>document.getElementById('pluginSelect');
+    for (let i = 0, j = select.options.length; i < j; ++i) {
+      if (select.options[i].innerText.toLowerCase() === this.pluginData.pluginName.toLowerCase()) {
+        this.serviceForm.controls['plugin'].setValue([this.plugins[i].name]);
+        select.selectedIndex = i;
+        select.dispatchEvent(new Event('change'));
+        break;
+      }
+    }
   }
 }

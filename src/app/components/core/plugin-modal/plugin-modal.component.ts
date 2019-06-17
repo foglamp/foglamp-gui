@@ -20,7 +20,7 @@ export class PluginModalComponent implements OnInit, OnChanges {
   };
 
   @Input() data: {
-    state: boolean,
+    modalState: boolean,
     type: string
   };
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
@@ -32,19 +32,24 @@ export class PluginModalComponent implements OnInit, OnChanges {
   ngOnInit() { }
 
   ngOnChanges() {
-    if (this.data.state === true) {
+    if (this.data.modalState === true) {
       this.toggleModal(true);
       this.getAvailablePlugins(this.data.type);
     }
   }
 
   public toggleModal(isOpen: Boolean) {
-    const modal_name = <HTMLDivElement>document.getElementById('plugin-modal');
+    const modal = <HTMLDivElement>document.getElementById('plugin-modal');
     if (isOpen) {
-      modal_name.classList.add('is-active');
+      modal.classList.add('is-active');
       return;
     }
-    modal_name.classList.remove('is-active');
+    this.notify.emit({
+      modalState: false,
+      name: '',
+      type: this.data.type.toLowerCase()
+    });
+    modal.classList.remove('is-active');
   }
 
   fetchPluginRequestStarted() {
@@ -55,14 +60,17 @@ export class PluginModalComponent implements OnInit, OnChanges {
 
   fetchPluginRequestDone() {
     this.ngProgress.done();
-
     if (this.plugins.length) {
       const ddnEle: HTMLElement = document.getElementsByClassName('ngx-dropdown-button')[0] as HTMLElement;
-      ddnEle.click();
+      if (ddnEle !== undefined) {
+        ddnEle.click();
+      }
     }
 
     const requestInProgressEle: HTMLElement = document.getElementById('requestInProgress') as HTMLElement;
-    requestInProgressEle.innerHTML = '';
+    if (requestInProgressEle !== null) {
+      requestInProgressEle.innerHTML = '';
+    }
   }
 
   getAvailablePlugins(type: string) {
@@ -87,6 +95,9 @@ export class PluginModalComponent implements OnInit, OnChanges {
   }
 
   installPlugin(pluginName: string) {
+    if (pluginName === undefined) {
+      return;
+    }
     const pluginData = {
       format: 'repository',
       name: `foglamp-${this.data.type.toLowerCase()}-` + pluginName,
@@ -102,7 +113,6 @@ export class PluginModalComponent implements OnInit, OnChanges {
           /** request done */
           this.ngProgress.done();
           this.toggleModal(false);
-          this.notify.emit();
           this.alertService.closeMessage();
           this.alertService.success(data.message, true);
         },
@@ -114,7 +124,13 @@ export class PluginModalComponent implements OnInit, OnChanges {
           } else {
             this.alertService.error(error.statusText);
           }
-        }
-      );
+        },
+        () => {
+          this.notify.emit({
+            modalState: true,
+            type: this.data.type.toLowerCase(),
+            name: pluginName
+          });
+        });
   }
 }
