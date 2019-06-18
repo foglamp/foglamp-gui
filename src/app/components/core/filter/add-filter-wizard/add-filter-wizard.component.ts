@@ -69,7 +69,6 @@ export class AddFilterWizardComponent implements OnInit {
 
   toggleAvailablePlugins() {
     this.show = !this.show;
-    // this.installedPlugin = true;
     this.getAvailablePlugins('Filter');
   }
 
@@ -251,8 +250,9 @@ export class AddFilterWizardComponent implements OnInit {
   }
 
   installPlugin(pluginName: string) {
-    const formValues = this.serviceForm.value;
-    pluginName = formValues['pluginToInstall'];
+    if (pluginName === undefined) {
+      return;
+    }
     const pluginData = {
       format: 'repository',
       name: `foglamp-filter-` + pluginName,
