@@ -2,7 +2,7 @@
   <div>
     <ng-container *ngIf="!isNotificationServiceAvailable">
       <article class="message is-warning">
-        <div class="message-body">
+        <div *ngIf="allServicesFetched" class="message-body">
           Notification service is not added
           and enabled.&nbsp; <a (click)="addServiceEvent()"><strong>add & enable now</strong></a>
         </div>

@@ -24,6 +24,7 @@ export class NotificationsComponent implements OnInit {
   notificationServicePackageName = 'foglamp-service-notification';
   notificationInstances = [];
   notification: any;
+  allServicesFetched = false;
   public notificationServiceRecord: any;
 
   public availableServices = [];
@@ -54,6 +55,7 @@ export class NotificationsComponent implements OnInit {
         (data: any) => {
           /** request done */
           this.ngProgress.done();
+          this.allServicesFetched = true;
           this.availableServices = data.services;
           if (this.availableServices.length === 0) {
             this.checkServiceStatus();
