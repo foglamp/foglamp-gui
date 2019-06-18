@@ -150,8 +150,9 @@ install () {
   # FIXME: if --keep, then don't remove
   sudo rm -rf foglamp-gui-${FOGLAMP_GUI_VER}.tar.gz
 
-  sudo sed -i 's/dist/\/var\/www\/html/g' ${DOC_ROOT}/nginx.conf
-  sudo cp ${DOC_ROOT}/nginx.conf /etc/nginx/sites-available/default
+  # sudo sed -i 's/dist/\/var\/www\/html/g' ${DOC_ROOT}/nginx.conf
+  sudo cp ${DOC_ROOT}/foglamp.html ${DOC_ROOT}/index.html
+
   sudo service nginx start
   sudo service nginx status | grep "Active:"
 

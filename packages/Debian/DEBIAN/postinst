@@ -31,6 +31,5 @@ start_nginx () {
   service nginx start
 }
 
-cp /var/www/html/nginx.conf /etc/nginx/sites-available/default
-
+cp /var/www/html/foglamp.html /var/www/html/index.html
 start_nginx
