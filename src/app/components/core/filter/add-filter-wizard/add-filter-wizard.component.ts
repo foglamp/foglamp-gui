@@ -24,7 +24,7 @@ export class AddFilterWizardComponent implements OnInit {
   public pluginData = [];
   public filesToUpload = [];
   public installNewPlugin = false;
-  private REQUEST_TIMEOUT_INTERVAL = 2000;
+  private REQUEST_TIMEOUT_INTERVAL = 5000;
 
   public show = false;
 
@@ -261,7 +261,7 @@ export class AddFilterWizardComponent implements OnInit {
 
     /** request started */
     this.ngProgress.start();
-    this.alertService.activityMessage('installing...', true);
+    this.alertService.activityMessage('installing ...', true);
     this.service.installPlugin(pluginData).
       subscribe(
         (data: any) => {
@@ -417,6 +417,8 @@ export class AddFilterWizardComponent implements OnInit {
           this.alertService.error(error.statusText);
         }
       });
+    // If new plugin is installed and it shows in the list of `installed plugins`,
+    // move to get it's configuration and further steps of wizard.
     if (this.installNewPlugin) {
       setTimeout(() => {
         this.moveNext();
