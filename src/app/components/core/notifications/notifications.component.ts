@@ -21,6 +21,7 @@ export class NotificationsComponent implements OnInit {
   isNotificationServiceAvailable = false;
   isNotificationServiceEnabled = false;
   notificationServiceName = 'FogLAMP Notifications';
+  notificationServicePackageName = 'foglamp-service-notification';
   notificationInstances = [];
   notification: any;
   public notificationServiceRecord: any;
@@ -41,25 +42,31 @@ export class NotificationsComponent implements OnInit {
     public router: Router) { }
 
   ngOnInit() {
-    this.getAvailableServices();
+    this.getAvailableServicePackages();
     this.getNotificationInstance();
   }
 
-  public getAvailableServices() {
+  public getAvailableServicePackages() {
     /** request start */
     this.ngProgress.start();
-    this.servicesApiService.getAvailableServices()
+    this.servicesApiService.getAvailableServicePackages()
       .subscribe(
         (data: any) => {
+          console.log('data', data);
           /** request done */
           this.ngProgress.done();
           this.availableServices = data.service;
-          if (this.availableServices.length >= 1) {
-          this.isNotificationServiceAvailable = false;
-          this.isNotificationServiceEnabled = false;
-          } else {
+          if (this.availableServices.length === 0) {
             this.checkServiceStatus();
           }
+          this.availableServices.forEach(svc => {
+            console.log('svc', svc);
+            if (svc === this.notificationServicePackageName) {
+              this.isNotificationServiceAvailable = false;
+              this.isNotificationServiceEnabled = false;
+            }
+          });
+
         },
         (error) => {
           /** request done */
@@ -102,16 +109,16 @@ export class NotificationsComponent implements OnInit {
 
 
   installNotificationService() {
-    const pluginData = {
+    const servicePayload = {
       format: 'repository',
-      name: 'foglamp-service-notification',
+      name: this.notificationServicePackageName,
       version: ''
     };
 
     /** request started */
     this.ngProgress.start();
-    this.alertService.activityMessage('installing...', true);
-    this.servicesApiService.installService(pluginData).
+    this.alertService.activityMessage('installing ...', true);
+    this.servicesApiService.installService(servicePayload).
       subscribe(
         (data: any) => {
           /** request done */

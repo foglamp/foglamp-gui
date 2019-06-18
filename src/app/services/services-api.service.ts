@@ -53,7 +53,7 @@ export class ServicesApiService {
   /**
    *  GET  | /foglamp/service/available
    */
-  getAvailableServices() {
+  getAvailableServicePackages() {
     return this.http.get(`${this.GET_SERVICES_URL}/available`).pipe(
       map(response => response),
       catchError(error => throwError(error)));
@@ -79,11 +79,11 @@ export class ServicesApiService {
   }
 
   /**
-   * POST | /foglamp/plugin?action=install
-   * @param payload plugin data
+   * POST | /foglamp/service?action=install
+   * @param payload service data
    */
   installService(payload: any) {
-    return this.http.post(`${this.POST_PLUGINS_URL}?action=install`, payload).pipe(
+    return this.http.post(`${this.GET_SERVICES_URL}?action=install`, payload).pipe(
       map(response => response),
       catchError(error => throwError(error)));
   }
