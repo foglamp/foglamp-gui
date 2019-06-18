@@ -25,6 +25,8 @@ export class NotificationsComponent implements OnInit {
   notification: any;
   public notificationServiceRecord: any;
 
+  public availableServices = [];
+
   public showSpinner = false;
   isNotificationModalOpen = false;
   @ViewChild(NotificationModalComponent) notificationModal: NotificationModalComponent;
@@ -39,6 +41,38 @@ export class NotificationsComponent implements OnInit {
     public router: Router) { }
 
   ngOnInit() {
+    this.getAvailableServices();
+    this.getNotificationInstance();
+  }
+
+  public getAvailableServices() {
+    /** request start */
+    this.ngProgress.start();
+    this.servicesApiService.getAvailableServices()
+      .subscribe(
+        (data: any) => {
+          /** request done */
+          this.ngProgress.done();
+          this.availableServices = data.service;
+          if (this.availableServices.length >= 1) {
+          this.isNotificationServiceAvailable = false;
+          this.isNotificationServiceEnabled = false;
+          } else {
+            this.checkServiceStatus();
+          }
+        },
+        (error) => {
+          /** request done */
+          this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
+        });
+  }
+
+  checkServiceStatus() {
     this.route.data.pipe(map(data => data['service'].services))
       .subscribe(res => {
         const service = res.find((svc: any) => {
@@ -64,7 +98,46 @@ export class NotificationsComponent implements OnInit {
             this.alertService.error(error.statusText);
           }
         });
-    this.getNotificationInstance();
+  }
+
+
+  installNotificationService() {
+    const pluginData = {
+      format: 'repository',
+      name: 'foglamp-service-notification',
+      version: ''
+    };
+
+    /** request started */
+    this.ngProgress.start();
+    this.alertService.activityMessage('installing...', true);
+    this.servicesApiService.installService(pluginData).
+      subscribe(
+        (data: any) => {
+          /** request done */
+          this.ngProgress.done();
+          this.alertService.closeMessage();
+          this.alertService.success(data.message, true);
+        },
+        error => {
+          /** request done */
+          this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
+        }, () => {
+          this.addNotificationService();
+        });
+  }
+
+  public addServiceEvent() {
+    if (this.availableServices.length > 0) {
+      this.installNotificationService();
+    } else {
+      this.addNotificationService();
+    }
   }
 
   addNotificationService() {
@@ -166,6 +239,7 @@ export class NotificationsComponent implements OnInit {
   }
 
   public getNotificationInstance() {
+    this.showLoadingSpinner();
     this.notificationService.getNotificationInstance().
       subscribe(
         (data: any) => {

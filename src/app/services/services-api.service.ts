@@ -51,6 +51,15 @@ export class ServicesApiService {
   }
 
   /**
+   *  GET  | /foglamp/service/available
+   */
+  getAvailableServices() {
+    return this.http.get(`${this.GET_SERVICES_URL}/available`).pipe(
+      map(response => response),
+      catchError(error => throwError(error)));
+  }
+
+  /**
    *  GET  | /foglamp/plugins/available
    */
   getAvailablePlugins(pluginType: string) {
@@ -65,6 +74,16 @@ export class ServicesApiService {
    */
   installPlugin(payload: any) {
     return this.http.post(this.POST_PLUGINS_URL, payload).pipe(
+      map(response => response),
+      catchError(error => throwError(error)));
+  }
+
+  /**
+   * POST | /foglamp/plugin?action=install
+   * @param payload plugin data
+   */
+  installService(payload: any) {
+    return this.http.post(`${this.POST_PLUGINS_URL}?action=install`, payload).pipe(
       map(response => response),
       catchError(error => throwError(error)));
   }
