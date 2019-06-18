@@ -52,15 +52,13 @@ export class NotificationsComponent implements OnInit {
     this.servicesApiService.getAvailableServicePackages()
       .subscribe(
         (data: any) => {
-          console.log('data', data);
           /** request done */
           this.ngProgress.done();
-          this.availableServices = data.service;
+          this.availableServices = data.services;
           if (this.availableServices.length === 0) {
             this.checkServiceStatus();
           }
           this.availableServices.forEach(svc => {
-            console.log('svc', svc);
             if (svc === this.notificationServicePackageName) {
               this.isNotificationServiceAvailable = false;
               this.isNotificationServiceEnabled = false;
