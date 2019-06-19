@@ -17,8 +17,9 @@
 
         <ng-container *ngIf="!plugins || plugins.length === 0">
           <div *ngIf="!show" class="has-text-centered">
-            <small class="no-rec">No plugin installed.</small>
-            <small><a (click)="toggleAvailablePlugins()">Install from available plugins</a></small>
+            <small class="no-rec">No plugin installed.</small>&nbsp;
+            <small class="no-rec" *ngIf="requestInProgress">Install from available plugins</small>
+            <small><a *ngIf="!requestInProgress" (click)="toggleAvailablePlugins()">Install from available plugins</a></small>
           </div>
 
           <ng-container *ngIf="show">
@@ -37,12 +38,7 @@
               </div>
             </div>
           </ng-container>
-
-          <div class="columns">
-            <div class="column">
-              <p id="requestInProgress" class="help has-text-centered"></p>
-            </div>
-          </div>
+          <p id="requestInProgress" class="help has-text-centered"></p>
 
           <ng-container *ngIf="show">
             <div class="field is-horizontal form-group">
@@ -93,7 +89,8 @@
             <div class="field-body">
               <div class="field">
                 <div class="control">
-                  <small><a (click)="toggleAvailablePlugins()">Install from available plugins</a></small>
+                  <small class="no-rec" *ngIf="requestInProgress">Install from available plugins</small>
+                  <small><a *ngIf="!requestInProgress" (click)="toggleAvailablePlugins()">Install from available plugins</a></small>
                 </div>
               </div>
             </div>

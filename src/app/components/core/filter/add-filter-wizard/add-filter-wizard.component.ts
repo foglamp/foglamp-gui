@@ -24,14 +24,15 @@ export class AddFilterWizardComponent implements OnInit {
   public pluginData = [];
   public filesToUpload = [];
   public installNewPlugin = false;
-  private REQUEST_TIMEOUT_INTERVAL = 5000;
+  private REQUEST_TIMEOUT_INTERVAL = 2000;
+  public requestInProgress = false;
 
   public show = false;
 
   config = {
     search: true,
     height: '200px',
-    placeholder: 'Choose from avaialble filter plugin',
+    placeholder: 'Choose from available filter plugins',
     limitTo: this.pluginData.length,
     moreText: 'more', // text to be displayed when more than one items are selected like Option 1 + 5 more
     noResultsFound: 'No plugin found!',
@@ -68,7 +69,11 @@ export class AddFilterWizardComponent implements OnInit {
   }
 
   toggleAvailablePlugins() {
-    this.show = !this.show;
+    if (this.show) {
+      this.show = false;
+      return;
+    }
+    this.show = true;
     this.getAvailablePlugins('Filter');
   }
 
@@ -91,15 +96,18 @@ export class AddFilterWizardComponent implements OnInit {
   }
 
   getAvailablePlugins(type: string) {
+    this.requestInProgress = true;
     this.fetchPluginRequestStarted();
     this.service.getAvailablePlugins(type).
       subscribe(
         (data: any) => {
           this.pluginData = data['plugins'].map((p: string) => p.replace(`foglamp-filter-`, ''));
           this.fetchPluginRequestDone();
+          this.requestInProgress = false;
         },
         error => {
           this.fetchPluginRequestDone();
+          this.requestInProgress = false;
           if (error.status === 0) {
             console.log('service down ', error);
           } else if (error.status === 404) {
@@ -409,6 +417,7 @@ export class AddFilterWizardComponent implements OnInit {
         this.plugins = sortBy(data.plugins, p => {
           return p.name.toLowerCase();
         });
+        this.moveNext();
       },
       (error) => {
         if (error.status === 0) {
@@ -417,13 +426,6 @@ export class AddFilterWizardComponent implements OnInit {
           this.alertService.error(error.statusText);
         }
       });
-    // If new plugin is installed and it shows in the list of `installed plugins`,
-    // move to get it's configuration and further steps of wizard.
-    if (this.installNewPlugin) {
-      setTimeout(() => {
-        this.moveNext();
-      }, this.REQUEST_TIMEOUT_INTERVAL);
-    }
   }
 
   public getCategories(): void {
