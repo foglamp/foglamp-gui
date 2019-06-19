@@ -23,8 +23,7 @@ export class AddFilterWizardComponent implements OnInit {
   public selectedPluginDescription = '';
   public pluginData = [];
   public filesToUpload = [];
-  public installNewPlugin = false;
-  private REQUEST_TIMEOUT_INTERVAL = 2000;
+
   public requestInProgress = false;
 
   public show = false;
@@ -277,7 +276,7 @@ export class AddFilterWizardComponent implements OnInit {
           this.ngProgress.done();
           this.alertService.closeMessage();
           this.alertService.success(data.message, true);
-          this.installNewPlugin = true;
+          this.getInstalledFilterPlugins(true);
         },
         error => {
           /** request done */
@@ -287,11 +286,6 @@ export class AddFilterWizardComponent implements OnInit {
           } else {
             this.alertService.error(error.statusText);
           }
-        },
-        () => {
-          setTimeout(() => {
-            this.getInstalledFilterPlugins();
-          }, this.REQUEST_TIMEOUT_INTERVAL);
         });
   }
 
@@ -411,13 +405,15 @@ export class AddFilterWizardComponent implements OnInit {
     }
   }
 
-  public getInstalledFilterPlugins() {
+  public getInstalledFilterPlugins(pluginInstalled?: boolean) {
     this.filterService.getInstalledFilterPlugins().subscribe(
       (data: any) => {
         this.plugins = sortBy(data.plugins, p => {
           return p.name.toLowerCase();
         });
-        this.moveNext();
+        if (pluginInstalled) {
+          this.moveNext();
+        }
       },
       (error) => {
         if (error.status === 0) {
