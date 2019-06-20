@@ -79,7 +79,9 @@ export class PluginModalComponent implements OnInit, OnChanges {
       subscribe(
         (data: any) => {
           this.plugins = data['plugins'].map((p: string) => p.replace(`foglamp-${this.data.type.toLowerCase()}-`, ''));
-          this.fetchPluginRequestDone();
+          setTimeout(() => {
+            this.fetchPluginRequestDone();
+          }, 100);
         },
         error => {
           this.fetchPluginRequestDone();

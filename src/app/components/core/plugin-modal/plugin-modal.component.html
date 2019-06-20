@@ -12,7 +12,7 @@
             <div class="field is-horizontal">
               <div class="field-body">
                 <div class="field">
-                  <ngx-select-dropdown #plugin [config]="config" [options]="plugins"></ngx-select-dropdown>
+                  <ngx-select-dropdown #plugin [config]="config" [options]="plugins" [disabled]="!plugins.length"></ngx-select-dropdown>
                 </div>
               </div>
             </div>
