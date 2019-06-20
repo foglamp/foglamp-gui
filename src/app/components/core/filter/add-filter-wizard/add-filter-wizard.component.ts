@@ -87,11 +87,15 @@ export class AddFilterWizardComponent implements OnInit {
 
     if (this.pluginData.length) {
       const ddnEle: HTMLElement = document.getElementsByClassName('ngx-dropdown-button')[0] as HTMLElement;
-      ddnEle.click();
+      if (ddnEle !== undefined) {
+        ddnEle.click();
+      }
     }
 
     const requestInProgressEle: HTMLElement = document.getElementById('requestInProgress') as HTMLElement;
-    requestInProgressEle.innerHTML = '';
+    if (requestInProgressEle !== null) {
+      requestInProgressEle.innerHTML = '';
+    }
   }
 
   getAvailablePlugins(type: string) {
