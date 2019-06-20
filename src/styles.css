@@ -244,3 +244,6 @@ a.dropdown-item:hover {
   overflow: auto;
 }
 
+.nsdicon-angle-down:before {
+  content: '';
+}
