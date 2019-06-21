@@ -243,7 +243,3 @@ a.dropdown-item:hover {
   max-height: 21rem;
   overflow: auto;
 }
-
-.nsdicon-angle-down:before {
-  content: '';
-}

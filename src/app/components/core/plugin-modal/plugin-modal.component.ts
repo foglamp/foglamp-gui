@@ -108,7 +108,7 @@ export class PluginModalComponent implements OnInit, OnChanges {
 
     /** request started */
     this.ngProgress.start();
-    this.alertService.activityMessage('installing...', true);
+    this.alertService.activityMessage('installing ...', true);
     this.service.installPlugin(pluginData).
       subscribe(
         (data: any) => {
