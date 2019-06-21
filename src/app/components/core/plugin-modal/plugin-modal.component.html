@@ -30,7 +30,7 @@
                 <button class="button is-small" (click)="toggleModal(false)">Cancel</button>
               </p>
               <p class="control">
-                <button class="button is-small is-link" (click)="installPlugin(plugin.value)">Install</button>
+                <button class="button is-small is-link" (click)="installPlugin(plugin.value)" [disabled]="!installButtonEnabled">Install</button>
               </p>
             </div>
           </div>

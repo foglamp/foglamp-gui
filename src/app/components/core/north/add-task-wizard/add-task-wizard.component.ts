@@ -27,6 +27,7 @@ export class AddTaskWizardComponent implements OnInit {
   public payload: any;
   public schedulesName = [];
   public selectedPluginDescription = '';
+  public showSpinner = false;
 
   public taskType = 'North';
 
@@ -223,20 +224,20 @@ export class AddTaskWizardComponent implements OnInit {
     };
   }
 
-  private getInstalledNorthPlugins() {
+  private getInstalledNorthPlugins(isPluginInstalled?: boolean) {
     /** request started */
-    this.ngProgress.start();
+    this.showLoadingSpinner();
     this.pluginService.getInstalledPlugins(this.taskType.toLowerCase()).subscribe(
       (data: any) => {
         /** request completed */
-        this.ngProgress.done();
+        this.hideLoadingSpinner();
         this.plugins = sortBy(data.plugins, p => {
           return p.name.toLowerCase();
         });
       },
       (error) => {
         /** request completed */
-        this.ngProgress.done();
+        this.hideLoadingSpinner();
         if (error.status === 0) {
           console.log('service down ', error);
         } else {
@@ -245,7 +246,7 @@ export class AddTaskWizardComponent implements OnInit {
       },
       () => {
         setTimeout(() => {
-          if (this.pluginData.modalState) {
+          if (isPluginInstalled) {
             this.selectInstalledPlugin();
           }
         }, 1000);
@@ -382,6 +383,8 @@ export class AddTaskWizardComponent implements OnInit {
     this.schedulesService.getSchedules().
       subscribe(
         (data) => {
+          /** request completed */
+          this.ngProgress.done();
           // To filter
           this.schedulesName = data['schedules'];
         },
@@ -411,7 +414,7 @@ export class AddTaskWizardComponent implements OnInit {
   onNotify(event: any) {
     this.pluginData.modalState = event.modalState;
     this.pluginData.pluginName = event.name;
-    if (event.modalState) {
+    if (event.pluginInstall) {
       this.getInstalledNorthPlugins();
     }
   }
@@ -426,5 +429,13 @@ export class AddTaskWizardComponent implements OnInit {
         break;
       }
     }
+  }
+
+  public showLoadingSpinner() {
+    this.showSpinner = true;
+  }
+
+  public hideLoadingSpinner() {
+    this.showSpinner = false;
   }
 }
