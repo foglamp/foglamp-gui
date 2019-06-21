@@ -87,7 +87,7 @@ export class AddNotificationWizardComponent implements OnInit {
     };
   }
 
-  getNotificationPlugins() {
+  getNotificationPlugins(isPluginInstalled?: boolean) {
     /** request started */
     this.ngProgress.start();
     this.notificationService.getNotificationPlugins().subscribe(
@@ -112,7 +112,7 @@ export class AddNotificationWizardComponent implements OnInit {
       },
       () => {
         setTimeout(() => {
-          if (this.pluginData.modalState) {
+          if (isPluginInstalled) {
             this.pluginData.modalState = false;
             this.selectInstalledPlugin();
           }
@@ -503,8 +503,8 @@ export class AddNotificationWizardComponent implements OnInit {
     this.pluginData.modalState = event.modalState;
     this.pluginData.pluginName = event.name;
     this.pluginData.type = event.type;
-    if (event.modalState) {
-      this.getNotificationPlugins();
+    if (event.pluginInstall) {
+      this.getNotificationPlugins(event.pluginInstall);
     }
   }
 
