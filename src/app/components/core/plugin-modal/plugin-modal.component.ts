@@ -1,5 +1,8 @@
 import { Component, OnInit, Input, OnChanges, Output, EventEmitter } from '@angular/core';
+import { isEmpty } from 'lodash';
+
 import { ServicesApiService, AlertService, ProgressBarService } from '../../../services';
+
 
 @Component({
   selector: 'app-plugin-modal',
@@ -18,6 +21,8 @@ export class PluginModalComponent implements OnInit, OnChanges {
     noResultsFound: 'No plugin found!',
     searchPlaceholder: 'Search',
   };
+
+  installButtonEnabled = false;
 
   @Input() data: {
     modalState: boolean,
@@ -78,7 +83,12 @@ export class PluginModalComponent implements OnInit, OnChanges {
     this.service.getAvailablePlugins(type).
       subscribe(
         (data: any) => {
+          this.installButtonEnabled = true;
           this.plugins = data['plugins'].map((p: string) => p.replace(`foglamp-${this.data.type.toLowerCase()}-`, ''));
+          if (isEmpty(this.plugins)) {
+            this.installButtonEnabled = false;
+            this.alertService.warning('No plugin available to install');
+          }
           setTimeout(() => {
             this.fetchPluginRequestDone();
           }, 100);
@@ -97,7 +107,9 @@ export class PluginModalComponent implements OnInit, OnChanges {
   }
 
   installPlugin(pluginName: string) {
+    this.installButtonEnabled = false;
     if (pluginName === undefined) {
+      this.installButtonEnabled = true;
       return;
     }
     const pluginData = {
@@ -108,7 +120,7 @@ export class PluginModalComponent implements OnInit, OnChanges {
 
     /** request started */
     this.ngProgress.start();
-    this.alertService.activityMessage('installing...', true);
+    this.alertService.activityMessage('installing ...', true);
     this.service.installPlugin(pluginData).
       subscribe(
         (data: any) => {
@@ -117,10 +129,12 @@ export class PluginModalComponent implements OnInit, OnChanges {
           this.toggleModal(false);
           this.alertService.closeMessage();
           this.alertService.success(data.message, true);
+          this.installButtonEnabled = false;
         },
         error => {
           /** request done */
           this.ngProgress.done();
+          this.installButtonEnabled = false;
           if (error.status === 0) {
             console.log('service down ', error);
           } else {
@@ -129,7 +143,8 @@ export class PluginModalComponent implements OnInit, OnChanges {
         },
         () => {
           this.notify.emit({
-            modalState: true,
+            modalState: false,
+            pluginInstall: true,
             type: this.data.type.toLowerCase(),
             name: pluginName
           });

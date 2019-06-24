@@ -21,14 +21,22 @@
     <div class="steps-content">
       <form [formGroup]="taskForm" validate>
         <div class="box step-content has-text-centered is-active" id="c-1">
-          <div *ngIf="!plugins || plugins.length === 0" class="has-text-centered">
-            <small class="no-rec">
-              No north plugin installed.
-            </small>
-            <small>
-              <a (click)="openPluginModal(true)">Install from available plugins</a>
-            </small>
+          <div *ngIf="showSpinner" class="app-loading">
+            &nbsp;
+            <svg class="spinner" viewBox="0 0 100 100">
+              <circle class="path" cx="50%" cy="50%" r="10" fill="none" stroke-width="2" stroke-miterlimit="10" />
+            </svg>
           </div>
+          <ng-container *ngIf="!showSpinner">
+            <div *ngIf="!plugins || plugins.length === 0" class="has-text-centered">
+              <small class="no-rec">
+                No north plugin installed.
+              </small>
+              <small>
+                <a (click)="openPluginModal(true)">Install from available plugins</a>
+              </small>
+            </div>
+          </ng-container>
           <div *ngIf="plugins.length > 0" class="field is-horizontal form-group">
             <div class="field-label is-normal">
               <label class="label">North Plugin</label>

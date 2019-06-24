@@ -24,6 +24,7 @@ export class AddServiceWizardComponent implements OnInit {
   public isScheduleEnabled = true;
   public payload: any;
   public schedulesName = [];
+  public showSpinner = false;
 
   serviceForm = new FormGroup({
     name: new FormControl(),
@@ -294,20 +295,20 @@ export class AddServiceWizardComponent implements OnInit {
     }
   }
 
-  public getInstalledSouthPlugins() {
+  public getInstalledSouthPlugins(pluginInstalled?: boolean) {
     /** request started */
-    this.ngProgress.start();
+    this.showLoadingSpinner();
     this.pluginService.getInstalledPlugins(this.serviceType.toLowerCase()).subscribe(
       (data: any) => {
         /** request completed */
-        this.ngProgress.done();
+        this.hideLoadingSpinner();
         this.plugins = sortBy(data.plugins, p => {
           return p.name.toLowerCase();
         });
       },
       (error) => {
         /** request completed */
-        this.ngProgress.done();
+        this.hideLoadingSpinner();
         if (error.status === 0) {
           console.log('service down ', error);
         } else {
@@ -316,7 +317,7 @@ export class AddServiceWizardComponent implements OnInit {
       },
       () => {
         setTimeout(() => {
-          if (this.pluginData.modalState) {
+          if (pluginInstalled) {
             this.selectInstalledPlugin();
           }
         }, 1000);
@@ -358,8 +359,8 @@ export class AddServiceWizardComponent implements OnInit {
   onNotify(event: any) {
     this.pluginData.modalState = event.modalState;
     this.pluginData.pluginName = event.name;
-    if (event.modalState) {
-      this.getInstalledSouthPlugins();
+    if (event.pluginInstall) {
+      this.getInstalledSouthPlugins(event.pluginInstall);
     }
   }
 
@@ -373,5 +374,13 @@ export class AddServiceWizardComponent implements OnInit {
         break;
       }
     }
+  }
+
+  public showLoadingSpinner() {
+    this.showSpinner = true;
+  }
+
+  public hideLoadingSpinner() {
+    this.showSpinner = false;
   }
 }
