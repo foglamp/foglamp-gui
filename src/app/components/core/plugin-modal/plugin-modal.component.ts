@@ -109,6 +109,7 @@ export class PluginModalComponent implements OnInit, OnChanges {
   installPlugin(pluginName: string) {
     this.installButtonEnabled = false;
     if (pluginName === undefined) {
+      this.installButtonEnabled = true;
       return;
     }
     const pluginData = {
