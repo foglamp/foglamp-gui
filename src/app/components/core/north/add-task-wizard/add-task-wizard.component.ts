@@ -415,7 +415,7 @@ export class AddTaskWizardComponent implements OnInit {
     this.pluginData.modalState = event.modalState;
     this.pluginData.pluginName = event.name;
     if (event.pluginInstall) {
-      this.getInstalledNorthPlugins();
+      this.getInstalledNorthPlugins(event.pluginInstall);
     }
   }
 
