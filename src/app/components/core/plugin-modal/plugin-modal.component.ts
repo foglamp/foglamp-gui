@@ -50,7 +50,7 @@ export class PluginModalComponent implements OnInit, OnChanges {
       return;
     }
     this.notify.emit({
-      modalState: false,
+      modalState: !this.installButtonEnabled ? true : false,
       name: '',
       type: this.data.type.toLowerCase()
     });
@@ -88,7 +88,6 @@ export class PluginModalComponent implements OnInit, OnChanges {
           this.installButtonEnabled = true;
           this.plugins = data['plugins'].map((p: string) => p.replace(`foglamp-${this.data.type.toLowerCase()}-`, ''));
           if (isEmpty(this.plugins)) {
-            this.installButtonEnabled = false;
             this.alertService.warning('No plugin available to install');
           }
           setTimeout(() => {
@@ -136,7 +135,7 @@ export class PluginModalComponent implements OnInit, OnChanges {
         error => {
           /** request done */
           this.ngProgress.done();
-          this.installButtonEnabled = false;
+          this.installButtonEnabled = true;
           if (error.status === 0) {
             console.log('service down ', error);
           } else {
