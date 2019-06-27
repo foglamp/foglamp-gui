@@ -22,7 +22,7 @@ export class PluginModalComponent implements OnInit, OnChanges {
     searchPlaceholder: 'Search',
   };
 
-  installButtonEnabled = false;
+  installButtonEnabled = true;
 
   @Input() data: {
     modalState: boolean,
@@ -54,7 +54,9 @@ export class PluginModalComponent implements OnInit, OnChanges {
       name: '',
       type: this.data.type.toLowerCase()
     });
-    modal.classList.remove('is-active');
+    if (modal !== null) {
+      modal.classList.remove('is-active');
+    }
   }
 
   fetchPluginRequestStarted() {
