@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { assign, reduce, sortBy } from 'lodash';
+import { assign, reduce, sortBy, isEmpty } from 'lodash';
 
 import { AlertService, ConfigurationService, FilterService, ServicesApiService, ProgressBarService } from '../../../../services';
 import { ViewConfigItemComponent } from '../../configuration-manager/view-config-item/view-config-item.component';
@@ -107,6 +107,9 @@ export class AddFilterWizardComponent implements OnInit {
           this.pluginData = data['plugins'].map((p: string) => p.replace(`foglamp-filter-`, ''));
           this.fetchPluginRequestDone();
           this.requestInProgress = false;
+          if (isEmpty(this.pluginData)) {
+            this.alertService.warning('No plugin available to install');
+          }
         },
         error => {
           this.fetchPluginRequestDone();
@@ -442,5 +445,13 @@ export class AddFilterWizardComponent implements OnInit {
           }
         }
       );
+  }
+
+  filterSelectionChanged(event: any) {
+    if (event.value !== undefined) {
+      this.isValidPlugin = true;
+    } else {
+      this.serviceForm.controls['pluginToInstall'].setValue('');
+    }
   }
 }
