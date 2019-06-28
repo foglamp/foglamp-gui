@@ -160,7 +160,7 @@ export class AddFilterWizardComponent implements OnInit {
 
   gotoNext() {
     const pluginToInstall = this.serviceForm.value['pluginToInstall'];
-    const isPluginInstalled = this.plugins.filter(p => p.name === pluginToInstall);
+    const isPluginInstalled = this.plugins.filter(p => p.name.toLowerCase() === pluginToInstall.toLowerCase());
     if (this.serviceForm.value['pluginToInstall'] && isPluginInstalled.length === 0) {
       if (this.serviceForm.value['name'].trim() === '') {
         this.isValidName = false;
@@ -217,7 +217,7 @@ export class AddFilterWizardComponent implements OnInit {
         if (formValues['name'].trim() !== '' && (formValues['plugin'].length > 0 || formValues['pluginToInstall'].length > 0)) {
           let pluginValue;
           if (formValues['pluginToInstall']) {
-            pluginValue = formValues['pluginToInstall'];
+            pluginValue = this.plugins.find(p => p.name.toLowerCase() === formValues['pluginToInstall'].toLowerCase()).name;
           } else {
             pluginValue = formValues['plugin'][0];
           }
