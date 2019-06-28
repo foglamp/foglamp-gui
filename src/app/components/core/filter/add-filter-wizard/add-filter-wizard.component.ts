@@ -317,7 +317,7 @@ export class AddFilterWizardComponent implements OnInit {
    */
   private getConfiguration(filterName: string): void {
     const config = this.plugins.map(p => {
-      if (p.name === this.payload.plugin) {
+      if (p.name.toLowerCase() === this.payload.plugin.toLowerCase()) {
         return p.config;
       }
     }).filter(value => value !== undefined);
