@@ -177,6 +177,9 @@ export class AddFilterWizardComponent implements OnInit {
     this.isValidName = true;
     const formValues = this.serviceForm.value;
     const first = <HTMLElement>document.getElementsByClassName('step-item is-active')[0];
+    if (first === undefined) {
+      return;
+    }
     const id = first.getAttribute('id');
     const nxtButton = <HTMLButtonElement>document.getElementById('next');
     const previousButton = <HTMLButtonElement>document.getElementById('previous');
