@@ -35,7 +35,7 @@
     "core-js": "^2.6.9",
     "moment": "~2.23.0",
     "ng-sidebar": "~8.0.0",
-    "plotly.js": "^1.48.1",
+    "plotly.js-gl3d-dist": "^1.48.3",
     "rxjs": "~6.5.2",
     "rxjs-compat": "~6.5.2",
     "zone.js": "~0.9.1"

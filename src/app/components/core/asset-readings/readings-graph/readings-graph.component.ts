@@ -259,18 +259,33 @@ export class ReadingsGraphComponent implements OnDestroy {
           key: k,
           values: assetReads
         };
+        console.log(read);
         this.assetReading.push(read);
       } else {
         if (k !== 'spectrum') {
           this.isSpectrum = false;
           this.excludedReadingsList.push(k);
         } else {
+          
+          const xx = [];
+          for (const rr of assetReads) {
+            // console.log("rr", rr);
+            const x = [];
+            for (const r of rr) {
+              
+              x.push(r.toString());
+            }
+            console.log("x:", x);
+            
+            xx.push(x);
+          }
+          console.log("xx", xx);
           this.polyGraphData = {
             data: [
               {
                 type: 'surface',
                 y: timestamps,
-                z: assetReads,
+                z: xx,
                 showscale: false,
                 colorscale: [
                   ['0', 'rgba(68,1,84,1)'],

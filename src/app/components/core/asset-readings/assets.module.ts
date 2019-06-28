@@ -3,7 +3,8 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 
-import * as PlotlyJS from 'plotly.js/dist/plotly.js';
+// import * as PlotlyJS from 'plotly.js/dist/plotly.js';
+import * as Plotly from 'plotly.js-gl3d-dist';
 import { PlotlyModule } from 'angular-plotly.js';
 
 import { AuthCheckGuard } from '../../../guards';
@@ -23,7 +24,7 @@ const routes: Routes = [
   }
 ];
 
-PlotlyModule.plotlyjs = PlotlyJS;
+PlotlyModule.plotlyjs = Plotly;
 
 @NgModule({
   declarations: [
