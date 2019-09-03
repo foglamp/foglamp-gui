@@ -254,7 +254,7 @@ export class ReadingsGraphComponent implements OnDestroy {
       }
     }
 
-    if (this.selectedTab === 2 && this.arrayTypeReadingsList.length) {
+    if (this.selectedTab === 2 && this.arrayTypeReadingsList.length === 0) {
       if (this.numberTypeReadingsList.length > 0) {
         this.selectedTab = 1;
       } else if (!this.isEmptyObject(this.stringTypeReadingsList)) {
