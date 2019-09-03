@@ -200,9 +200,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     const numReadings = [];
     const strReadings = [];
     const arrReadings = [];
-    this.numberTypeReadingsList = [];
-    this.arrayTypeReadingsList = [];
-    this.stringTypeReadingsList = {};
     const datePipe = new DateFormatterPipe();
     this.timestamps = readings.map((r: any) => datePipe.transform(r.timestamp, 'HH:mm:ss:SSS'));
 
@@ -239,14 +236,6 @@ export class ReadingsGraphComponent implements OnDestroy {
 
 
   setTabData() {
-    if (this.selectedTab === 2 && this.arrayTypeReadingsList.length === 0) {
-      this.selectedTab = 1;
-    } else if (this.selectedTab === 3 && this.isEmptyObject(this.stringTypeReadingsList)) {
-      this.selectedTab = 1;
-    } else if (this.selectedTab === 4 && this.assetReadingSummary.length === 0) {
-      this.selectedTab = 1;
-    }
-
     if (this.isModalOpened) {
       if (this.numberTypeReadingsList.length > 0) {
         this.selectedTab = 1;
@@ -258,14 +247,34 @@ export class ReadingsGraphComponent implements OnDestroy {
       this.isModalOpened = false;
     }
 
+    if (this.selectedTab === 1 && this.numberTypeReadingsList.length === 0) {
+      if (this.arrayTypeReadingsList.length > 0) {
+        this.selectedTab = 2;
+      } else if (!this.isEmptyObject(this.stringTypeReadingsList)) {
+        this.selectedTab = 3;
+      }
+    }
+
+    if (this.selectedTab === 2 && this.arrayTypeReadingsList.length) {
+      if (this.numberTypeReadingsList.length > 0) {
+        this.selectedTab = 1;
+      } else if (!this.isEmptyObject(this.stringTypeReadingsList)) {
+        this.selectedTab = 3;
+      }
+    }
+
+    if (this.selectedTab === 3 && this.isEmptyObject(this.stringTypeReadingsList)) {
+      if (this.numberTypeReadingsList.length > 0) {
+        this.selectedTab = 1;
+      } else if (this.arrayTypeReadingsList.length > 0) {
+        this.selectedTab = 2;
+      }
+    }
+
     if (this.selectedTab === 1 && this.numberTypeReadingsList.length > 0) {
       this.statsAssetReadingsGraph(this.numberTypeReadingsList, this.timestamps);
     } else if (this.selectedTab === 2 && this.arrayTypeReadingsList.length > 0) {
       this.create3DGraph(this.arrayTypeReadingsList, this.timestamps);
-    } else if (this.selectedTab === 3 && !this.isEmptyObject(this.stringTypeReadingsList)) {
-      if (this.graphRefreshInterval !== -1) {
-        this.selectTab(this.selectedTab, false);
-      }
     }
     this.showSpinner = false;
   }
