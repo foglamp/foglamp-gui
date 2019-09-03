@@ -270,20 +270,18 @@ export class ReadingsGraphComponent implements OnDestroy {
       }
     }
 
-    if (this.selectedTab === 1 && this.numberTypeReadingsList.length > 0) {
-      this.statsAssetReadingsGraph(this.numberTypeReadingsList, this.timestamps);
-    } else if (this.selectedTab === 2 && this.arrayTypeReadingsList.length > 0) {
-      this.create3DGraph(this.arrayTypeReadingsList, this.timestamps);
-    }
-
     if (this.selectedTab === 4 && this.numberTypeReadingsList.length === 0) {
-      if (this.numberTypeReadingsList.length > 0) {
-        this.selectedTab = 1;
-      } else if (this.arrayTypeReadingsList.length > 0) {
+      if (this.arrayTypeReadingsList.length > 0) {
         this.selectedTab = 2;
       } else if (!this.isEmptyObject(this.stringTypeReadingsList)) {
         this.selectedTab = 3;
       }
+    }
+
+    if (this.selectedTab === 1 && this.numberTypeReadingsList.length > 0) {
+      this.statsAssetReadingsGraph(this.numberTypeReadingsList, this.timestamps);
+    } else if (this.selectedTab === 2 && this.arrayTypeReadingsList.length > 0) {
+      this.create3DGraph(this.arrayTypeReadingsList, this.timestamps);
     }
     this.showSpinner = false;
   }
