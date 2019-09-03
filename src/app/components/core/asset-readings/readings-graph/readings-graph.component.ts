@@ -139,7 +139,6 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   public showAssetReadingsSummary(assetCode, limit: number = 0, time: number = 0) {
-    this.assetReadingSummary = [];
     this.assetService.getAllAssetSummary(assetCode, limit, time).subscribe(
       (data: any) => {
         this.showSpinner = false;
@@ -467,7 +466,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   showSummaryTab() {
-    return this.numberTypeReadingsList.length;
+    return this.numberTypeReadingsList.length > 0;
   }
 
   isEmptyObject(obj) {
