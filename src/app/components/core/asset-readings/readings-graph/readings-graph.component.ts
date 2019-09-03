@@ -139,6 +139,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   public showAssetReadingsSummary(assetCode, limit: number = 0, time: number = 0) {
+    this.assetReadingSummary = [];
     this.assetService.getAllAssetSummary(assetCode, limit, time).subscribe(
       (data: any) => {
         this.showSpinner = false;
@@ -199,6 +200,9 @@ export class ReadingsGraphComponent implements OnDestroy {
     const numReadings = [];
     const strReadings = [];
     const arrReadings = [];
+    this.numberTypeReadingsList = [];
+    this.arrayTypeReadingsList = [];
+    this.stringTypeReadingsList = {};
     const datePipe = new DateFormatterPipe();
     this.timestamps = readings.map((r: any) => datePipe.transform(r.timestamp, 'HH:mm:ss:SSS'));
 
