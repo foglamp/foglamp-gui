@@ -1,17 +1,15 @@
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-
-import { BackupRestoreComponent } from './components/core/backup-restore';
-import { CertificateStoreComponent } from './components/core/certificate/certificate-store';
-import { DashboardComponent } from './components/core/dashboard';
 import { ListTasksComponent } from './components/core/logs';
 import { ServiceDiscoveryComponent } from './components/core/service-discovery';
 import { SettingsComponent } from './components/core/settings';
-import { SupportComponent } from './components/core/support';
 import { LoginComponent } from './components/layout/login';
 import { AuthCheckGuard } from './guards';
 
 const appRoutes: Routes = [
-  { path: '', component: DashboardComponent, canActivate: [AuthCheckGuard] },
+  {
+    path: '', loadChildren: () => import('./components/core/dashboard/dashboard.module')
+      .then(m => m.DashboardModule)
+  },
   {
     path: 'asset', loadChildren: () => import('./components/core/asset-readings/assets.module')
       .then(m => m.AssetsModule)
@@ -50,9 +48,18 @@ const appRoutes: Routes = [
     path: 'notification', loadChildren: () => import('./components/core/notifications/notifications.module')
       .then(m => m.NotificationsModule)
   },
-  { path: 'certificate', component: CertificateStoreComponent, canActivate: [AuthCheckGuard] },
-  { path: 'support', component: SupportComponent, canActivate: [AuthCheckGuard] },
-  { path: 'backup-restore', component: BackupRestoreComponent, canActivate: [AuthCheckGuard] },
+  {
+    path: 'certificate', loadChildren: () => import('./components/core/certificate/certificate.module')
+      .then(m => m.CertificateModule)
+  },
+  {
+    path: 'support', loadChildren: () => import('./components/core/support/support.module')
+      .then(m => m.SupportModule)
+  },
+  {
+    path: 'backup-restore', loadChildren: () => import('./components/core/backup-restore/backup-restore.module')
+      .then(m => m.BackupRestoreModule)
+  },
   { path: 'setting', component: SettingsComponent },
   { path: 'service-discovery', component: ServiceDiscoveryComponent },
   // user-management
