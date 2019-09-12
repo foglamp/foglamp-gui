@@ -35,9 +35,11 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
   public oldFileName = '';
   public newFileName = '';
   public isFileUploaded = false;
+  public isValidJson = true;
 
-  @ViewChild('textarea', { static: false }) textarea: ElementRef;
+  @ViewChild('codeeditor', { static: false }) codeeditor: ElementRef;
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
+  @ViewChild('jsoneditor', { static: false }) jsoneditor: ElementRef;
 
   @ViewChild(JsonEditorComponent, { static: false }) editor: JsonEditorComponent;
   public editorOptions: JsonEditorOptions;
@@ -48,18 +50,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
   constructor(private configService: ConfigurationService,
     private alertService: AlertService,
     public ngProgress: ProgressBarService,
-    private cdRef: ChangeDetectorRef
-  ) {
-    this.editorOptions = new JsonEditorOptions();
-    this.editorOptions.mode = 'code';
-    // this.options.modes = ['code', 'text', 'tree', 'view'];
-    this.editorOptions.mainMenuBar = false;
-    this.editorOptions.onChange = () => {
-      try {
-        this.editor.isValidJson();
-      } catch { }
-    };
-  }
+    private cdRef: ChangeDetectorRef) {}
 
   ngOnInit() { }
 
@@ -121,6 +112,10 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
       this.isValidForm = false;
       return;
     }
+    if (!this.isValidJson) {
+      this.isValidJson = true;
+      return;
+    }
 
     if (this.passwordMatched) {
       this.passwordOnChangeFired = false;
@@ -160,6 +155,17 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
     }
     if (this.filesToUpload.length > 0) {
       this.uploadScript();
+    }
+  }
+
+  public checkValidJson(configValue) {
+    try {
+      JSON.parse(configValue);
+      this.isValidJson = true;
+      return true;
+    } catch (e) {
+      this.isValidJson = false;
+      return false;
     }
   }
 
@@ -236,8 +242,8 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
    * @param configVal Config value to pass in ngModel
    */
   public setConfigValue(configVal) {
-    if (this.textarea !== undefined) {
-      this.textarea.nativeElement.click();
+    if (this.codeeditor !== undefined) {
+      this.codeeditor.nativeElement.click();
     }
     if (configVal.value !== undefined) {
       return configVal.value;
