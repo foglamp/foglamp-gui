@@ -5,6 +5,17 @@ import { SidebarModule } from 'ng-sidebar';
 import { PingService } from './services';
 import { SharedService } from './services/shared.service';
 
+import '../../node_modules/codemirror/mode/javascript/javascript';
+import '../../node_modules/codemirror/mode/python/python';
+import '../../node_modules/codemirror/addon/fold/foldgutter';
+import '../../node_modules/codemirror/addon/fold/brace-fold';
+import '../../node_modules/codemirror/lib/codemirror';
+import '../../node_modules/codemirror/addon/edit/closebrackets';
+import '../../node_modules/codemirror/addon/edit/matchbrackets';
+import '../../node_modules/codemirror/addon/lint/lint';
+import '../../node_modules/codemirror/addon/lint/javascript-lint';
+import '../../node_modules/codemirror/addon/lint/json-lint';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

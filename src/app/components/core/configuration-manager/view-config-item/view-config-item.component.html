@@ -72,20 +72,25 @@
                       appNumberOnly />
 
                     <ng-container *ngIf="getConfigAttributeType(configItem.value.type) === 'LONG_TEXT'">
-                      <json-editor #editor [options]="editorOptions" [data]="configItem?.value?.value != undefined ? configItem?.value?.value : configItem?.value?.default">
-                      </json-editor>
-                      <input class="input" type="hidden" name="{{configItem.value.key}}" [ngModel]="editor.getText()"
-                        [jsonValue]="setConfigValue(configItem.value)" />
+                      <ngx-codemirror #jsoneditor name="{{configItem.value.key}}" [options]="{theme: 'darcula',mode: 'application/json',
+                        lineNumbers: true,lineWrapping: true,foldGutter: true,gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
+                        autoCloseBrackets: true,matchBrackets: true,lint: true}" [autoFocus]="true" [ngModel]="setConfigValue(configItem.value)" (ngModelChange)="checkValidJson(jsoneditor.value)">
+                        configItem?.value?.value != undefined ? configItem?.value?.value : configItem?.value?.default
+                      </ngx-codemirror>
+                      <p *ngIf="!isValidJson" class="help is-danger" >
+                          Not a valid Json.
+                      </p>
                     </ng-container>
 
                     <div *ngIf="getConfigAttributeType(configItem.value.type) === 'SCRIPT'">
-                      <textarea #textarea rows="10" class="textarea is-fullwidth is-small"
-                        name="{{configItem.value.key}}" [ngModel]="fileContent || setConfigValue(configItem.value)"
-                        (click)="getFileName(configItem?.value?.file)"
-                        [value]='fileContent || setConfigValue(configItem.value)' [disabled]="!isFileUploaded">
+                      <ngx-codemirror name="{{configItem.value.key}}" [options]="{theme: 'darcula',mode: 'text/x-python',
+                      lineNumbers: true,lineWrapping: true,foldGutter: true,gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
+                      autoCloseBrackets: true,matchBrackets: true,lint: true}" [autoFocus]="true" (ngModelChange)="getFileName(configItem?.value?.file)"
+                      [ngModel]="fileContent || setConfigValue(configItem.value)">
                         {{configItem?.value?.value != undefined ? configItem?.value?.value : configItem?.value?.default}}
-                      </textarea>
-                      <p class="help">
+                      </ngx-codemirror>
+                      <input class="input" #codeeditor (click)="getFileName(configItem?.value?.file)" type="hidden"/>
+                      <p class="help" >
                         {{newFileName != '' ? newFileName : oldFileName}}
                       </p>
                     </div>

@@ -27,13 +27,16 @@
               "./node_modules/animate.css/animate.css",
               "./node_modules/ngx-select-dropdown/dist/assets/style.css",
               "./node_modules/jsoneditor/dist/jsoneditor.min.css",
+              "./node_modules/codemirror/theme/darcula.css",
+              "./node_modules/codemirror/addon/lint/lint.css",
+              "./node_modules/codemirror/lib/codemirror.css",
               "src/assets/css/bulma.min.css",
               "src/assets/css/font-awesome.min.css",
               "src/assets/css/bulma-tooltip.min.css",
               "src/assets/css/bulma-steps.min.css",
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": ["src/assets/js/jsonlint.js"]
           },
           "configurations": {
             "production": {

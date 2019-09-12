@@ -1,14 +1,12 @@
 import {
   Component, EventEmitter, Input, OnChanges, OnInit,
   Output, SimpleChanges, ViewChild, ElementRef, ChangeDetectorRef,
-  AfterViewChecked
-} from '@angular/core';
+  AfterViewChecked} from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { differenceWith, sortBy, isEqual, isEmpty, cloneDeep, has } from 'lodash';
 
 import { AlertService, ConfigurationService, ProgressBarService } from '../../../../services';
 import ConfigTypeValidation from '../configuration-type-validation';
-import { JsonEditorComponent, JsonEditorOptions } from '../../../common/json-editor/json-editor.component';
 
 @Component({
   selector: 'app-view-config-item',
@@ -28,6 +26,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
   public categoryConfiguration;
   public configItems = [];
   public isValidForm: boolean;
+  public isValidJson = true;
   public isWizardCall = false;
   public filesToUpload = [];
   public hasEditableConfigItems = true;
@@ -36,11 +35,9 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
   public newFileName = '';
   public isFileUploaded = false;
 
-  @ViewChild('textarea', { static: false }) textarea: ElementRef;
+  @ViewChild('codeeditor', { static: false }) codeeditor: ElementRef;
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
-
-  @ViewChild(JsonEditorComponent, { static: false }) editor: JsonEditorComponent;
-  public editorOptions: JsonEditorOptions;
+  @ViewChild('jsoneditor', { static: false }) jsoneditor: ElementRef;
 
   public passwordOnChangeFired = false;
   public passwordMatched = true;
@@ -49,19 +46,9 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
     private alertService: AlertService,
     public ngProgress: ProgressBarService,
     private cdRef: ChangeDetectorRef
-  ) {
-    this.editorOptions = new JsonEditorOptions();
-    this.editorOptions.mode = 'code';
-    // this.options.modes = ['code', 'text', 'tree', 'view'];
-    this.editorOptions.mainMenuBar = false;
-    this.editorOptions.onChange = () => {
-      try {
-        this.editor.isValidJson();
-      } catch { }
-    };
-  }
+  ) {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   ngAfterViewChecked() {
     if (this.fileInput !== undefined) {
@@ -127,6 +114,11 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
       form.control.removeControl('confirm-password');
     }
 
+    if (!this.isValidJson) {
+      this.isValidJson = true;
+      return;
+    }
+
     const formData = Object.keys(form.value).map(key => {
       return {
         key: key,
@@ -134,10 +126,9 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
         type: this.configItems.find(conf => key === conf.key).type
       };
     });
-
     const changedConfigValues = this.configItems.length > 0 ? differenceWith(formData, this.configItems, (newConfig, oldConfig) => {
       if (newConfig.type === 'JSON' && oldConfig.type === 'JSON') {
-        return isEqual(JSON.parse(newConfig.value), JSON.parse(oldConfig.value));
+          return isEqual(JSON.parse(newConfig.value), JSON.parse(oldConfig.value));
       }
       return isEqual(newConfig, oldConfig);
     }) : [];
@@ -160,6 +151,17 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
     }
     if (this.filesToUpload.length > 0) {
       this.uploadScript();
+    }
+  }
+
+  public checkValidJson(configValue) {
+    try {
+      JSON.parse(configValue);
+      this.isValidJson = true;
+      return true;
+    } catch (e) {
+      this.isValidJson = false;
+      return false;
     }
   }
 
@@ -236,8 +238,8 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
    * @param configVal Config value to pass in ngModel
    */
   public setConfigValue(configVal) {
-    if (this.textarea !== undefined) {
-      this.textarea.nativeElement.click();
+    if (this.codeeditor !== undefined) {
+      this.codeeditor.nativeElement.click();
     }
     if (configVal.value !== undefined) {
       return configVal.value;
