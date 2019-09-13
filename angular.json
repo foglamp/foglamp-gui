@@ -26,7 +26,6 @@
               "./node_modules/angular-tree-component/dist/angular-tree-component.css",
               "./node_modules/animate.css/animate.css",
               "./node_modules/ngx-select-dropdown/dist/assets/style.css",
-              "./node_modules/jsoneditor/dist/jsoneditor.min.css",
               "./node_modules/codemirror/theme/darcula.css",
               "./node_modules/codemirror/addon/lint/lint.css",
               "./node_modules/codemirror/lib/codemirror.css",

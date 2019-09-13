@@ -14,10 +14,9 @@ import { DirectivesModule } from './directives/directives.module';
 import { PipesModule } from './pipes/pipes.module';
 import { ConfigChildrenComponent } from './components/core/configuration-manager/config-children/config-children.component';
 import { PluginModalComponent } from './components/core/plugin-modal/plugin-modal.component';
-import { JsonEditorModule } from './components/common/json-editor/json-editor.module';
 
 @NgModule({
-  imports: [CommonModule, CodemirrorModule, PipesModule, FormsModule, DirectivesModule, SelectDropDownModule, JsonEditorModule],
+  imports: [CommonModule, CodemirrorModule, PipesModule, FormsModule, DirectivesModule, SelectDropDownModule],
   declarations: [ViewConfigItemComponent, ConfigChildrenComponent, PluginModalComponent, ViewLogsComponent],
   exports: [ViewConfigItemComponent, ConfigChildrenComponent, PluginModalComponent, ViewLogsComponent]
 })

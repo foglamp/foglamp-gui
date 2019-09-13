@@ -1,11 +1,12 @@
 import {
   Component, EventEmitter, Input, OnChanges, OnInit,
   Output, SimpleChanges, ViewChild, ElementRef, ChangeDetectorRef,
-  AfterViewChecked} from '@angular/core';
+  AfterViewChecked, OnDestroy} from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { differenceWith, sortBy, isEqual, isEmpty, cloneDeep, has } from 'lodash';
+import { Subscription } from 'rxjs';
 
-import { AlertService, ConfigurationService, ProgressBarService } from '../../../../services';
+import { AlertService, ConfigurationService, ProgressBarService, SharedService } from '../../../../services';
 import ConfigTypeValidation from '../configuration-type-validation';
 
 @Component({
@@ -13,7 +14,7 @@ import ConfigTypeValidation from '../configuration-type-validation';
   templateUrl: './view-config-item.component.html',
   styleUrls: ['./view-config-item.component.css']
 })
-export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChecked {
+export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChecked, OnDestroy {
   @Input() categoryConfigurationData: any;
   @Input() useProxy = 'false';
   @Input() useFilterProxy = 'false';
@@ -26,7 +27,6 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
   public categoryConfiguration;
   public configItems = [];
   public isValidForm: boolean;
-  public isValidJson = true;
   public isWizardCall = false;
   public filesToUpload = [];
   public hasEditableConfigItems = true;
@@ -34,6 +34,9 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
   public oldFileName = '';
   public newFileName = '';
   public isFileUploaded = false;
+  public isValidJson = true;
+  public selectedTheme = 'default';
+  private subscription: Subscription;
 
   @ViewChild('codeeditor', { static: false }) codeeditor: ElementRef;
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
@@ -45,10 +48,17 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
   constructor(private configService: ConfigurationService,
     private alertService: AlertService,
     public ngProgress: ProgressBarService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private sharedService: SharedService
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.subscription = this.sharedService.theme.subscribe(theme => {
+      if (theme === 'dark') {
+        this.selectedTheme = 'darcula';
+      }
+    });
+   }
 
   ngAfterViewChecked() {
     if (this.fileInput !== undefined) {
@@ -352,6 +362,10 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
     if (password !== confirmPassword) {
       this.passwordMatched = false;
     }
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
 }
