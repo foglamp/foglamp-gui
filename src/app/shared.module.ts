@@ -13,11 +13,10 @@ import { DirectivesModule } from './directives/directives.module';
 import { PipesModule } from './pipes/pipes.module';
 import { ConfigChildrenComponent } from './components/core/configuration-manager/config-children/config-children.component';
 import { PluginModalComponent } from './components/core/plugin-modal/plugin-modal.component';
-import { JsonEditorModule } from './components/common/json-editor/json-editor.module';
 import { MonacoEditorModule } from 'ngx-monaco-editor';
 
 @NgModule({
-  imports: [CommonModule, PipesModule, FormsModule, DirectivesModule, SelectDropDownModule, JsonEditorModule, MonacoEditorModule.forRoot()],
+  imports: [CommonModule, PipesModule, FormsModule, DirectivesModule, SelectDropDownModule, MonacoEditorModule.forRoot()],
   declarations: [ViewConfigItemComponent, ConfigChildrenComponent, PluginModalComponent, ViewLogsComponent],
   exports: [ViewConfigItemComponent, ConfigChildrenComponent, PluginModalComponent, ViewLogsComponent]
 })

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 import { PingService } from '../../../services';
+import { SharedService } from '../../../services/shared.service';
 import { NavbarComponent } from '../../layout/navbar/navbar.component';
 import { ServiceDiscoveryComponent } from '../service-discovery';
 
@@ -20,8 +21,9 @@ export class SettingsComponent implements OnInit {
   pingInterval: string;
   refreshInterval: string;
   serviceUrl = '';
+  selectedTheme = localStorage.getItem('OPTED_THEME');
 
-  constructor(private pingService: PingService) {
+  constructor(private pingService: PingService, private sharedService: SharedService) {
     this.protocol = localStorage.getItem('CONNECTED_PROTOCOL') != null ?
       localStorage.getItem('CONNECTED_PROTOCOL') : location.protocol.replace(':', '').trim();
     this.host = localStorage.getItem('CONNECTED_HOST') != null ? localStorage.getItem('CONNECTED_HOST') : location.hostname;
@@ -88,6 +90,15 @@ export class SettingsComponent implements OnInit {
     this.pingInterval = time;
     localStorage.setItem('PING_INTERVAL', time);
     this.pingService.pingIntervalChanged.next(+time);
+  }
+
+  /**
+   * Set theme for code editor
+   */
+  public selectTheme(theme: string) {
+    this.selectedTheme = theme;
+    localStorage.setItem('OPTED_THEME', theme);
+    this.sharedService.theme.next(theme);
   }
 
   setDashboardRefreshTime(time: string) {
