@@ -60,3 +60,8 @@
 #confirm-password input {
   padding-right: 2rem;
 }
+
+.editor {
+  border: 1px solid grey;
+  border-radius: 5px;
+}

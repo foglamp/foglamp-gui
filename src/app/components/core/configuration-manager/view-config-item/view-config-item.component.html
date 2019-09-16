@@ -72,7 +72,7 @@
                       appNumberOnly />
 
                     <ng-container *ngIf="getConfigAttributeType(configItem.value.type) === 'LONG_TEXT'">
-                      <ngx-monaco-editor name="{{configItem.value.key}}" [options]="{theme: selectedTheme, language: 'json'}" [ngModel]="setConfigValue(configItem.value)"
+                      <ngx-monaco-editor [ngClass]="{'editor':selectedTheme === 'vs'}" name="{{configItem.value.key}}" [options]="{theme: selectedTheme, language: 'json'}" [ngModel]="setConfigValue(configItem.value)"
                       (ngModelChange)="checkValidJson($event)">
                         configItem?.value?.value != undefined ? configItem?.value?.value : configItem?.value?.default
                       </ngx-monaco-editor>
@@ -82,7 +82,7 @@
                     </ng-container>
 
                     <div *ngIf="getConfigAttributeType(configItem.value.type) === 'SCRIPT'">
-                      <ngx-monaco-editor [options]="{theme: selectedTheme, language: 'python'}"
+                      <ngx-monaco-editor [ngClass]="{'editor':selectedTheme === 'vs'}" [options]="{theme: selectedTheme, language: 'python'}"
                         name="{{configItem.value.key}}" [ngModel]="fileContent || setConfigValue(configItem.value)"
                         (ngModelChange)="getFileName(configItem?.value?.file)">
                       </ngx-monaco-editor>
