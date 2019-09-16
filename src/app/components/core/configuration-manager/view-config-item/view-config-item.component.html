@@ -72,8 +72,8 @@
                       appNumberOnly />
 
                     <ng-container *ngIf="getConfigAttributeType(configItem.value.type) === 'LONG_TEXT'">
-                      <ngx-monaco-editor #jsoneditor name="{{configItem.value.key}}" [options]="{theme: selectedTheme, language: 'json'}" [ngModel]="setConfigValue(configItem.value)"
-                      (ngModelChange)="checkValidJson(jsoneditor._value)">
+                      <ngx-monaco-editor name="{{configItem.value.key}}" [options]="{theme: selectedTheme, language: 'json'}" [ngModel]="setConfigValue(configItem.value)"
+                      (ngModelChange)="checkValidJson($event)">
                         configItem?.value?.value != undefined ? configItem?.value?.value : configItem?.value?.default
                       </ngx-monaco-editor>
                       <p *ngIf="!isValidJson" class="help is-danger">

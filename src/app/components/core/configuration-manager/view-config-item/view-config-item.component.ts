@@ -41,7 +41,6 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
 
   @ViewChild('codeeditor', { static: false }) codeeditor: ElementRef;
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
-  @ViewChild('jsoneditor', { static: false }) jsoneditor: ElementRef;
 
   public passwordOnChangeFired = false;
   public passwordMatched = true;
