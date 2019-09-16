@@ -60,3 +60,8 @@
 #confirm-password input {
   padding-right: 2rem;
 }
+
+:host ::ng-deep ngx-codemirror .CodeMirror-wrap {
+  border: 1px solid grey;
+  border-radius: 5px;
+}
