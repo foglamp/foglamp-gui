@@ -124,32 +124,21 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
   }
 
   public setEditorConfig(type: string) {
+    const editorOptions = {
+      theme: this.selectedTheme,
+      mode: 'text/x-python',
+      lineNumbers: true,
+      lineWrapping: true,
+      foldGutter: true,
+      gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
+      autoCloseBrackets: true,
+      matchBrackets: true,
+      lint: true
+    };
     if (type === 'JSON') {
-      this.editorOptions = {
-        theme: this.selectedTheme,
-        mode: 'application/json',
-        lineNumbers: true,
-        lineWrapping: true,
-        foldGutter: true,
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
-        autoCloseBrackets: true,
-        matchBrackets: true,
-        lint: true
-      };
-    } else {
-      this.editorOptions = {
-        theme: this.selectedTheme,
-        mode: 'text/x-python',
-        lineNumbers: true,
-        lineWrapping: true,
-        foldGutter: true,
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
-        autoCloseBrackets: true,
-        matchBrackets: true,
-        lint: true
-      };
+        editorOptions.mode = 'application/json';
     }
-    return this.editorOptions;
+    return editorOptions;
   }
 
   public saveConfiguration(form: NgForm) {
