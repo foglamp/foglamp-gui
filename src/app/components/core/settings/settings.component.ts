@@ -20,7 +20,7 @@ export class SettingsComponent implements OnInit {
   pingInterval: string;
   refreshInterval: string;
   serviceUrl = '';
-  selectedTheme = localStorage.getItem('OPTED_THEME');
+  selectedTheme: string;
 
   constructor(private pingService: PingService, private sharedService: SharedService) {
     this.protocol = localStorage.getItem('CONNECTED_PROTOCOL') != null ?
@@ -34,6 +34,7 @@ export class SettingsComponent implements OnInit {
     // get last selected time interval
     this.pingInterval = localStorage.getItem('PING_INTERVAL');
     this.refreshInterval = localStorage.getItem('DASHBOARD_GRAPH_REFRESH_INTERVAL');
+    this.selectedTheme = localStorage.getItem('OPTED_THEME') != null ? localStorage.getItem('OPTED_THEME') : 'light';
   }
 
   public testServiceConnection(): void {

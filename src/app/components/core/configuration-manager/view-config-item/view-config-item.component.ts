@@ -9,6 +9,16 @@ import { Subscription } from 'rxjs';
 import { AlertService, ConfigurationService, ProgressBarService, SharedService } from '../../../../services';
 import ConfigTypeValidation from '../configuration-type-validation';
 
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/python/python';
+import 'codemirror/addon/fold/foldgutter';
+import 'codemirror/addon/fold/brace-fold';
+import 'codemirror/lib/codemirror';
+import 'codemirror/addon/edit/closebrackets';
+import 'codemirror/addon/edit/matchbrackets';
+import 'codemirror/addon/lint/lint';
+import 'codemirror/addon/lint/json-lint';
+
 @Component({
   selector: 'app-view-config-item',
   templateUrl: './view-config-item.component.html',
@@ -37,6 +47,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
   public isValidJson = true;
   public selectedTheme = 'default';
   private subscription: Subscription;
+  public editorOptions: any;
 
   @ViewChild('codeeditor', { static: false }) codeeditor: ElementRef;
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
@@ -110,6 +121,35 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
         }
       }
     }
+  }
+
+  public setEditorConfig(type: string) {
+    if (type === 'JSON') {
+      this.editorOptions = {
+        theme: this.selectedTheme,
+        mode: 'application/json',
+        lineNumbers: true,
+        lineWrapping: true,
+        foldGutter: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
+        autoCloseBrackets: true,
+        matchBrackets: true,
+        lint: true
+      };
+    } else {
+      this.editorOptions = {
+        theme: this.selectedTheme,
+        mode: 'text/x-python',
+        lineNumbers: true,
+        lineWrapping: true,
+        foldGutter: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
+        autoCloseBrackets: true,
+        matchBrackets: true,
+        lint: true
+      };
+    }
+    return this.editorOptions;
   }
 
   public saveConfiguration(form: NgForm) {

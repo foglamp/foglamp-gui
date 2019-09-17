@@ -72,9 +72,7 @@
                       appNumberOnly />
 
                     <ng-container *ngIf="getConfigAttributeType(configItem.value.type) === 'LONG_TEXT'">
-                      <ngx-codemirror #jsoneditor name="{{configItem.value.key}}" [options]="{theme: selectedTheme,mode: 'application/json',
-                        lineNumbers: true,lineWrapping: true,foldGutter: true,gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
-                        autoCloseBrackets: true,matchBrackets: true,lint: true}" [autoFocus]="true" [ngModel]="setConfigValue(configItem.value)" (ngModelChange)="checkValidJson(jsoneditor.value)">
+                      <ngx-codemirror #jsoneditor name="{{configItem.value.key}}" [options]="setEditorConfig(configItem.value.type)" [autoFocus]="true" [ngModel]="setConfigValue(configItem.value)" (ngModelChange)="checkValidJson(jsoneditor.value)">
                         configItem?.value?.value != undefined ? configItem?.value?.value : configItem?.value?.default
                       </ngx-codemirror>
                       <p *ngIf="!isValidJson" class="help is-danger" >
@@ -83,9 +81,7 @@
                     </ng-container>
 
                     <div *ngIf="getConfigAttributeType(configItem.value.type) === 'SCRIPT'">
-                      <ngx-codemirror name="{{configItem.value.key}}" [options]="{theme: selectedTheme,mode: 'text/x-python',
-                      lineNumbers: true,lineWrapping: true,foldGutter: true,gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
-                      autoCloseBrackets: true,matchBrackets: true,lint: true}" [autoFocus]="true" (ngModelChange)="getFileName(configItem?.value?.file)"
+                      <ngx-codemirror name="{{configItem.value.key}}" [options]="setEditorConfig(configItem.value.type)" [autoFocus]="true" (ngModelChange)="getFileName(configItem?.value?.file)"
                       [ngModel]="fileContent || setConfigValue(configItem.value)">
                         {{configItem?.value?.value != undefined ? configItem?.value?.value : configItem?.value?.default}}
                       </ngx-codemirror>

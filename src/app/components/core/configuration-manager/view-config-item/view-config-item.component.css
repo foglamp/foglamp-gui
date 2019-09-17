@@ -31,16 +31,6 @@
   }
 }
 
-:host ::ng-deep json-editor div.jsoneditor {
-  border: thin solid lightgray !important;
-}
-:host ::ng-deep json-editor,
-:host ::ng-deep json-editor .jsoneditor,
-:host ::ng-deep json-editor > div,
-:host ::ng-deep json-editor jsoneditor-outer {
-  height: 21rem;
-}
-
 .config-div {
   margin-top: 1vw;
 }
