@@ -47,7 +47,6 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
   public isValidJson = true;
   public selectedTheme = 'default';
   private subscription: Subscription;
-  public editorOptions: any;
 
   @ViewChild('codeeditor', { static: false }) codeeditor: ElementRef;
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
