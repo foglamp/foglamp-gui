@@ -17,7 +17,8 @@
                   <ng-container *ngSwitchCase="'BOOLEAN'">
                     <label class="checkbox">
                       <input type="checkbox" name='{{configItem.value.key}}' value="setConfigValue(configItem.value)"
-                        [ngModel]="setConfigValue(configItem.value) == 'true'" (input)="checkValidity(configItem.value, $event.target.value)"
+                        [ngModel]="setConfigValue(configItem.value) == 'true'"
+                        (input)="checkValidity(configItem.value, $event.target.value)"
                         [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable">
                     </label>
                   </ng-container>
@@ -30,11 +31,12 @@
 
                     <div class="field has-addons " *ngSwitchCase="'PASSWORD'">
                       <div class="control">
-                        <input #pwd (input)="showConfirmPassword(); checkValidity(configItem.value, $event.target.value)" name="{{configItem.value.key}}"
-                          class="input is-fullwidth is-small" type="password" onPaste="return false"
-                          (focus)="pwd.value=''; passwordMatched=false" [ngModel]="setConfigValue(configItem.value)"
-                          [value]='setConfigValue(configItem.value)' [attr.maxLength]="configItem?.value?.length"
-                          placeholder="password"
+                        <input #pwd
+                          (click)="showConfirmPassword(); checkValidity(configItem.value, $event.target.value)"
+                          name="{{configItem.value.key}}" class="input is-fullwidth is-small" type="password"
+                          onPaste="return false" (focus)="pwd.value=''; passwordMatched=false"
+                          [ngModel]="setConfigValue(configItem.value)" [value]='setConfigValue(configItem.value)'
+                          [attr.maxLength]="configItem?.value?.length" placeholder="password"
                           (ngModelChange)="checkPasswords(pwd.value, f?.controls['confirm-password']?.value)"
                           [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable" />
                       </div>
@@ -46,7 +48,8 @@
                         </a>
                       </div>
                     </div>
-                    <div class="field" *ngIf="getConfigAttributeType(configItem.value.type) === 'PASSWORD' && passwordOnChangeFired">
+                    <div class="field" *ngIf="getConfigAttributeType(configItem.value.type) === 'PASSWORD' && passwordOnChangeFired
+                    && configItem?.value?.editable">
                       <div class="control">
                         <div id="confirm-password" class="field has-addons">
                           <div class="control">
@@ -65,14 +68,16 @@
                     <input *ngSwitchCase="'INTEGER'" name="{{configItem.value.key}}" type="number"
                       [value]='setConfigValue(configItem.value)' class="input is-fullwidth is-small"
                       [minValue]="configItem?.value?.minimum" [maxValue]="configItem?.value?.maximum"
-                      [ngModel]="setConfigValue(configItem.value)" (input)="checkValidity(configItem.value, $event.target.value)"
+                      [ngModel]="setConfigValue(configItem.value)"
+                      (input)="checkValidity(configItem.value, $event.target.value)"
                       [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable"
                       appNumberOnly />
 
                     <input *ngSwitchCase="'FLOAT'" name="{{configItem.value.key}}" type="number"
                       [value]='setConfigValue(configItem.value)' step="any" class="input is-fullwidth is-small"
                       [minValue]="configItem?.value?.minimum" [maxValue]="configItem?.value?.maximum"
-                      [ngModel]="setConfigValue(configItem.value)" (input)="checkValidity(configItem.value, $event.target.value)"
+                      [ngModel]="setConfigValue(configItem.value)"
+                      (input)="checkValidity(configItem.value, $event.target.value)"
                       [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable"
                       appNumberOnly />
 
