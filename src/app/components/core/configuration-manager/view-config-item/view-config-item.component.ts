@@ -1,10 +1,9 @@
 import {
-  Component, EventEmitter, Input, OnChanges, OnInit,
-  Output, SimpleChanges, ViewChild, ElementRef, ChangeDetectorRef,
-  AfterViewChecked
+  Component, EventEmitter, Input, OnChanges,
+  Output, ViewChild, ElementRef, ChangeDetectorRef
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { differenceWith, sortBy, isEqual, isEmpty, cloneDeep, has } from 'lodash';
+import { differenceWith, sortBy, isEqual, isEmpty, cloneDeep, has, map, assign, find } from 'lodash';
 
 import { AlertService, ConfigurationService, ProgressBarService } from '../../../../services';
 import ConfigTypeValidation from '../configuration-type-validation';
@@ -15,7 +14,7 @@ import { JsonEditorComponent, JsonEditorOptions } from '../../../common/json-edi
   templateUrl: './view-config-item.component.html',
   styleUrls: ['./view-config-item.component.css']
 })
-export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChecked {
+export class ViewConfigItemComponent implements OnChanges {
   @Input() categoryConfigurationData: any;
   @Input() useProxy = 'false';
   @Input() useFilterProxy = 'false';
@@ -25,7 +24,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
   @Input() pageId = 'page';
   @Output() onConfigChanged: EventEmitter<any> = new EventEmitter<any>();
 
-  public categoryConfiguration;
+  public categoryConfiguration: any;
   public configItems = [];
   public isValidForm: boolean;
   public isWizardCall = false;
@@ -61,57 +60,46 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
     };
   }
 
-  ngOnInit() { }
-
-  ngAfterViewChecked() {
-    if (this.fileInput !== undefined) {
-      if (this.fileInput.nativeElement.value === '') {
-        this.newFileName = '';
-      }
-    }
-    this.cdRef.detectChanges();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges() {
     this.filesToUpload = [];
     this.configItems = [];
     this.fileContent = '';
-    if (changes.categoryConfigurationData) {
-      const categoryConfigurationCurrentData = cloneDeep(changes.categoryConfigurationData.currentValue);
-      if (categoryConfigurationCurrentData !== undefined) {
-        let configAttributes = [];
-        if (categoryConfigurationCurrentData.length !== 0) {
-          const currentConfigValues = categoryConfigurationCurrentData.value[0];
-          configAttributes = Object.keys(currentConfigValues).map(key => {
-            const element = currentConfigValues[key];
-            element.key = key;
-            return element;
-          });
+    if (!isEmpty(this.categoryConfigurationData)) {
+      this.categoryConfiguration = cloneDeep(this.categoryConfigurationData.value[0]);
+      this.categoryConfiguration = Object.keys(this.categoryConfiguration).map(key => {
+        const element = this.categoryConfiguration[key];
+        element.key = key;
+        return element;
+      });
 
-          configAttributes = sortBy(configAttributes, function (ca) {
-            return parseInt(ca.order, 10);
-          });
+      this.categoryConfiguration = sortBy(this.categoryConfiguration, (ca: any) => {
+        return parseInt(ca.order, 10);
+      });
 
-          categoryConfigurationCurrentData.value = configAttributes;
-          this.categoryConfiguration = categoryConfigurationCurrentData;
-          this.configItems = configAttributes.map(el => {
-            return {
-              key: el.key,
-              value: el.value !== undefined ? el.value : el.default,
-              type: el.type
-            };
-          });
-          // check if editable config item found, based on readonly property
-          for (const el of this.categoryConfiguration.value) {
-            if (!has(el, 'readonly') || el.readonly === 'false') {
-              this.hasEditableConfigItems = true;
-              break;
-            } else {
-              this.hasEditableConfigItems = false;
-            }
-          }
+      this.configItems = this.categoryConfiguration.map(el => {
+        return {
+          key: el.key,
+          value: el.value !== undefined ? el.value : el.default,
+          type: el.type
+        };
+      });
+
+      // check if editable config item found, based on readonly property
+      for (const el of this.categoryConfiguration) {
+        if (!has(el, 'readonly') || el.readonly === 'false') {
+          this.hasEditableConfigItems = true;
+          break;
+        } else {
+          this.hasEditableConfigItems = false;
         }
       }
+      if (this.fileInput !== undefined) {
+        if (this.fileInput.nativeElement.value === '') {
+          this.newFileName = '';
+        }
+      }
+      this.checkValidity();
+      this.cdRef.detectChanges();
     }
   }
 
@@ -156,7 +144,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
       return;
     }
     if (changedConfigValues.length > 0) {
-      this.updateConfiguration(this.categoryConfiguration.key, changedConfigValues);
+      this.updateConfiguration(this.categoryConfigurationData.key, changedConfigValues);
     }
     if (this.filesToUpload.length > 0) {
       this.uploadScript();
@@ -262,7 +250,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
       const formData = new FormData();
       formData.append('script', file);
       this.ngProgress.start();
-      this.configService.uploadFile(this.categoryConfiguration.key, configItem, formData)
+      this.configService.uploadFile(this.categoryConfigurationData.key, configItem, formData)
         .subscribe((content: any) => {
           this.filesToUpload = [];
           this.ngProgress.done();
@@ -333,7 +321,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
     const blob = new Blob([data.value], { type: 'plain/text' });
     const file = new File([blob], this.newFileName !== '' ?
       this.newFileName : this.oldFileName
-        .replace(`${this.categoryConfiguration.key.toLowerCase()}_${data.key.toLowerCase()}_`, ''));
+        .replace(`${this.categoryConfigurationData.key.toLowerCase()}_${data.key.toLowerCase()}_`, ''));
     return { script: file };
   }
 
@@ -352,4 +340,59 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
     }
   }
 
+  checkValidity(item: any = '', value = '') {
+    if (!isEmpty(this.categoryConfigurationData)) {
+      const data = this.categoryConfigurationData.value[0];
+      const config = [];
+      for (const k in data) {
+        if (data.hasOwnProperty(k)) {
+          data[k].value = data[k].value !== '' ? data[k].value : data[k].default;
+          if (item !== '' && k === item.key) {
+            data[k].value = value;
+          }
+          config.push(
+            {
+              key: k,
+              value: data[k].value
+            });
+        }
+      }
+
+      for (const k in data) {
+        if (data.hasOwnProperty(k)) {
+          data[k].key = k;
+          if (data[k].hasOwnProperty('validity')) {
+            data[k].validityExpression = data[k].validity;
+            config.forEach(element => {
+              data[k].validityExpression = data[k].validityExpression.includes(element.key) ? data[k].validityExpression
+                .replace(new RegExp(element.key, 'g'), `'${element.value}'`) : data[k].validityExpression;
+            });
+          }
+        }
+      }
+
+      for (const k in data) {
+        if (data.hasOwnProperty(k)) {
+          if (data[k].hasOwnProperty('validity')) {
+            if (data[k]['validity'].trim() !== '') {
+              try {
+                // tslint:disable-next-line: no-eval
+                const e = eval(data[k].validityExpression);
+                if (e !== true && e !== false) {
+                  console.log('Validity expression', data[k].validityExpression, 'for', k, 'evlauted to non-boolean value ', e);
+                }
+                data[k].editable = e === false ? false : true;
+              } catch (e) {
+                data[k].editable = true;
+              }
+            }
+          }
+        }
+      }
+
+      map(this.categoryConfiguration, obj => {
+        return assign(obj, find(data, { key: obj.key }));
+      });
+    }
+  }
 }
