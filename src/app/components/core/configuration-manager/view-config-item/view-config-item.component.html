@@ -32,7 +32,8 @@
                     <div class="field has-addons " *ngSwitchCase="'PASSWORD'">
                       <div class="control">
                         <input #pwd
-                          (click)="showConfirmPassword(); checkValidity(configItem.value, $event.target.value)"
+                          (click)="showConfirmPassword()"
+                          (input)="checkValidity(configItem.value, $event.target.value)"
                           name="{{configItem.value.key}}" class="input is-fullwidth is-small" type="password"
                           onPaste="return false" (focus)="pwd.value=''; passwordMatched=false"
                           [ngModel]="setConfigValue(configItem.value)" [value]='setConfigValue(configItem.value)'
