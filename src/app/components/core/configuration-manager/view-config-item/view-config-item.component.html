@@ -46,14 +46,14 @@
                         </a>
                       </div>
                     </div>
-                    <div class="field" *ngSwitchCase="'PASSWORD' && passwordOnChangeFired">
+                    <div class="field" *ngIf="getConfigAttributeType(configItem.value.type) === 'PASSWORD' && passwordOnChangeFired">
                       <div class="control">
                         <div id="confirm-password" class="field has-addons">
                           <div class="control">
                             <input #confirmPwd name="confirm-password" class="input is-fullwidth is-small"
                               onPaste="return false" type="password" [ngModel]="setConfigValue(confirmPwd.value)"
                               [value]='setConfigValue(confirmPwd.value)' [attr.maxLength]="configItem?.value?.length"
-                              placeholder="confirm password" (input)="checkValidity(configItem.value, $event.target.value)"
+                              placeholder="confirm password"
                               (ngModelChange)="checkPasswords(f?.controls[configItem.value.key]?.value, confirmPwd.value)" />
                           </div>
                         </div>

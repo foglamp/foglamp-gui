@@ -378,7 +378,7 @@ export class ViewConfigItemComponent implements OnChanges {
               try {
                 // tslint:disable-next-line: no-eval
                 const e = eval(data[k].validityExpression);
-                if (e !== true && e !== false) {
+                if (typeof(e) !== 'boolean') {
                   console.log('Validity expression', data[k].validityExpression, 'for', k, 'evlauted to non-boolean value ', e);
                 }
                 data[k].editable = e === false ? false : true;
