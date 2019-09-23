@@ -82,7 +82,7 @@
 
                     <div *ngIf="getConfigAttributeType(configItem.value.type) === 'SCRIPT'">
                       <ngx-codemirror name="{{configItem.value.key}}" [options]="setEditorConfig(configItem.value.type)" [autoFocus]="true" (ngModelChange)="getFileName(configItem?.value?.file)"
-                      [ngModel]="fileContent || setConfigValue(configItem.value)">
+                      [ngModel]="fileContent || setConfigValue(configItem.value)" [disabled]="!isFileUploaded">
                         {{configItem?.value?.value != undefined ? configItem?.value?.value : configItem?.value?.default}}
                       </ngx-codemirror>
                       <input class="input" #codeeditor (click)="getFileName(configItem?.value?.file)" type="hidden"/>
