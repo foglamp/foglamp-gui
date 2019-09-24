@@ -346,7 +346,7 @@ export class ViewConfigItemComponent implements OnChanges {
       const config = [];
       for (const k in data) {
         if (data.hasOwnProperty(k)) {
-          data[k].value = data[k].value !== '' ? data[k].value : data[k].default;
+          data[k].value = data[k].value !== undefined ? data[k].value : data[k].default;
           if (item !== '' && k === item.key) {
             data[k].value = value;
           }
