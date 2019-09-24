@@ -64,6 +64,7 @@ export class ViewConfigItemComponent implements OnChanges {
     this.filesToUpload = [];
     this.configItems = [];
     this.fileContent = '';
+    this.newFileName = '';
     if (!isEmpty(this.categoryConfigurationData)) {
       this.categoryConfiguration = cloneDeep(this.categoryConfigurationData.value[0]);
       this.categoryConfiguration = Object.keys(this.categoryConfiguration).map(key => {
@@ -252,6 +253,7 @@ export class ViewConfigItemComponent implements OnChanges {
       this.ngProgress.start();
       this.configService.uploadFile(this.categoryConfigurationData.key, configItem, formData)
         .subscribe((content: any) => {
+          this.newFileName = content.file.substr(content.file.lastIndexOf('/') + 1);
           this.filesToUpload = [];
           this.ngProgress.done();
           this.alertService.success('Configuration updated successfully.', true);
