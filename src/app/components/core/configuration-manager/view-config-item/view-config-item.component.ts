@@ -378,7 +378,7 @@ export class ViewConfigItemComponent implements OnChanges {
               try {
                 // tslint:disable-next-line: no-eval
                 const e = eval(data[k].validityExpression);
-                if (typeof(e) !== 'boolean') {
+                if (typeof (e) !== 'boolean') {
                   console.log('Validity expression', data[k].validityExpression, 'for', k, 'evlauted to non-boolean value ', e);
                 }
                 data[k].editable = e === false ? false : true;
@@ -392,6 +392,12 @@ export class ViewConfigItemComponent implements OnChanges {
 
       map(this.categoryConfiguration, obj => {
         return assign(obj, find(data, { key: obj.key }));
+      });
+
+      this.categoryConfiguration.map(obj => {
+        if (obj.key === 'password' && obj.editable === false) {
+          this.passwordMatched = true;
+        }
       });
     }
   }

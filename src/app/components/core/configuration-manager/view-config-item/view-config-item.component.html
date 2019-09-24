@@ -31,13 +31,12 @@
 
                     <div class="field has-addons " *ngSwitchCase="'PASSWORD'">
                       <div class="control">
-                        <input #pwd
-                          (click)="showConfirmPassword()"
-                          (input)="checkValidity(configItem.value, $event.target.value)"
-                          name="{{configItem.value.key}}" class="input is-fullwidth is-small" type="password"
-                          onPaste="return false" (focus)="pwd.value=''; passwordMatched=false"
-                          [ngModel]="setConfigValue(configItem.value)" [value]='setConfigValue(configItem.value)'
-                          [attr.maxLength]="configItem?.value?.length" placeholder="password"
+                        <input #pwd (click)="showConfirmPassword()"
+                          (input)="checkValidity(configItem.value, $event.target.value)" name="{{configItem.value.key}}"
+                          class="input is-fullwidth is-small" type="password" onPaste="return false"
+                          (focus)="pwd.value='';passwordMatched=false" [ngModel]="setConfigValue(configItem.value)"
+                          [value]='setConfigValue(configItem.value)' [attr.maxLength]="configItem?.value?.length"
+                          placeholder="password"
                           (ngModelChange)="checkPasswords(pwd.value, f?.controls['confirm-password']?.value)"
                           [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable" />
                       </div>
@@ -49,8 +48,7 @@
                         </a>
                       </div>
                     </div>
-                    <div class="field" *ngIf="getConfigAttributeType(configItem.value.type) === 'PASSWORD' && passwordOnChangeFired
-                    && configItem?.value?.editable">
+                    <div class="field" *ngIf="getConfigAttributeType(configItem.value.type) === 'PASSWORD' && passwordOnChangeFired">
                       <div class="control">
                         <div id="confirm-password" class="field has-addons">
                           <div class="control">
@@ -58,6 +56,7 @@
                               onPaste="return false" type="password" [ngModel]="setConfigValue(confirmPwd.value)"
                               [value]='setConfigValue(confirmPwd.value)' [attr.maxLength]="configItem?.value?.length"
                               placeholder="confirm password"
+                              [hidden]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable"
                               (ngModelChange)="checkPasswords(f?.controls[configItem.value.key]?.value, confirmPwd.value)" />
                           </div>
                         </div>
