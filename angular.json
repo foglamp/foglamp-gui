@@ -35,7 +35,11 @@
               "src/assets/css/bulma-steps.min.css",
               "src/styles.css"
             ],
-            "scripts": ["src/assets/js/jsonlint.js"]
+            "scripts": [
+              "./node_modules/codemirror/lib/codemirror.js",
+              "./node_modules/codemirror/addon/hint/javascript-hint.js",
+              "src/assets/js/jsonlint.js"
+            ]
           },
           "configurations": {
             "production": {

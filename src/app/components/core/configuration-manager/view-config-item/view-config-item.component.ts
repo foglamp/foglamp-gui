@@ -11,9 +11,6 @@ import ConfigTypeValidation from '../configuration-type-validation';
 
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/python/python';
-import 'codemirror/addon/fold/foldgutter';
-import 'codemirror/addon/fold/brace-fold';
-import 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/lint/lint';

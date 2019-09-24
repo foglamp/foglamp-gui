@@ -72,21 +72,25 @@
                       appNumberOnly />
 
                     <ng-container *ngIf="getConfigAttributeType(configItem.value.type) === 'LONG_TEXT'">
-                      <ngx-codemirror #jsoneditor name="{{configItem.value.key}}" [options]="setEditorConfig(configItem.value.type)" [autoFocus]="true" [ngModel]="setConfigValue(configItem.value)" (ngModelChange)="checkValidJson(jsoneditor.value)">
+                      <ngx-codemirror #jsoneditor name="{{configItem.value.key}}"
+                        [options]="setEditorConfig(configItem.value.type)" [autoFocus]="true"
+                        [ngModel]="setConfigValue(configItem.value)" (ngModelChange)="checkValidJson(jsoneditor.value)">
                         configItem?.value?.value != undefined ? configItem?.value?.value : configItem?.value?.default
                       </ngx-codemirror>
-                      <p *ngIf="!isValidJson" class="help is-danger" >
+                      <p *ngIf="!isValidJson" class="help is-danger">
                         Invalid JSON
                       </p>
                     </ng-container>
 
                     <div *ngIf="getConfigAttributeType(configItem.value.type) === 'SCRIPT'">
-                      <ngx-codemirror name="{{configItem.value.key}}" [options]="setEditorConfig(configItem.value.type)" [autoFocus]="true" (ngModelChange)="getFileName(configItem?.value?.file)"
-                      [ngModel]="fileContent || setConfigValue(configItem.value)" [disabled]="!isFileUploaded">
+                      <ngx-codemirror [ngClass]="{'readonly-editor': !isFileUploaded}" name="{{configItem.value.key}}"
+                        [options]="setEditorConfig(configItem.value.type)" [autoFocus]="true"
+                        (ngModelChange)="getFileName(configItem?.value?.file)"
+                        [ngModel]="fileContent || setConfigValue(configItem.value)" [disabled]="!isFileUploaded">
                         {{configItem?.value?.value != undefined ? configItem?.value?.value : configItem?.value?.default}}
                       </ngx-codemirror>
-                      <input class="input" #codeeditor (click)="getFileName(configItem?.value?.file)" type="hidden"/>
-                      <p class="help" >
+                      <input class="input" #codeeditor (click)="getFileName(configItem?.value?.file)" type="hidden" />
+                      <p class="help">
                         {{newFileName != '' ? newFileName : oldFileName}}
                       </p>
                     </div>
