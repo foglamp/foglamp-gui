@@ -99,7 +99,7 @@ export class ViewConfigItemComponent implements OnChanges {
           this.newFileName = '';
         }
       }
-      this.checkValidity();
+      this.checkValidityonPageLoad();
       this.cdRef.detectChanges();
     }
   }
@@ -342,22 +342,15 @@ export class ViewConfigItemComponent implements OnChanges {
     }
   }
 
-  checkValidity(item: any = '', value = '') {
+  checkValidityonPageLoad() {
     if (!isEmpty(this.categoryConfigurationData)) {
       const data = this.categoryConfigurationData.value[0];
       const config = [];
       for (const k in data) {
-        if (data.hasOwnProperty(k)) {
-          data[k].value = data[k].value !== undefined ? data[k].value : data[k].default;
-          if (item !== '' && k === item.key) {
-            data[k].value = value;
-          }
-          config.push(
-            {
-              key: k,
-              value: data[k].value
-            });
-        }
+        config.push({
+          key: k,
+          value: data[k].value !== undefined ? data[k].value : data[k].default
+        });
       }
 
       for (const k in data) {
@@ -402,5 +395,39 @@ export class ViewConfigItemComponent implements OnChanges {
         }
       });
     }
+  }
+
+  checkValidityOnChangeValue(key: string, configValue: string) {
+    this.categoryConfiguration.map(configItem => {
+      if (configItem.hasOwnProperty('validity')) {
+        if (configItem.validity.includes(key)) {
+          configItem.validityExpression = configItem.validity
+            .replace(new RegExp(key, 'g'), `'${configValue}'`);
+        }
+      }
+    });
+
+    this.categoryConfiguration.map(config => {
+      if (config.hasOwnProperty('validity')) {
+        if (config.validity.trim() !== '') {
+          try {
+            // tslint:disable-next-line: no-eval
+            const e = eval(config.validityExpression);
+            if (typeof (e) !== 'boolean') {
+              console.log('Validity expression', config.validityExpression, 'for', key, 'evlauted to non-boolean value ', e);
+            }
+            config.editable = e === false ? false : true;
+          } catch (e) {
+            config.editable = true;
+          }
+        }
+      }
+    });
+
+    this.categoryConfiguration.map(obj => {
+      if (obj.key === 'password' && obj.editable === false) {
+        this.passwordMatched = true;
+      }
+    });
   }
 }
