@@ -23,11 +23,12 @@
                     </label>
                   </ng-container>
                   <div class="field">
-                    <input *ngSwitchCase="'TEXT'" name="{{configItem.value.key}}" class="input is-fullwidth is-small"
+                    <textarea *ngSwitchCase="'TEXT'" name="{{configItem.value.key}}" class="input is-fullwidth is-small"
                       type="text" [ngModel]="setConfigValue(configItem.value)"
                       (input)="checkValidityOnChangeValue(configItem.value.key, $event.target.value)"
                       [value]='setConfigValue(configItem.value)' [attr.maxLength]="configItem?.value?.length"
-                      [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable" />
+                      [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable">
+                    </textarea>
 
                     <div class="field has-addons " *ngSwitchCase="'PASSWORD'">
                       <div class="control">
