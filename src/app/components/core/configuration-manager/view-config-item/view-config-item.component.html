@@ -18,7 +18,7 @@
                     <label class="checkbox">
                       <input type="checkbox" name='{{configItem.value.key}}' value="setConfigValue(configItem.value)"
                         [ngModel]="setConfigValue(configItem.value) == 'true'"
-                        (input)="checkValidity(configItem.value, $event.target.value)"
+                        (change)="checkValidity(configItem.value, $event.target.checked)"
                         [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable">
                     </label>
                   </ng-container>
