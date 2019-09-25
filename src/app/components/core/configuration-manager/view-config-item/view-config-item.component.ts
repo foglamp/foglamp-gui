@@ -43,6 +43,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
   public isFileUploaded = false;
   public isValidJson = true;
   public selectedTheme = 'default';
+  public isValidExtension = true;
   private subscription: Subscription;
 
   @ViewChild('codeeditor', { static: false }) codeeditor: ElementRef;
@@ -202,6 +203,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
 
   public fileChange(event, configItem) {
     this.isFileUploaded = true;
+    this.isValidExtension = true;
     const fileReader = new FileReader();
     const fi = event.target;
     if (fi.files && fi.files[0]) {
@@ -211,7 +213,10 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, AfterViewChec
         this.fileContent = fileReader.result.toString();
       };
       fileReader.readAsText(file);
-
+      const ext = file.name.substr(file.name.lastIndexOf('.') + 1);
+      if (ext !== 'py') {
+        this.isValidExtension = false;
+      }
       this.filesToUpload.push({ [configItem]: file });
     }
   }
