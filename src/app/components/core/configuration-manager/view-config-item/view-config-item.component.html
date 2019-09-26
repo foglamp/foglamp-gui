@@ -23,13 +23,18 @@
                     </label>
                   </ng-container>
                   <div class="field">
-                    <textarea *ngSwitchCase="'TEXT'" name="{{configItem.value.key}}" class="input is-fullwidth is-small"
+                    <input *ngSwitchCase="'TEXT'" name="{{configItem.value.key}}" class="input is-fullwidth is-small"
                       type="text" [ngModel]="setConfigValue(configItem.value)"
                       (input)="checkValidityOnChangeValue(configItem.value.key, $event.target.value)"
                       [value]='setConfigValue(configItem.value)' [attr.maxLength]="configItem?.value?.length"
-                      [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable">
-                    </textarea>
+                      [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable" />
 
+                      <textarea #textarea rows="3" *ngSwitchCase="'RAW_TEXT'" class="textarea is-fullwidth is-small"
+                      name="{{configItem.value.key}}" [ngModel]="setConfigValue(configItem.value)"
+                      [value]='setConfigValue(configItem.value)' [attr.maxLength]="configItem?.value?.length"
+                      [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable">
+                      {{configItem?.value?.value != undefined ? configItem?.value?.value : configItem?.value?.default}}
+                    </textarea>
                     <div class="field has-addons " *ngSwitchCase="'PASSWORD'">
                       <div class="control">
                         <input #pwd (click)="showConfirmPassword()"
