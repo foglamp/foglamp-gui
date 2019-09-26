@@ -29,7 +29,7 @@
                       [value]='setConfigValue(configItem.value)' [attr.maxLength]="configItem?.value?.length"
                       [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable" />
 
-                      <textarea #textarea rows="3" *ngSwitchCase="'RAW_TEXT'" class="textarea is-fullwidth is-small"
+                    <textarea #textarea rows="3" *ngSwitchCase="'RAW_TEXT'" class="textarea is-fullwidth is-small"
                       name="{{configItem.value.key}}" [ngModel]="setConfigValue(configItem.value)"
                       [value]='setConfigValue(configItem.value)' [attr.maxLength]="configItem?.value?.length"
                       [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable">
