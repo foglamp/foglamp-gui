@@ -18,14 +18,14 @@
                     <label class="checkbox">
                       <input type="checkbox" name='{{configItem.value.key}}' value="setConfigValue(configItem.value)"
                         [ngModel]="setConfigValue(configItem.value) == 'true'"
-                        (change)="checkValidityOnChangeValue(configItem.value.key, $event.target.checked)"
+                        (change)="checkValidityOnChange(configItem.value.key, $event.target.checked)"
                         [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable">
                     </label>
                   </ng-container>
                   <div class="field">
                     <input *ngSwitchCase="'TEXT'" name="{{configItem.value.key}}" class="input is-fullwidth is-small"
                       type="text" [ngModel]="setConfigValue(configItem.value)"
-                      (input)="checkValidityOnChangeValue(configItem.value.key, $event.target.value)"
+                      (input)="checkValidityOnChange(configItem.value.key, $event.target.value)"
                       [value]='setConfigValue(configItem.value)' [attr.maxLength]="configItem?.value?.length"
                       [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable" />
 
@@ -38,7 +38,7 @@
                     <div class="field has-addons " *ngSwitchCase="'PASSWORD'">
                       <div class="control">
                         <input #pwd (click)="showConfirmPassword()"
-                          (input)="checkValidityOnChangeValue(configItem.value.key, $event.target.value)" name="{{configItem.value.key}}"
+                          (input)="checkValidityOnChange(configItem.value.key, $event.target.value)" name="{{configItem.value.key}}"
                           class="input is-fullwidth is-small" type="password" onPaste="return false"
                           (focus)="pwd.value='';passwordMatched=false" [ngModel]="setConfigValue(configItem.value)"
                           [value]='setConfigValue(configItem.value)' [attr.maxLength]="configItem?.value?.length"
@@ -75,7 +75,7 @@
                       [value]='setConfigValue(configItem.value)' class="input is-fullwidth is-small"
                       [minValue]="configItem?.value?.minimum" [maxValue]="configItem?.value?.maximum"
                       [ngModel]="setConfigValue(configItem.value)"
-                      (input)="checkValidityOnChangeValue(configItem.value.key, $event.target.value)"
+                      (input)="checkValidityOnChange(configItem.value.key, $event.target.value)"
                       [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable"
                       appNumberOnly />
 
@@ -83,7 +83,7 @@
                       [value]='setConfigValue(configItem.value)' step="any" class="input is-fullwidth is-small"
                       [minValue]="configItem?.value?.minimum" [maxValue]="configItem?.value?.maximum"
                       [ngModel]="setConfigValue(configItem.value)"
-                      (input)="checkValidityOnChangeValue(configItem.value.key, $event.target.value)"
+                      (input)="checkValidityOnChange(configItem.value.key, $event.target.value)"
                       [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable"
                       appNumberOnly />
 
@@ -111,7 +111,7 @@
                     <div *ngSwitchCase="'ENUMERATION'" class="select is-small">
                       <select name='{{configItem.value.key}}' [ngModel]="setConfigValue(configItem.value)"
                         [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable"
-                        (change)="checkValidityOnChangeValue(configItem.value.key, $event.target.value)">
+                        (change)="checkValidityOnChange(configItem.value.key, $event.target.value)">
                         <option *ngFor="let configOption of configItem.value.options" [value]='configOption'>
                           {{configOption}}</option>
                       </select>
@@ -126,7 +126,7 @@
 
                     <input *ngSwitchCase="'URL'" name="{{configItem.value.key}}" class="input is-fullwidth is-small"
                       type="url" [ngModel]="setConfigValue(configItem.value)" [value]='setConfigValue(configItem.value)'
-                      (change)="checkValidityOnChangeValue(configItem.value.key, $event.target.value)"
+                      (change)="checkValidityOnChange(configItem.value.key, $event.target.value)"
                       [disabled]="configItem?.value?.hasOwnProperty('editable') && !configItem?.value?.editable" />
                   </div>
 

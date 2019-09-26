@@ -99,7 +99,7 @@ export class ViewConfigItemComponent implements OnChanges {
           this.newFileName = '';
         }
       }
-      this.checkValidityonPageLoad();
+      this.checkValidityOnPageLoad();
       this.cdRef.detectChanges();
     }
   }
@@ -342,7 +342,7 @@ export class ViewConfigItemComponent implements OnChanges {
     }
   }
 
-  checkValidityonPageLoad() {
+  checkValidityOnPageLoad() {
     if (!isEmpty(this.categoryConfigurationData)) {
       const data = this.categoryConfigurationData.value[0];
       const config = [];
@@ -397,7 +397,7 @@ export class ViewConfigItemComponent implements OnChanges {
     }
   }
 
-  checkValidityOnChangeValue(key: string, configValue: string) {
+  checkValidityOnChange(key: string, configValue: string) {
     this.categoryConfiguration.map(configItem => {
       if (configItem.hasOwnProperty('validity')) {
         if (configItem.validity.includes(key)) {
