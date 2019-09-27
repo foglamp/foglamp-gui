@@ -92,7 +92,6 @@
                       <ngx-codemirror #jsoneditor name="{{configItem.value.key}}"
                         [options]="setEditorConfig(configItem.value.type)" [autoFocus]="true"
                         [ngModel]="setConfigValue(configItem.value)" (ngModelChange)="checkValidJson(jsoneditor.value)">
-                        configItem?.value?.value != undefined ? configItem?.value?.value : configItem?.value?.default
                       </ngx-codemirror>
                       <p *ngIf="!isValidJson" class="help is-danger">
                         Invalid JSON

@@ -8,13 +8,6 @@ import { Subscription } from 'rxjs';
 import { AlertService, ConfigurationService, ProgressBarService, SharedService } from '../../../../services';
 import ConfigTypeValidation from '../configuration-type-validation';
 
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/mode/python/python';
-import 'codemirror/addon/edit/closebrackets';
-import 'codemirror/addon/edit/matchbrackets';
-import 'codemirror/addon/lint/lint';
-import 'codemirror/addon/lint/json-lint';
-
 @Component({
   selector: 'app-view-config-item',
   templateUrl: './view-config-item.component.html',
