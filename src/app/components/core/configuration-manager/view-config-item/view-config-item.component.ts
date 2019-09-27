@@ -73,6 +73,8 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
     this.configItems = [];
     this.fileContent = '';
     this.newFileName = '';
+    this.isValidJson = true;
+    this.isValidExtension = true;
     if (!isEmpty(this.categoryConfigurationData)) {
       this.categoryConfiguration = cloneDeep(this.categoryConfigurationData.value[0]);
       this.categoryConfiguration = Object.keys(this.categoryConfiguration).map(key => {
@@ -142,8 +144,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
       form.control.removeControl('confirm-password');
     }
 
-    if (!this.isValidJson) {
-      this.isValidJson = true;
+    if (!this.isValidJson || !this.isValidExtension) {
       return;
     }
 
