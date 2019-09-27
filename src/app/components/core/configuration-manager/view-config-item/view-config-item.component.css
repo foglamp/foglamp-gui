@@ -63,3 +63,7 @@
     color: #7a7a7a;
     cursor: not-allowed;
 }
+
+[hidden] {
+display: none !important;
+}
