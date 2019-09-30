@@ -13,6 +13,13 @@ import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/lint/lint';
 import 'codemirror/addon/lint/json-lint';
+import jsonlint from 'jsonlint-mod';
+
+declare global {
+  interface Window { jsonlint: any; }
+}
+
+window.jsonlint = jsonlint;
 
 if (environment.production) {
   enableProdMode();
