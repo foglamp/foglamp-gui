@@ -91,7 +91,7 @@
                     <ng-container *ngSwitchCase="'LONG_TEXT'">
                       <ngx-codemirror #jsoneditor name="{{configItem.value.key}}"
                         [options]="setEditorConfig(configItem.value.type)" [autoFocus]="true"
-                        [ngModel]="setConfigValue(configItem.value)" (ngModelChange)="checkValidJson(jsoneditor.value)">
+                        [ngModel]="JSON.parse(setConfigValue(configItem.value)) | json " (ngModelChange)="checkValidJson(jsoneditor.value)">
                       </ngx-codemirror>
                       <p *ngIf="!isValidJson" class="help is-danger">
                         Invalid JSON

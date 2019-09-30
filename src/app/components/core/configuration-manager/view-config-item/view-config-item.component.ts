@@ -46,12 +46,16 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
   public passwordOnChangeFired = false;
   public passwordMatched = true;
 
+  public JSON;
+
   constructor(private configService: ConfigurationService,
     private alertService: AlertService,
     public ngProgress: ProgressBarService,
     private cdRef: ChangeDetectorRef,
     private sharedService: SharedService
-  ) {}
+  ) {
+    this.JSON = JSON;
+  }
 
   ngOnInit() {
     this.subscription = this.sharedService.theme.subscribe(theme => {
