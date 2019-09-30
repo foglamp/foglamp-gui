@@ -57,13 +57,28 @@
 }
 
 :host ::ng-deep ngx-codemirror.readonly-editor .CodeMirror-wrap  {
-    background-color: #f5f5f5;
-    border-color: #f5f5f5;
-    box-shadow: none;
-    color: #7a7a7a;
-    cursor: not-allowed;
+  background-color: #f5f5f5;
+  border-color: #f5f5f5;
+  box-shadow: none;
+  color: #7a7a7a;
+  cursor: not-allowed;
+}
+
+:host ::ng-deep ngx-codemirror.dark-bg-color .CodeMirror-wrap  {
+  background-color: #2B2B2B !important;
+}
+
+:host ::ng-deep ngx-codemirror.readonly-editor .CodeMirror-cursors  {
+  visibility: hidden !important;
+}
+
+:host ::ng-deep ngx-codemirror.readonly-editor .CodeMirror-lines  {
+  border-color: #f5f5f5;
+  box-shadow: none;
+  color: #7a7a7a;
+  cursor: not-allowed;
 }
 
 [hidden] {
-display: none !important;
+  display: none !important;
 }
