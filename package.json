@@ -15,13 +15,6 @@
     "clean": "rm -rf dist && rm -rf node_modules && yarn cache clean",
     "purge": "git clean -fdx && yarn cache clean"
   },
-  "browser": {
-    "fs": false,
-    "path": false,
-    "os": false,
-    "file": false,
-    "system": false
-  },
   "private": true,
   "dependencies": {
     "@angular/animations": "~8.2.5",

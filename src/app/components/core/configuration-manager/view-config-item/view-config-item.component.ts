@@ -124,7 +124,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
       lint: true
     };
     if (type === 'JSON') {
-        editorOptions.mode = 'application/ld+json';
+        editorOptions.mode = 'application/json';
     }
     return editorOptions;
   }
