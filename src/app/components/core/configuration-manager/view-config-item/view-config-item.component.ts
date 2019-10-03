@@ -1,20 +1,20 @@
 import {
-  Component, EventEmitter, Input, OnChanges, OnInit,
-  Output, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy} from '@angular/core';
+  Component, EventEmitter, Input, OnChanges,
+  Output, ViewChild, ElementRef, ChangeDetectorRef
+} from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { differenceWith, sortBy, isEqual, isEmpty, cloneDeep, has, map, assign, find } from 'lodash';
-import { Subscription } from 'rxjs';
 
-import { AlertService, ConfigurationService, ProgressBarService, SharedService } from '../../../../services';
+import { AlertService, ConfigurationService, ProgressBarService } from '../../../../services';
 import ConfigTypeValidation from '../configuration-type-validation';
+import { JsonEditorComponent, JsonEditorOptions } from '../../../common/json-editor/json-editor.component';
 
 @Component({
   selector: 'app-view-config-item',
   templateUrl: './view-config-item.component.html',
   styleUrls: ['./view-config-item.component.css']
 })
-
-export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
+export class ViewConfigItemComponent implements OnChanges {
   @Input() categoryConfigurationData: any;
   @Input() useProxy = 'false';
   @Input() useFilterProxy = 'false';
@@ -34,44 +34,37 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
   public oldFileName = '';
   public newFileName = '';
   public isFileUploaded = false;
-  public isValidJson = true;
-  public selectedTheme = 'default';
-  public isValidExtension = true;
-  private subscription: Subscription;
 
-  @ViewChild('codeeditor', { static: false }) codeeditor: ElementRef;
+  @ViewChild('textarea', { static: false }) textarea: ElementRef;
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
-  @ViewChild('jsoneditor', { static: false }) jsoneditor: ElementRef;
+
+  @ViewChild(JsonEditorComponent, { static: false }) editor: JsonEditorComponent;
+  public editorOptions: JsonEditorOptions;
 
   public passwordOnChangeFired = false;
   public passwordMatched = true;
 
-  public JSON;
-
   constructor(private configService: ConfigurationService,
     private alertService: AlertService,
     public ngProgress: ProgressBarService,
-    private cdRef: ChangeDetectorRef,
-    private sharedService: SharedService
+    private cdRef: ChangeDetectorRef
   ) {
-    this.JSON = JSON;
+    this.editorOptions = new JsonEditorOptions();
+    this.editorOptions.mode = 'code';
+    // this.options.modes = ['code', 'text', 'tree', 'view'];
+    this.editorOptions.mainMenuBar = false;
+    this.editorOptions.onChange = () => {
+      try {
+        this.editor.isValidJson();
+      } catch { }
+    };
   }
-
-  ngOnInit() {
-    this.subscription = this.sharedService.theme.subscribe(theme => {
-      if (theme === 'dark') {
-        this.selectedTheme = 'darcula';
-      }
-    });
-   }
 
   ngOnChanges() {
     this.filesToUpload = [];
     this.configItems = [];
     this.fileContent = '';
     this.newFileName = '';
-    this.isValidJson = true;
-    this.isValidExtension = true;
     if (!isEmpty(this.categoryConfigurationData)) {
       this.categoryConfiguration = cloneDeep(this.categoryConfigurationData.value[0]);
       this.categoryConfiguration = Object.keys(this.categoryConfiguration).map(key => {
@@ -111,24 +104,6 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  public setEditorConfig(type: string) {
-    const editorOptions = {
-      theme: this.selectedTheme,
-      mode: 'text/x-python',
-      lineNumbers: true,
-      lineWrapping: true,
-      foldGutter: true,
-      gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
-      autoCloseBrackets: true,
-      matchBrackets: true,
-      lint: true
-    };
-    if (type === 'JSON') {
-        editorOptions.mode = 'application/json';
-    }
-    return editorOptions;
-  }
-
   public saveConfiguration(form: NgForm) {
     this.isValidForm = true;
     if (!form.valid || !this.passwordMatched) {
@@ -141,10 +116,6 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
       form.control.removeControl('confirm-password');
     }
 
-    if (!this.isValidJson || !this.isValidExtension) {
-      return;
-    }
-
     const formData = Object.keys(form.value).map(key => {
       return {
         key: key,
@@ -152,9 +123,10 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
         type: this.configItems.find(conf => key === conf.key).type
       };
     });
+
     const changedConfigValues = this.configItems.length > 0 ? differenceWith(formData, this.configItems, (newConfig, oldConfig) => {
       if (newConfig.type === 'JSON' && oldConfig.type === 'JSON') {
-          return isEqual(JSON.parse(newConfig.value), JSON.parse(oldConfig.value));
+        return isEqual(JSON.parse(newConfig.value), JSON.parse(oldConfig.value));
       }
       return isEqual(newConfig, oldConfig);
     }) : [];
@@ -180,24 +152,10 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  public checkValidJson(configValue) {
-    try {
-      JSON.parse(configValue);
-      this.isValidJson = true;
-      return true;
-    } catch (e) {
-      this.isValidJson = false;
-      return false;
-    }
-  }
-
   public fileChange(event, configItem) {
+    this.isFileUploaded = true;
     const fileReader = new FileReader();
     const fi = event.target;
-    if (fi.files.length !== 0) {
-      this.isFileUploaded = true;
-      this.isValidExtension = true;
-    }
     if (fi.files && fi.files[0]) {
       const file = fi.files[0];
       this.newFileName = file.name;
@@ -205,13 +163,8 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
         this.fileContent = fileReader.result.toString();
       };
       fileReader.readAsText(file);
-      const ext = file.name.substr(file.name.lastIndexOf('.') + 1);
-      if (ext !== 'py') {
-        this.isValidExtension = false;
-        this.isFileUploaded = false;
-      } else {
-        this.filesToUpload.push({ [configItem]: file });
-      }
+
+      this.filesToUpload.push({ [configItem]: file });
     }
   }
 
@@ -272,8 +225,8 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
    * @param configVal Config value to pass in ngModel
    */
   public setConfigValue(configVal) {
-    if (this.codeeditor !== undefined) {
-      this.codeeditor.nativeElement.click();
+    if (this.textarea !== undefined) {
+      this.textarea.nativeElement.click();
     }
     if (configVal.value !== undefined) {
       return configVal.value;
@@ -387,10 +340,6 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
     if (password !== confirmPassword) {
       this.passwordMatched = false;
     }
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
   }
 
   checkValidityOnPageLoad() {
