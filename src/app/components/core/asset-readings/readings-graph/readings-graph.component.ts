@@ -7,6 +7,7 @@ import { Chart } from 'chart.js';
 import { AlertService, AssetsService, PingService } from '../../../../services';
 import { ASSET_READINGS_TIME_FILTER, COLOR_CODES, MAX_INT_SIZE, POLLING_INTERVAL } from '../../../../utils';
 import { KeyValue } from '@angular/common';
+import { DateFormatterPipe } from '../../../../pipes';
 
 @Component({
   selector: 'app-readings-graph',
@@ -204,6 +205,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     const numReadings = [];
     const strReadings = [];
     const arrReadings = [];
+    const datePipe = new DateFormatterPipe();
     this.timestamps = readings.map((r: any) => r.timestamp);
 
     for (const r of readings) {
@@ -217,7 +219,7 @@ export class ReadingsGraphComponent implements OnDestroy {
         if (typeof value === 'string') {
           strReadings.push({
             key: k,
-            timestamp: r.timestamp,
+            timestamp: datePipe.transform(r.timestamp, 'HH:mm:ss:SSS'),
             data: value
           });
         }
@@ -373,6 +375,7 @@ export class ReadingsGraphComponent implements OnDestroy {
           distribution: 'linear',
           time: {
             unit: 'second',
+            tooltipFormat: 'HH:mm:ss:SSS',
             displayFormats: {
               unit: 'second',
               second: 'HH:mm:ss'
