@@ -4,6 +4,8 @@ import { interval } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
 
 import { Chart } from 'chart.js';
+import 'chartjs-plugin-zoom';
+
 import { AlertService, AssetsService, PingService } from '../../../../services';
 import { ASSET_READINGS_TIME_FILTER, COLOR_CODES, MAX_INT_SIZE, POLLING_INTERVAL } from '../../../../utils';
 import { KeyValue } from '@angular/common';
@@ -39,6 +41,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   public polyGraphData: any;
   public timeDropDownOpened = false;
   public isModalOpened = false;
+  public showResetButton = false;
 
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('assetChart', { static: false }) assetChart: Chart;
@@ -412,6 +415,27 @@ export class ReadingsGraphComponent implements OnDestroy {
           sessionStorage.setItem(this.assetCode, JSON.stringify(savedLegendState));
           chart.update();
         }
+      },
+      pan: {
+        enabled: true,
+        mode: '',
+        speed: 10,
+        threshold: 10,
+        onPan: () => { this.isAlive = false; }
+      },
+      zoom: {
+        enabled: true,
+        mode: 'x',
+        sensitivity: 0.3,
+        drag: {
+          enabled: true,
+          borderWidth: 1,
+          backgroundColor: 'rgb(130, 202, 250, 0.4)',
+        },
+        onZoomComplete: () => {
+          this.isAlive = false;
+          this.showResetButton = true;
+        }
       }
     };
   }
@@ -509,6 +533,12 @@ export class ReadingsGraphComponent implements OnDestroy {
 
   keyDescOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
     return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
+  }
+
+  public resetZoom() {
+    this.isAlive = true;
+    this.showResetButton = false;
+    this.assetChart.chart.resetZoom();
   }
 
   public ngOnDestroy(): void {

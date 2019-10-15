@@ -90,6 +90,7 @@
               </ng-container>
               <ng-template #DataDiv>
                 <div *ngIf="selectedTab === 1 && numberTypeReadingsList?.length > 0" class="is-active" data-content="1">
+                    <button *ngIf="showResetButton" class="button is-text is-small" (click)="resetZoom()">Reset Zoom</button>
                   <app-chart *ngIf="!showGraphSpinner" class="chart-container animated fadeIn" [type]="assetChartType"
                     [data]="assetReadingValues" [options]="assetChartOptions" #assetChart></app-chart>
                 </div>

@@ -1929,6 +1929,13 @@ chartjs-color@^2.1.0:
     chartjs-color-string "^0.6.0"
     color-convert "^0.5.3"
 
+chartjs-plugin-zoom@^0.7.4:
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/chartjs-plugin-zoom/-/chartjs-plugin-zoom-0.7.4.tgz#8d85e13fbbc8113f1f38dd5d339142576a376feb"
+  integrity sha512-G60Xe9HmIEbYAH1Q3D5MrodLZZbd9nyc+a3vZVTHKFNNHozfh9UJZBH2RGVPDNk6xI+E4SffrgN5XE1MfyqimQ==
+  dependencies:
+    hammerjs "^2.0.8"
+
 "chokidar@>=2.0.0 <4.0.0", chokidar@^3.0.0:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.0.2.tgz#0d1cd6d04eb2df0327446188cd13736a3367d681"
@@ -4641,6 +4648,11 @@ grid-index@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/grid-index/-/grid-index-1.1.0.tgz#97f8221edec1026c8377b86446a7c71e79522ea7"
   integrity sha512-HZRwumpOGUrHyxO5bqKZL0B0GlUpwtCAzZ42sgxUPniu33R1LSFH5yrIcBCHjkctCAh3mtWKcKd9J4vDDdeVHA==
+
+hammerjs@^2.0.8:
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/hammerjs/-/hammerjs-2.0.8.tgz#04ef77862cff2bb79d30f7692095930222bf60f1"
+  integrity sha1-BO93hiz/K7edMPdpIJWTAiK/YPE=
 
 handle-thing@^2.0.0:
   version "2.0.0"
