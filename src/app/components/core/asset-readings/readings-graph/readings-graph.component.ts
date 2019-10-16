@@ -418,25 +418,19 @@ export class ReadingsGraphComponent implements OnDestroy {
       },
       pan: {
         enabled: true,
-        mode: '',
-        speed: 10,
-        threshold: 10,
-        onPan: () => { this.isAlive = false; }
+        mode: 'x',
+        speed: 10
       },
       zoom: {
         enabled: true,
         mode: 'x',
         sensitivity: 0.3,
-        drag: {
-          enabled: true,
-          borderWidth: 1,
-          backgroundColor: 'rgb(130, 202, 250, 0.4)',
-        },
         onZoomComplete: () => {
           this.isAlive = false;
           this.showResetButton = true;
         }
-      }
+      },
+      responsive: true
     };
   }
 

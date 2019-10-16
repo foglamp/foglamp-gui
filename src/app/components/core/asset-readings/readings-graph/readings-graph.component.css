@@ -16,13 +16,16 @@
   .modal-card {
     width: 81%;
   }
+  :host ::ng-deep canvas[style] {
+    height: 400px !important;
+  }
 }
 
 @media screen and (max-width: 769px) {
   .chart-container {
-      position: relative;
-      width: 736px;
-      height: 397px;
+    position: relative;
+    width: 736px;
+    height: 397px;
   }
   .summary {
     width: 736px;
@@ -31,12 +34,12 @@
 
 .summary,
 .summary .table {
-  background-color: #F8F9F9;
+  background-color: #f8f9f9;
   border-radius: 5px;
 }
 
 .is-info {
-  background-color: #85C1E9 !important;
+  background-color: #85c1e9 !important;
 }
 
 table.is-borderless tr a {
