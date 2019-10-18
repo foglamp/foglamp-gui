@@ -16,8 +16,8 @@
   .modal-card {
     width: 81%;
   }
-  :host ::ng-deep canvas[style] {
-    height: 400px !important;
+   :host ::ng-deep canvas[style] {
+    height: 500px !important;
   }
 }
 

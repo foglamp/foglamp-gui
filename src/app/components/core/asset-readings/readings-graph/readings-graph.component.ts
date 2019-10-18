@@ -5,6 +5,7 @@ import { takeWhile } from 'rxjs/operators';
 
 import { Chart } from 'chart.js';
 import 'chartjs-plugin-zoom';
+import * as moment from 'moment';
 
 import { AlertService, AssetsService, PingService } from '../../../../services';
 import { ASSET_READINGS_TIME_FILTER, COLOR_CODES, MAX_INT_SIZE, POLLING_INTERVAL } from '../../../../utils';
@@ -194,111 +195,30 @@ export class ReadingsGraphComponent implements OnDestroy {
       this.isInvalidLimit = true;
       return;
     }
-
     this.limit = limit;
-    this.assetService.getAssetReadings(encodeURIComponent(assetCode), +limit, 0, time).
-      subscribe(
-        (data: any[]) => {
-          this.loadPage = false;
-          this.getReadings(data);
-        },
-        error => {
-          console.log('error in response', error);
-        });
+    this.getAssetReadings();
   }
 
-  getReadings(readings: any) {
+  getBucketReadings(readings: any) {
     const numReadings = [];
-    const strReadings = [];
-    const arrReadings = [];
     this.timestamps = readings.map((r: any) => r.timestamp);
-
     for (const r of readings) {
-      Object.entries(r.reading).forEach(([k, value]) => {
-        if (typeof value === 'number') {
-          numReadings.push({
-            key: k,
-            read: { x: r.timestamp, y: value }
-          });
-        }
-        if (typeof value === 'string') {
-          strReadings.push({
-            key: k,
-            timestamp: r.timestamp,
-            data: value
-          });
-        }
-        if (Array.isArray(value)) {
-          arrReadings.push({
-            key: k,
-            read: value
-          });
-        }
+      numReadings.push({
+        k: this.assetCode,
+        read: { x: r.timestamp, y: r.average }
       });
     }
     this.numberTypeReadingsList = numReadings.length > 0 ? this.mergeObjects(numReadings) : [];
-    this.stringTypeReadingsList = strReadings;
-    this.arrayTypeReadingsList = arrReadings.length > 0 ? this.mergeObjects(arrReadings) : [];
-    this.stringTypeReadingsList = mapValues(groupBy(this.stringTypeReadingsList,
-      (reading) => reading.timestamp), rlist => rlist.map(read => omit(read, 'timestamp')));
     this.setTabData();
   }
 
-
   setTabData() {
-    if (this.isModalOpened) {
-      if (this.numberTypeReadingsList.length > 0) {
-        this.selectedTab = 1;
-      } else if (this.arrayTypeReadingsList.length > 0) {
-        this.selectedTab = 2;
-      } else if (!this.isEmptyObject(this.stringTypeReadingsList)) {
-        this.selectedTab = 3;
-      }
-      this.isModalOpened = false;
-    }
-
-    if (this.selectedTab === 1 && this.numberTypeReadingsList.length === 0) {
-      if (this.arrayTypeReadingsList.length > 0) {
-        this.selectedTab = 2;
-      } else if (!this.isEmptyObject(this.stringTypeReadingsList)) {
-        this.selectedTab = 3;
-      }
-    }
-
-    if (this.selectedTab === 2 && this.arrayTypeReadingsList.length === 0) {
-      if (this.numberTypeReadingsList.length > 0) {
-        this.selectedTab = 1;
-      } else if (!this.isEmptyObject(this.stringTypeReadingsList)) {
-        this.selectedTab = 3;
-      }
-    }
-
-    if (this.selectedTab === 3 && this.isEmptyObject(this.stringTypeReadingsList)) {
-      if (this.numberTypeReadingsList.length > 0) {
-        this.selectedTab = 1;
-      } else if (this.arrayTypeReadingsList.length > 0) {
-        this.selectedTab = 2;
-      }
-    }
-
-    if (this.selectedTab === 4 && this.numberTypeReadingsList.length === 0) {
-      if (this.arrayTypeReadingsList.length > 0) {
-        this.selectedTab = 2;
-      } else if (!this.isEmptyObject(this.stringTypeReadingsList)) {
-        this.selectedTab = 3;
-      }
-    }
-
-    if (this.selectedTab === 1 && this.numberTypeReadingsList.length > 0) {
-      this.statsAssetReadingsGraph(this.numberTypeReadingsList, this.timestamps);
-    } else if (this.selectedTab === 2 && this.arrayTypeReadingsList.length > 0) {
-      this.create3DGraph(this.arrayTypeReadingsList, this.timestamps);
-    }
-    this.showSpinner = false;
+    this.selectedTab = 1;
+    this.statsAssetReadingsGraph(this.numberTypeReadingsList, this.timestamps);
   }
 
   mergeObjects(assetReadings: any) {
-    return chain(assetReadings).groupBy('key').map(function (group, key) {
+    return chain(assetReadings).groupBy('k').map(function (group, key) {
       return {
         key: key,
         read: map(group, 'read')
@@ -418,20 +338,59 @@ export class ReadingsGraphComponent implements OnDestroy {
       },
       pan: {
         enabled: true,
-        mode: 'x',
-        speed: 10
+        mode: '',
+        speed: 10,
+        onPan: () => { this.isAlive = false; },
       },
       zoom: {
         enabled: true,
         mode: 'x',
         sensitivity: 0.3,
-        onZoomComplete: () => {
+        onZoomComplete: ({ chart }) => {
           this.isAlive = false;
           this.showResetButton = true;
+          const start = moment(chart.scales['x-axis-0'].min);
+          console.log('start', start.seconds());
+          const end = moment(chart.scales['x-axis-0'].max);
+          console.log('end', end.seconds());
+          const duration = moment.duration(end.diff(start));
+          const seconds = duration.asSeconds();
+          const bucketSize = this.caluclateBucketSize(seconds);
+          console.log('round seonds', Math.round(seconds));
+          const payload = {
+            assetCode: encodeURIComponent(this.assetCode),
+            start: start.seconds(),
+            length: Math.round(seconds),
+            bucketSize: bucketSize
+          };
+          console.log(payload);
+          this.assetService.getAssetReadingsBucket(payload).
+            subscribe(
+              (data: any[]) => {
+                this.getBucketReadings(data);
+              },
+              error => {
+                console.log('error in response', error);
+              });
         }
       },
       responsive: true
     };
+
+    // TODO : Apply drag functionality
+
+    // drag: {
+    //   enabled: true,
+    //   borderWidth: 1,
+    //   backgroundColor: 'rgb(130, 202, 250, 0.4)',
+    // },
+
+    // this.assetChartOptions.zoom['drag'] = {};
+    // this.assetChartOptions.zoom['drag']['enable'] = true;
+    // this.assetChartOptions.zoom['drag']['borderWidth'] = 1;
+    // this.assetChartOptions.zoom['drag']['backgroundColor'] = 'rgb(130, 202, 250, 0.4)';
+    // console.log(this.assetChartOptions);
+
   }
 
   public toggleDropdown() {
@@ -533,9 +492,33 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.isAlive = true;
     this.showResetButton = false;
     this.assetChart.chart.resetZoom();
+    this.getAssetReadings();
   }
 
   public ngOnDestroy(): void {
     this.isAlive = false;
+  }
+
+  getAssetReadings() {
+    const payload = {
+      assetCode: encodeURIComponent(this.assetCode),
+      start: 0,
+      length: 60,
+      bucketSize: 1
+    };
+    this.assetService.getAssetReadingsBucket(payload).
+      subscribe(
+        (data: any[]) => {
+          this.loadPage = false;
+          this.getBucketReadings(data);
+        },
+        error => {
+          console.log('error in response', error);
+        });
+  }
+
+  public caluclateBucketSize(duration) {
+    let bucket = Math.round(duration / 10);
+    return bucket = bucket === 0 ? 1 : (bucket > 48 ? 48 : bucket);
   }
 }
