@@ -115,32 +115,35 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   public getAssetCode(assetCode: string) {
+    this.assetCode = assetCode;
+    const payload = {
+      assetCode: encodeURIComponent(this.assetCode),
+      start: 0,
+      length: 60,
+      bucketSize: 1
+    };
     this.isModalOpened = true;
     this.selectedTab = 1;
     this.loadPage = true;
     this.notify.emit(false);
     if (this.graphRefreshInterval === -1) {
       this.isAlive = false;
+      this.getAssetReadings(payload);
     } else {
       this.isAlive = true;
+      interval(this.graphRefreshInterval)
+        .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
+        .subscribe(() => {
+          console.log('sub');
+
+          this.autoRefresh = true;
+          if (this.selectedTab === 4) {
+            this.showAssetReadingsSummary(this.assetCode, this.optedTime);
+          } else {
+            this.getAssetReadings(payload);
+          }
+        });
     }
-    this.assetCode = assetCode;
-    interval(this.graphRefreshInterval)
-      .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
-      .subscribe(() => {
-        this.autoRefresh = true;
-        if (this.selectedTab === 4) {
-          this.showAssetReadingsSummary(this.assetCode, this.optedTime);
-        } else {
-          const payload = {
-            assetCode: encodeURIComponent(this.assetCode),
-            start: 0,
-            length: 60,
-            bucketSize: 1
-          };
-          this.getAssetReadings(payload);
-        }
-      });
   }
 
   public showAssetReadingsSummary(assetCode, time = 0) {
