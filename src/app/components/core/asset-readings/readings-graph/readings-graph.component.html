@@ -19,7 +19,7 @@
       </ng-container>
       <ng-template #tabs>
         <div class="columns">
-          <div class="column is-2">
+          <div *ngIf="selectedTab == 4" class="column is-2">
             <div id="time-dropdown" class="dropdown is-left">
               <div class="dropdown-trigger">
                 <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu"
@@ -79,9 +79,25 @@
               </ng-container>
               <ng-template #DataDiv>
                 <div *ngIf="selectedTab === 1 && numberTypeReadingsList?.length > 0" class="is-active" data-content="1">
-                    <button *ngIf="showResetButton" class="button is-text is-small" (click)="resetZoom()">Reset Zoom</button>
-                  <app-chart *ngIf="!showGraphSpinner" class="chart-container animated fadeIn" [type]="assetChartType"
-                    [data]="assetReadingValues" [options]="assetChartOptions" #assetChart></app-chart>
+                  <div class="columns">
+                    <div class="column">
+                      <button *ngIf="showResetZoomButton" class="button is-text is-small" (click)="resetZoom()">Reset
+                        Zoom</button>
+                    </div>
+                    <div class="column ">
+                      <label class="checkbox is-pulled-right">
+                        <input type="checkbox"  (change)="setPaning($event)">
+                        Paning
+                      </label>
+                    </div>
+                  </div>
+                  <div class="columns">
+                    <div class="column">
+                      <app-chart *ngIf="!showGraphSpinner" class="chart-container animated fadeIn"
+                        [type]="assetChartType" [data]="assetReadingValues" [options]="assetChartOptions" #assetChart>
+                      </app-chart>
+                    </div>
+                  </div>
                 </div>
                 <div *ngIf="selectedTab === 4 && assetReadingSummary?.length > 0 && showSummaryTab() " data-content="4">
                   <div [ngClass]="{'summary': buttonText !== ''}" class="animated fadeIn" *ngIf="!showSummarySpinner">

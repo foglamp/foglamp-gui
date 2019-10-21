@@ -1,5 +1,5 @@
-import { Component, EventEmitter, OnDestroy, HostListener, Output, ViewChild, ElementRef } from '@angular/core';
-import { orderBy, chain, map, groupBy, mapValues, omit } from 'lodash';
+import { Component, EventEmitter, OnDestroy, HostListener, Output, ViewChild } from '@angular/core';
+import { orderBy, chain, map } from 'lodash';
 import { interval } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
 
@@ -10,9 +10,6 @@ import * as moment from 'moment';
 import { AlertService, AssetsService, PingService } from '../../../../services';
 import { ASSET_READINGS_TIME_FILTER, COLOR_CODES, MAX_INT_SIZE, POLLING_INTERVAL } from '../../../../utils';
 import { KeyValue } from '@angular/common';
-import { DateFormatterPipe } from '../../../../pipes';
-
-declare var Plotly: any;
 
 @Component({
   selector: 'app-readings-graph',
@@ -26,12 +23,8 @@ export class ReadingsGraphComponent implements OnDestroy {
   public assetChartOptions: any;
   public loadPage = true;
   public assetReadingSummary = [];
-  public isInvalidLimit = false;
   public MAX_RANGE = MAX_INT_SIZE;
   public graphRefreshInterval = POLLING_INTERVAL;
-
-  public limit: number;
-  public DEFAULT_LIMIT = 100;
   public optedTime = ASSET_READINGS_TIME_FILTER;
   public readKeyColorLabel = [];
   private isAlive: boolean;
@@ -39,18 +32,15 @@ export class ReadingsGraphComponent implements OnDestroy {
   public buttonText = '';
   public autoRefresh = false;
   public showSpinner = false;
-  public polyGraphData: any;
   public timeDropDownOpened = false;
   public isModalOpened = false;
-  public showResetButton = false;
+  public showResetZoomButton = false;
+  public paning = false;
 
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('assetChart', { static: false }) assetChart: Chart;
-  @ViewChild('3DGraph', { static: false }) Graph: ElementRef;
 
   public numberTypeReadingsList = [];
-  public stringTypeReadingsList: any;
-  public arrayTypeReadingsList = [];
   public selectedTab = 1;
   public timestamps = [];
 
@@ -96,6 +86,8 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.readKeyColorLabel = [];
     this.assetChartOptions = {};
     sessionStorage.removeItem(this.assetCode);
+    this.showResetZoomButton = false;
+    this.paning = false;
 
     const chart_modal = <HTMLDivElement>document.getElementById('chart_modal');
     if (shouldOpen) {
@@ -116,10 +108,9 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.optedTime = ASSET_READINGS_TIME_FILTER;
   }
 
-  getTimeBasedAssetReadingsAndSummary(time) {
+  getTimeBasedAssetReadingsAndSummary(time: number) {
     this.optedTime = time;
-    this.showAssetReadingsSummary(this.assetCode, this.limit, this.optedTime);
-    this.plotReadingsGraph(this.assetCode, this.limit, this.optedTime);
+    this.showAssetReadingsSummary(this.assetCode, time);
     this.toggleDropdown();
   }
 
@@ -134,25 +125,26 @@ export class ReadingsGraphComponent implements OnDestroy {
       this.isAlive = true;
     }
     this.assetCode = assetCode;
-    if (this.optedTime !== 0) {
-      this.limit = 0;
-      this.autoRefresh = false;
-      this.plotReadingsGraph(assetCode, this.limit, this.optedTime);
-    }
     interval(this.graphRefreshInterval)
       .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
       .subscribe(() => {
         this.autoRefresh = true;
         if (this.selectedTab === 4) {
-          this.showAssetReadingsSummary(this.assetCode, this.limit, this.optedTime);
+          this.showAssetReadingsSummary(this.assetCode, this.optedTime);
         } else {
-          this.plotReadingsGraph(this.assetCode, this.limit, this.optedTime);
+          const payload = {
+            assetCode: encodeURIComponent(this.assetCode),
+            start: 0,
+            length: 60,
+            bucketSize: 1
+          };
+          this.getAssetReadings(payload);
         }
       });
   }
 
-  public showAssetReadingsSummary(assetCode, limit: number = 0, time: number = 0) {
-    this.assetService.getAllAssetSummary(assetCode, limit, time).subscribe(
+  public showAssetReadingsSummary(assetCode, time = 0) {
+    this.assetService.getAllAssetSummary(assetCode, time).subscribe(
       (data: any) => {
         this.showSpinner = false;
         this.assetReadingSummary = data
@@ -182,21 +174,6 @@ export class ReadingsGraphComponent implements OnDestroy {
           this.alertService.error(error.statusText);
         }
       });
-  }
-
-  public plotReadingsGraph(assetCode, limit = null, time = null) {
-    if (assetCode === '') {
-      return false;
-    }
-    this.isInvalidLimit = false;
-    if (limit === undefined || limit === null || limit === '' || limit === 0) {
-      limit = 0;
-    } else if (!Number.isInteger(+limit) || +limit < 0 || +limit > this.MAX_RANGE) { // max limit of int in c++
-      this.isInvalidLimit = true;
-      return;
-    }
-    this.limit = limit;
-    this.getAssetReadings();
   }
 
   getBucketReadings(readings: any) {
@@ -285,6 +262,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   private setAssetReadingValues(ds: any, timestamps) {
+    this.assetChartOptions = {};
     this.assetReadingValues = {
       labels: timestamps,
       datasets: ds
@@ -348,7 +326,7 @@ export class ReadingsGraphComponent implements OnDestroy {
         sensitivity: 0.3,
         onZoomComplete: ({ chart }) => {
           this.isAlive = false;
-          this.showResetButton = true;
+          this.showResetZoomButton = true;
           const start = moment(chart.scales['x-axis-0'].min);
           console.log('start', start.seconds());
           const end = moment(chart.scales['x-axis-0'].max);
@@ -356,41 +334,24 @@ export class ReadingsGraphComponent implements OnDestroy {
           const duration = moment.duration(end.diff(start));
           const seconds = duration.asSeconds();
           const bucketSize = this.caluclateBucketSize(seconds);
-          console.log('round seonds', Math.round(seconds));
           const payload = {
             assetCode: encodeURIComponent(this.assetCode),
             start: start.seconds(),
             length: Math.round(seconds),
             bucketSize: bucketSize
           };
-          console.log(payload);
-          this.assetService.getAssetReadingsBucket(payload).
-            subscribe(
-              (data: any[]) => {
-                this.getBucketReadings(data);
-              },
-              error => {
-                console.log('error in response', error);
-              });
+          this.getAssetReadings(payload);
         }
       },
       responsive: true
     };
 
-    // TODO : Apply drag functionality
-
-    // drag: {
-    //   enabled: true,
-    //   borderWidth: 1,
-    //   backgroundColor: 'rgb(130, 202, 250, 0.4)',
-    // },
-
-    // this.assetChartOptions.zoom['drag'] = {};
-    // this.assetChartOptions.zoom['drag']['enable'] = true;
-    // this.assetChartOptions.zoom['drag']['borderWidth'] = 1;
-    // this.assetChartOptions.zoom['drag']['backgroundColor'] = 'rgb(130, 202, 250, 0.4)';
-    // console.log(this.assetChartOptions);
-
+    if (this.paning) {
+      this.assetChartOptions.zoom['drag'] = {};
+      this.assetChartOptions.zoom['drag']['enable'] = true;
+      this.assetChartOptions.zoom['drag']['borderWidth'] = 1;
+      this.assetChartOptions.zoom['drag']['backgroundColor'] = 'rgb(130, 202, 250, 0.4)';
+    }
   }
 
   public toggleDropdown() {
@@ -403,65 +364,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     }
   }
 
-  create3DGraph(readings: any, ts: any) {
-    const datePipe = new DateFormatterPipe();
-    const timestamps = ts.map((t: any) => datePipe.transform(t, 'HH:mm:ss:SSS'));
-    this.polyGraphData = {
-      data: [
-        {
-          type: 'surface',
-          y: timestamps,
-          z: readings.map(r => r.read)[0],
-          showscale: false,
-          colorscale: [
-            ['0', 'rgba(68,1,84,1)'],
-            ['0.1', 'rgba(61,77,137,1)'],
-            ['0.2', 'rgba(57,89,140,1)'],
-            ['0.3', 'rgba(49,104,142,1)'],
-            ['0.4', 'rgba(44,119,142,1)'],
-            ['0.5', 'rgba(38,136,141,1)'],
-            ['0.6', 'rgba(33,154,138,1)'],
-            ['0.7', 'rgba(50,178,124,1)'],
-            ['0.8', 'rgba(101,201,96,1)'],
-            ['0.9', 'rgba(101,201,96,1)'],
-            ['1', 'rgba(253,231,37,1)']],
-          colorbar: {
-            tick0: 0,
-            dtick: 5
-          }
-        },
-      ],
-      layout: {
-        title: this.assetCode,
-        showlegend: true,
-        autoSize: true,
-        margin: {
-          b: 40,
-          l: 60,
-          r: 10,
-          t: 25
-        }
-      },
-      config: {
-        displayModeBar: false
-      }
-    };
-    this.generate3Dgraph();
-  }
-
-  public async generate3Dgraph() {
-    // Initilization of DOM element to render graph
-    // takes time at fist so need some time to wait here.
-    const intervalId = setInterval(() => {
-      if (this.Graph) {
-        Plotly.newPlot(
-          this.Graph.nativeElement,
-          this.polyGraphData);
-        clearInterval(intervalId);
-      }
-    }, 100);
-  }
-
   public isNumber(val) {
     return typeof val === 'number';
   }
@@ -469,10 +371,16 @@ export class ReadingsGraphComponent implements OnDestroy {
   selectTab(id: number, showSpinner = true) {
     this.showSpinner = showSpinner;
     this.selectedTab = id;
-    if (this.graphRefreshInterval === -1 && this.selectedTab === 4) {
-      this.showAssetReadingsSummary(this.assetCode, this.limit, this.optedTime);
-    } else if (this.graphRefreshInterval === -1) {
-      this.plotReadingsGraph(this.assetCode, this.limit, this.optedTime);
+    if (this.selectedTab === 4) {
+      this.showAssetReadingsSummary(this.assetCode, this.optedTime);
+    } else {
+      const payload = {
+        assetCode: encodeURIComponent(this.assetCode),
+        start: 0,
+        length: 60,
+        bucketSize: 1
+      };
+      this.getAssetReadings(payload);
     }
   }
 
@@ -490,29 +398,31 @@ export class ReadingsGraphComponent implements OnDestroy {
 
   public resetZoom() {
     this.isAlive = true;
-    this.showResetButton = false;
+    this.showResetZoomButton = false;
     this.assetChart.chart.resetZoom();
-    this.getAssetReadings();
-  }
-
-  public ngOnDestroy(): void {
-    this.isAlive = false;
-  }
-
-  getAssetReadings() {
     const payload = {
       assetCode: encodeURIComponent(this.assetCode),
       start: 0,
       length: 60,
       bucketSize: 1
     };
+    this.getAssetReadings(payload);
+  }
+
+  public ngOnDestroy(): void {
+    this.isAlive = false;
+  }
+
+  getAssetReadings(payload: any) {
     this.assetService.getAssetReadingsBucket(payload).
       subscribe(
         (data: any[]) => {
+          this.showSpinner = false;
           this.loadPage = false;
           this.getBucketReadings(data);
         },
         error => {
+          this.showSpinner = false;
           console.log('error in response', error);
         });
   }
@@ -520,5 +430,10 @@ export class ReadingsGraphComponent implements OnDestroy {
   public caluclateBucketSize(duration) {
     let bucket = Math.round(duration / 10);
     return bucket = bucket === 0 ? 1 : (bucket > 48 ? 48 : bucket);
+  }
+
+  setPaning(event: any) {
+    this.paning = event.target.checked;
+    this.resetZoom();
   }
 }
