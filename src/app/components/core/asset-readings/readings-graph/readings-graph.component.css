@@ -17,7 +17,7 @@
     width: 81%;
   }
    :host ::ng-deep canvas[style] {
-    height: 500px !important;
+    height: 400px !important;
   }
 }
 
