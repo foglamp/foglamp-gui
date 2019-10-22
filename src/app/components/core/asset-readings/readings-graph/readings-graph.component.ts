@@ -321,7 +321,7 @@ export class ReadingsGraphComponent implements OnDestroy {
         enabled: true,
         mode: '',
         speed: 10,
-        onPan: () => { this.isAlive = false; },
+        onPan: () => { this.isAlive = false; }
       },
       zoom: {
         enabled: true,
@@ -331,9 +331,9 @@ export class ReadingsGraphComponent implements OnDestroy {
           this.isAlive = false;
           this.showResetZoomButton = true;
           const start = moment(chart.scales['x-axis-0'].min);
-          console.log('start', start.seconds());
+          console.log('start time', start.format('DD MMM YYYY hh:mm:ss'));
           const end = moment(chart.scales['x-axis-0'].max);
-          console.log('end', end.seconds());
+          console.log('end time', end.format('DD MMM YYYY hh:mm:ss'));
           const duration = moment.duration(end.diff(start));
           const seconds = duration.asSeconds();
           const bucketSize = this.caluclateBucketSize(seconds);
