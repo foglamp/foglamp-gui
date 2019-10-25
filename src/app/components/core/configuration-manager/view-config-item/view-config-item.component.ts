@@ -183,13 +183,15 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  public checkValidJson(configValue) {
+  public checkValidJson(key, configValue) {
     try {
       JSON.parse(configValue);
       this.isValidJson = true;
+      this.form.controls[key].setErrors({'jsonValue': false});
       return true;
     } catch (e) {
       this.isValidJson = false;
+      this.form.controls[key].setErrors({'jsonValue': true});
       return false;
     }
   }
