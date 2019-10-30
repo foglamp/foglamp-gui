@@ -461,7 +461,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
             .replace(new RegExp(key, 'g'), `'${configValue}'`);
         }
       }
-      if (configItem.hasOwnProperty('mandatory') && configValue.trim().length === 0) {
+      if (configItem.hasOwnProperty('mandatory') === true && configValue.trim().length === 0) {
         this.form.controls[key].setErrors({'required': true});
       }
     });

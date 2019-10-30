@@ -115,4 +115,12 @@ export class ConfigChildrenComponent implements AfterViewInit {
         }
       );
   }
+
+  checkValueOnChange(key: string, configValue: string) {
+    this.configAttributes.map(configItem => {
+      if (configItem.hasOwnProperty('mandatory') === true && configValue.trim().length === 0) {
+        this.form.controls[key].setErrors({'required': true});
+      }
+    });
+  }
 }
