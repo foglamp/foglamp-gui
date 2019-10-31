@@ -187,7 +187,6 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
     try {
       JSON.parse(configValue);
       this.isValidJson = true;
-      this.form.controls[key].setErrors({'jsonValue': false});
       return true;
     } catch (e) {
       this.isValidJson = false;
@@ -461,8 +460,10 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
             .replace(new RegExp(key, 'g'), `'${configValue}'`);
         }
       }
-      if (configItem.hasOwnProperty('mandatory') === true && configValue.trim().length === 0) {
-        this.form.controls[key].setErrors({'required': true});
+      if (configItem.hasOwnProperty('mandatory') && configItem['key'] === key) {
+        if (configItem['mandatory'] === 'true' && configValue.trim().length === 0) {
+         this.form.controls[key].setErrors({'required': true});
+        }
       }
     });
 
