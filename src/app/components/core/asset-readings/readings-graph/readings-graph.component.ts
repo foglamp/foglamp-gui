@@ -180,14 +180,28 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   getBucketReadings(readings: any) {
+    console.log('data read', readings);
     const numReadings = [];
     this.timestamps = readings.map((r: any) => r.timestamp);
     for (const r of readings) {
-      numReadings.push({
-        k: this.assetCode,
-        read: { x: r.timestamp, y: r.average }
-      });
-    }
+    Object.entries(r.reading).forEach(([k, value]) => {
+      if (typeof value['average'] === 'number') {
+        numReadings.push({
+          key: k,
+          read: { x: r.timestamp, y: value['average'] }
+        });
+      }
+    });
+  }
+
+    // for (const r of readings) {
+    //   numReadings.push({
+    //     k: this.assetCode,
+    //     read: { x: r.timestamp, y: r.average }
+    //   });
+    // }
+    console.log('number list', numReadings);
+
     this.numberTypeReadingsList = numReadings.length > 0 ? this.mergeObjects(numReadings) : [];
     this.setTabData();
   }
@@ -198,7 +212,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   mergeObjects(assetReadings: any) {
-    return chain(assetReadings).groupBy('k').map(function (group, key) {
+    return chain(assetReadings).groupBy('key').map(function (group, key) {
       return {
         key: key,
         read: map(group, 'read')
