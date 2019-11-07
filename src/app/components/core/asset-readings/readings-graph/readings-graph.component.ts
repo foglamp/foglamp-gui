@@ -134,8 +134,6 @@ export class ReadingsGraphComponent implements OnDestroy {
       interval(this.graphRefreshInterval)
         .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
         .subscribe(() => {
-          console.log('sub');
-
           this.autoRefresh = true;
           if (this.selectedTab === 4) {
             this.showAssetReadingsSummary(this.assetCode, this.optedTime);
@@ -180,28 +178,18 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   getBucketReadings(readings: any) {
-    console.log('data read', readings);
     const numReadings = [];
     this.timestamps = readings.map((r: any) => r.timestamp);
     for (const r of readings) {
-    Object.entries(r.reading).forEach(([k, value]) => {
-      if (typeof value['average'] === 'number') {
-        numReadings.push({
-          key: k,
-          read: { x: r.timestamp, y: value['average'] }
-        });
-      }
-    });
-  }
-
-    // for (const r of readings) {
-    //   numReadings.push({
-    //     k: this.assetCode,
-    //     read: { x: r.timestamp, y: r.average }
-    //   });
-    // }
-    console.log('number list', numReadings);
-
+      Object.entries(r.reading).forEach(([k, value]) => {
+        if (typeof value['average'] === 'number') {
+          numReadings.push({
+            key: k,
+            read: { x: r.timestamp, y: value['average'] }
+          });
+        }
+      });
+    }
     this.numberTypeReadingsList = numReadings.length > 0 ? this.mergeObjects(numReadings) : [];
     this.setTabData();
   }
