@@ -80,15 +80,23 @@
               <ng-template #DataDiv>
                 <div *ngIf="selectedTab === 1 && numberTypeReadingsList?.length > 0" class="is-active" data-content="1">
                   <div class="columns btn-container">
-                    <div class="column">
-                      <button *ngIf="showResetZoomButton" class="button is-text is-small" (click)="resetZoom()">Reset
-                        Zoom</button>
-                    </div>
                     <div class="column ">
-                      <label class="checkbox is-pulled-right">
-                        <input type="checkbox"  (change)="setPaning($event)">
-                        Paning
-                      </label>
+                      <div class="field has-addons is-pulled-right">
+                        <p *ngIf="showResetZoomButton" class="control">
+                          <button class="button" (click)="resetZoom()">
+                            <span class="icon is-small">
+                              <i class="fas fa-undo"></i>
+                            </span>
+                          </button>
+                        </p>
+                        <p class="control">
+                          <button class="button" (click)="setPaning(panning)">
+                            <span class="icon is-small">
+                              <i class="fas fa-expand-arrows-alt"></i>
+                            </span>
+                          </button>
+                        </p>
+                      </div>
                     </div>
                   </div>
                   <div class="columns">

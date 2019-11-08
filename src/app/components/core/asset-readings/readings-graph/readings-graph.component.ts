@@ -35,7 +35,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   public timeDropDownOpened = false;
   public isModalOpened = false;
   public showResetZoomButton = false;
-  public paning = false;
+  public panning = false;
 
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('assetChart', { static: false }) assetChart: Chart;
@@ -87,7 +87,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.assetChartOptions = {};
     sessionStorage.removeItem(this.assetCode);
     this.showResetZoomButton = false;
-    this.paning = false;
+    this.panning = false;
 
     const chart_modal = <HTMLDivElement>document.getElementById('chart_modal');
     if (shouldOpen) {
@@ -321,7 +321,7 @@ export class ReadingsGraphComponent implements OnDestroy {
       },
       pan: {
         enabled: true,
-        mode: '',
+        mode: 'x',
         speed: 10,
         onPan: () => { this.isAlive = false; }
       },
@@ -351,7 +351,7 @@ export class ReadingsGraphComponent implements OnDestroy {
       responsive: true
     };
 
-    if (this.paning) {
+    if (this.panning) {
       this.assetChartOptions.zoom['drag'] = {};
       this.assetChartOptions.zoom['drag']['enable'] = true;
       this.assetChartOptions.zoom['drag']['borderWidth'] = 1;
@@ -437,8 +437,8 @@ export class ReadingsGraphComponent implements OnDestroy {
     return bucket = bucket === 0 ? 1 : (bucket > 48 ? 48 : bucket);
   }
 
-  setPaning(event: any) {
-    this.paning = event.target.checked;
+  setPaning(isPanning: boolean) {
+    this.panning = !isPanning;
     this.resetZoom();
   }
 }
