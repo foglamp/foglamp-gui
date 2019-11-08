@@ -22,14 +22,11 @@ export class ReadingsGraphComponent implements OnDestroy {
   public assetReadingValues: any;
   public assetChartOptions: any;
   public loadPage = true;
-  public assetReadingSummary = [];
   public MAX_RANGE = MAX_INT_SIZE;
   public graphRefreshInterval = POLLING_INTERVAL;
   public optedTime = ASSET_READINGS_TIME_FILTER;
   public readKeyColorLabel = [];
   private isAlive: boolean;
-  public summaryLimit = 5;
-  public buttonText = '';
   public autoRefresh = false;
   public showSpinner = false;
   public timeDropDownOpened = false;
@@ -61,17 +58,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.toggleModal(false);
   }
 
-  public showAll() {
-    this.autoRefresh = false;
-    if (this.buttonText === 'Show Less') {
-      this.summaryLimit = 5;
-      this.buttonText = 'Show All';
-    } else {
-      this.summaryLimit = this.assetReadingSummary.length;
-      this.buttonText = 'Show Less';
-    }
-  }
-
   public roundTo(num, to) {
     const _to = Math.pow(10, to);
     return Math.round(num * _to) / _to;
@@ -79,10 +65,7 @@ export class ReadingsGraphComponent implements OnDestroy {
 
   public toggleModal(shouldOpen: Boolean) {
     // reset all variable and array to default state
-    this.assetReadingSummary = [];
-    this.buttonText = '';
     this.assetReadingValues = [];
-    this.summaryLimit = 5;
     this.readKeyColorLabel = [];
     this.assetChartOptions = {};
     sessionStorage.removeItem(this.assetCode);
@@ -108,12 +91,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.optedTime = ASSET_READINGS_TIME_FILTER;
   }
 
-  getTimeBasedAssetReadingsAndSummary(time: number) {
-    this.optedTime = time;
-    this.showAssetReadingsSummary(this.assetCode, time);
-    this.toggleDropdown();
-  }
-
   public getAssetCode(assetCode: string) {
     this.assetCode = assetCode;
     const payload = {
@@ -135,46 +112,9 @@ export class ReadingsGraphComponent implements OnDestroy {
         .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
         .subscribe(() => {
           this.autoRefresh = true;
-          if (this.selectedTab === 4) {
-            this.showAssetReadingsSummary(this.assetCode, this.optedTime);
-          } else {
-            this.getAssetReadings(payload);
-          }
+          this.getAssetReadings(payload);
         });
     }
-  }
-
-  public showAssetReadingsSummary(assetCode, time = 0) {
-    this.assetService.getAllAssetSummary(assetCode, time).subscribe(
-      (data: any) => {
-        this.showSpinner = false;
-        this.assetReadingSummary = data
-          .map(o => {
-            const k = Object.keys(o)[0];
-            return {
-              name: k,
-              value: [o[k]]
-            };
-          }).filter(value => value !== undefined);
-
-        this.assetReadingSummary = orderBy(this.assetReadingSummary, ['name'], ['asc']);
-        if (this.assetReadingSummary.length > 5 && this.summaryLimit === 5) {
-          this.buttonText = 'Show All';
-        }
-        if (this.assetReadingSummary.length <= 5) {
-          this.buttonText = '';
-        }
-        if (this.assetReadingSummary.length > 5 && this.summaryLimit > 5) {
-          this.buttonText = 'Show Less';
-        }
-      },
-      error => {
-        if (error.status === 0) {
-          console.log('service down ', error);
-        } else {
-          this.alertService.error(error.statusText);
-        }
-      });
   }
 
   getBucketReadings(readings: any) {
@@ -191,11 +131,6 @@ export class ReadingsGraphComponent implements OnDestroy {
       });
     }
     this.numberTypeReadingsList = numReadings.length > 0 ? this.mergeObjects(numReadings) : [];
-    this.setTabData();
-  }
-
-  setTabData() {
-    this.selectedTab = 1;
     this.statsAssetReadingsGraph(this.numberTypeReadingsList, this.timestamps);
   }
 
@@ -376,21 +311,13 @@ export class ReadingsGraphComponent implements OnDestroy {
   selectTab(id: number, showSpinner = true) {
     this.showSpinner = showSpinner;
     this.selectedTab = id;
-    if (this.selectedTab === 4) {
-      this.showAssetReadingsSummary(this.assetCode, this.optedTime);
-    } else {
-      const payload = {
-        assetCode: encodeURIComponent(this.assetCode),
-        start: 0,
-        length: 60,
-        bucketSize: 1
-      };
-      this.getAssetReadings(payload);
-    }
-  }
-
-  showSummaryTab() {
-    return this.numberTypeReadingsList.length > 0;
+    const payload = {
+      assetCode: encodeURIComponent(this.assetCode),
+      start: 0,
+      length: 60,
+      bucketSize: 1
+    };
+    this.getAssetReadings(payload);
   }
 
   isEmptyObject(obj) {

@@ -12,6 +12,14 @@
   padding: 15px !important;
 }
 
+.btn-pan {
+  background: #e5e5e5;
+  outline: none;
+  -webkit-box-shadow: inset 0px 0px 5px #c1c1c1;
+     -moz-box-shadow: inset 0px 0px 5px #c1c1c1;
+          box-shadow: inset 0px 0px 5px #c1c1c1;
+}
+
 @media screen and (min-width: 769px) {
   .modal-card {
     width: 85%;
