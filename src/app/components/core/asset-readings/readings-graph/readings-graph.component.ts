@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnDestroy, HostListener, Output, ViewChild } from '@angular/core';
-import { orderBy, chain, map } from 'lodash';
+import { chain, map } from 'lodash';
 import { interval } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
 
@@ -7,7 +7,7 @@ import { Chart } from 'chart.js';
 import 'chartjs-plugin-zoom';
 import * as moment from 'moment';
 
-import { AlertService, AssetsService, PingService } from '../../../../services';
+import { AssetsService, PingService } from '../../../../services';
 import { ASSET_READINGS_TIME_FILTER, COLOR_CODES, MAX_INT_SIZE, POLLING_INTERVAL } from '../../../../utils';
 import { KeyValue } from '@angular/common';
 
@@ -41,7 +41,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   public selectedTab = 1;
   public timestamps = [];
 
-  constructor(private assetService: AssetsService, private alertService: AlertService,
+  constructor(private assetService: AssetsService,
     private ping: PingService) {
     this.assetChartType = 'line';
     this.assetReadingValues = [];
@@ -258,12 +258,18 @@ export class ReadingsGraphComponent implements OnDestroy {
         enabled: true,
         mode: 'x',
         speed: 10,
+        rangeMin: {
+          x: 1000
+        },
         onPan: () => { this.isAlive = false; }
       },
       zoom: {
         enabled: true,
         mode: 'x',
         sensitivity: 0.3,
+        rangeMin: {
+          x: 1000
+        },
         onZoomComplete: ({ chart }) => {
           this.isAlive = false;
           this.showResetZoomButton = true;
