@@ -261,7 +261,12 @@ export class ReadingsGraphComponent implements OnDestroy {
         rangeMin: {
           x: 1000
         },
-        onPan: () => { this.isAlive = false; }
+        onPan: () => {
+          this.isAlive = false;
+        },
+        onPanComplete: ({ chart }) => {
+          this.setGraphData(chart);
+        }
       },
       zoom: {
         enabled: true,
@@ -271,22 +276,9 @@ export class ReadingsGraphComponent implements OnDestroy {
           x: 1000
         },
         onZoomComplete: ({ chart }) => {
-          this.isAlive = false;
-          this.showResetZoomButton = true;
-          const start = moment(chart.scales['x-axis-0'].min);
-          console.log('start time', start.format('DD MMM YYYY hh:mm:ss'));
-          const end = moment(chart.scales['x-axis-0'].max);
-          console.log('end time', end.format('DD MMM YYYY hh:mm:ss'));
-          const duration = moment.duration(end.diff(start));
-          const seconds = duration.asSeconds();
-          const bucketSize = this.caluclateBucketSize(seconds);
-          const payload = {
-            assetCode: encodeURIComponent(this.assetCode),
-            start: start.seconds(),
-            length: Math.round(seconds),
-            bucketSize: bucketSize
-          };
-          this.getAssetReadings(payload);
+          if (!this.panning) {
+            this.setGraphData(chart);
+          }
         }
       },
       responsive: true
@@ -298,6 +290,26 @@ export class ReadingsGraphComponent implements OnDestroy {
       this.assetChartOptions.zoom['drag']['borderWidth'] = 1;
       this.assetChartOptions.zoom['drag']['backgroundColor'] = 'rgb(130, 202, 250, 0.4)';
     }
+  }
+
+  setGraphData(chart: Chart) {
+    this.isAlive = false;
+    this.showResetZoomButton = true;
+    const start = moment.utc(chart.scales['x-axis-0'].min);
+    const end = moment.utc(chart.scales['x-axis-0'].max);
+    console.log('pan start', start);
+    console.log('pan end', end);
+    const duration = moment.duration(end.diff(start));
+    console.log('duration', duration.asSeconds());
+    const seconds = duration.asSeconds();
+    const bucketSize = this.caluclateBucketSize(seconds);
+    const payload = {
+      assetCode: encodeURIComponent(this.assetCode),
+      start: start.unix(),
+      length: Math.round(seconds),
+      bucketSize: bucketSize
+    };
+    this.getAssetReadings(payload);
   }
 
   public toggleDropdown() {
