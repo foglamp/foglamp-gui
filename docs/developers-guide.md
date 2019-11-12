@@ -79,11 +79,12 @@ Set API base URL in `environments/environment.prod.ts`, you can always change it
 #### Core
  Library      |   Version     | Latest Stable (? Y/n) | License
 ------------- | ------------- | --------------------  | ------------
- Angular      | 8.2.12         |        8.2.12         | MIT
- Angular CLI  | 8.3.14         |        8.3.14          | MIT
+ Angular      | 8.2.12        |        8.2.12         | MIT
+ Angular CLI  | 8.3.14        |        8.3.14         | MIT
  TypeScript   | 3.5.3         |        3.6.3          | Apache 2.0
  rxjs         | 6.5.2         |        6.5.2          | Apache 2.0
  Bulma css    | 0.7.5         |        0.7.5          | MIT
+ chartjs-plugin-zoom | 0.7.4  |        0.7.5          | MIT
 
 #### Dev
  Library         |   Version     | Latest Stable (? Y/n) | License
