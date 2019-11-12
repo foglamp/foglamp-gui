@@ -44,7 +44,9 @@ export class AssetsService {
 
   public getAssetReadingsBucket(payload) {
     let params = new HttpParams();
-    params = params.append('start', payload.start);
+    if (payload.start) {
+      params = params.append('start', payload.start);
+    }
     params = params.append('length', payload.length);
     return this.http.get(`${this.GET_ASSET}/${payload.assetCode}/bucket/${payload.bucketSize}`, { params: params }).pipe(
         map(response => response),

@@ -2,9 +2,8 @@ import { Component, EventEmitter, OnDestroy, HostListener, Output, ViewChild } f
 import { chain, map } from 'lodash';
 import { interval } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
-
 import { Chart } from 'chart.js';
-import 'chartjs-plugin-zoom';
+
 import * as moment from 'moment';
 
 import { AssetsService, PingService } from '../../../../services';
@@ -95,7 +94,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.assetCode = assetCode;
     const payload = {
       assetCode: encodeURIComponent(this.assetCode),
-      start: 0,
       length: 60,
       bucketSize: 1
     };
