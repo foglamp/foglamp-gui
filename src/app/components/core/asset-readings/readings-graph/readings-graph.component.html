@@ -35,14 +35,16 @@
                     <div class="column ">
                       <div class="field has-addons is-pulled-right">
                         <p *ngIf="showResetZoomButton" class="control">
-                          <button class="button is-small" (click)="resetZoom()">
+                          <button class="button is-small tooltip is-tooltip-bottom" data-tooltip="Reset"
+                          (click)="resetZoom()">
                             <span class="icon is-small">
                               <i class="fas fa-undo"></i>
                             </span>
                           </button>
                         </p>
                         <p class="control">
-                          <button [ngClass]="{'btn-pan': panning}" class="button is-small" (click)="setPaning(panning)">
+                          <button [ngClass]="{'btn-pan': panning}" class="button is-small tooltip is-tooltip-bottom" data-tooltip="Pan"
+                          (click)="setPaning(panning)">
                             <span class="icon is-small">
                               <i class="fas fa-arrows-alt-h"></i>
                             </span>

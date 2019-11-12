@@ -228,6 +228,9 @@ export class ReadingsGraphComponent implements OnDestroy {
         }]
       },
       legend: {
+        onHover: (e: any) => {
+          e.target.style.cursor = 'pointer';
+        },
         onClick: (e, legendItem) => {
           console.log('clicked ', legendItem, e);
           const index = legendItem.datasetIndex;
@@ -249,6 +252,16 @@ export class ReadingsGraphComponent implements OnDestroy {
           }
           sessionStorage.setItem(this.assetCode, JSON.stringify(savedLegendState));
           chart.update();
+        }
+      },
+      hover: {
+        onHover: function (e) {
+          const point = this.getElementAtEvent(e);
+          if (point.length) {
+            e.target.style.cursor = 'default';
+          } else {
+            e.target.style.cursor = 'ew-resize';
+          }
         }
       },
       pan: {
