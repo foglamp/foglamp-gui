@@ -94,7 +94,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.assetCode = assetCode;
     const payload = {
       assetCode: encodeURIComponent(this.assetCode),
-      length: 60,
       bucketSize: 1
     };
     this.isModalOpened = true;
@@ -283,6 +282,9 @@ export class ReadingsGraphComponent implements OnDestroy {
     };
 
     if (this.panning) {
+      // in pan mode set mode to empty from x-axis to stop chart drag
+      this.assetChartOptions.pan['mode'] = '';
+
       this.assetChartOptions.zoom['drag'] = {};
       this.assetChartOptions.zoom['drag']['enable'] = true;
       this.assetChartOptions.zoom['drag']['borderWidth'] = 1;
@@ -304,7 +306,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     const payload = {
       assetCode: encodeURIComponent(this.assetCode),
       start: start.unix(),
-      length: Math.round(seconds),
+      len: Math.round(seconds),
       bucketSize: bucketSize
     };
     this.getAssetReadings(payload);
@@ -329,8 +331,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.selectedTab = id;
     const payload = {
       assetCode: encodeURIComponent(this.assetCode),
-      start: 0,
-      length: 60,
       bucketSize: 1
     };
     this.getAssetReadings(payload);
@@ -350,8 +350,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.assetChart.chart.resetZoom();
     const payload = {
       assetCode: encodeURIComponent(this.assetCode),
-      start: 0,
-      length: 60,
       bucketSize: 1
     };
     this.getAssetReadings(payload);

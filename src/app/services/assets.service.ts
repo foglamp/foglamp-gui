@@ -47,10 +47,13 @@ export class AssetsService {
     if (payload.start) {
       params = params.append('start', payload.start);
     }
-    params = params.append('length', payload.length);
+    if (payload.len) {
+      params = params.append('length', payload.len);
+    }
+
     return this.http.get(`${this.GET_ASSET}/${payload.assetCode}/bucket/${payload.bucketSize}`, { params: params }).pipe(
-        map(response => response),
-        catchError(error => throwError(error)));
+      map(response => response),
+      catchError(error => throwError(error)));
   }
 
   /**
