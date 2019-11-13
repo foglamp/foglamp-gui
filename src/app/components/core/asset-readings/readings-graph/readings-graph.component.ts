@@ -365,7 +365,14 @@ export class ReadingsGraphComponent implements OnDestroy {
       assetCode: encodeURIComponent(this.assetCode),
       bucketSize: 1
     };
-    this.getAssetReadings(payload);
+
+    this.isAlive = true;
+    interval(this.graphRefreshInterval)
+      .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
+      .subscribe(() => {
+        this.autoRefresh = true;
+        this.getAssetReadings(payload);
+      });
   }
 
   public ngOnDestroy(): void {
