@@ -11,7 +11,8 @@
           </p>
         </div>
       </div>
-      <a id="add_south_service" class="fix-pad button is-light" (click)="addSouthService()">Add &nbsp;
+      <a id="add_south_service" class="fix-pad button is-light" (click)="addSouthService()">
+        <p *ngIf="viewPort !== 'mobile'">Add &nbsp;</p>
         <i class="fa fa-plus" aria-hidden="true"></i>
       </a>
     </header>

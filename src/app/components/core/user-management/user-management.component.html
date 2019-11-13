@@ -17,7 +17,8 @@
           </ul>
           <div>
             <a class="is-light" (click)="openCreateUserModal()">
-              <i class="fa fa-user" aria-hidden="true"></i>&nbsp; Add User&nbsp;
+              <i class="fa fa-user" aria-hidden="true"></i>
+              <p *ngIf="viewPort !== 'mobile'">&nbsp; Add User&nbsp;</p>
             </a>
           </div>
         </div>
