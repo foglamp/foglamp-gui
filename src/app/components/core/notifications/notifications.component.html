@@ -53,8 +53,8 @@
         </div>
       </div>
       <button [disabled]="!isNotificationServiceEnabled" id="add_notification_instance" class="button is-light"
-        (click)="addNotificationInstance()">Create
-        Notification Instance &nbsp;
+        (click)="addNotificationInstance()">
+        <p *ngIf="viewPort !== 'mobile'">Create Notification Instance &nbsp;</p>
         <i class="fa fa-plus" aria-hidden="true"></i>
       </button>
     </header>
