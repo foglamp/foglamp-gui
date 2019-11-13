@@ -19,7 +19,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   public assetCode: string;
   public assetChartType: string;
   public assetReadingValues: any;
-  public assetChartOptions: any;
+  public assetChartOptions = {};
   public loadPage = true;
   public MAX_RANGE = MAX_INT_SIZE;
   public graphRefreshInterval = POLLING_INTERVAL;
@@ -29,7 +29,6 @@ export class ReadingsGraphComponent implements OnDestroy {
   public autoRefresh = false;
   public showSpinner = false;
   public timeDropDownOpened = false;
-  public isModalOpened = false;
   public showResetZoomButton = false;
   public panning = false;
 
@@ -96,8 +95,6 @@ export class ReadingsGraphComponent implements OnDestroy {
       assetCode: encodeURIComponent(this.assetCode),
       bucketSize: 1
     };
-    this.isModalOpened = true;
-    this.selectedTab = 1;
     this.loadPage = true;
     this.notify.emit(false);
     if (this.graphRefreshInterval === -1) {
@@ -199,7 +196,6 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   private setAssetReadingValues(ds: any, timestamps) {
-    this.assetChartOptions = {};
     this.assetReadingValues = {
       labels: timestamps,
       datasets: ds
@@ -255,40 +251,28 @@ export class ReadingsGraphComponent implements OnDestroy {
         }
       },
       hover: {
-        onHover: function (e) {
-          const point = this.getElementAtEvent(e);
-          if (point.length) {
-            e.target.style.cursor = 'default';
-          } else {
+        onHover: (e) => {
+          if (this.panning) {
             e.target.style.cursor = 'ew-resize';
+          } else {
+            e.target.style.cursor = 'default';
           }
         }
       },
       pan: {
         enabled: true,
-        mode: 'x',
+        mode: '',
         speed: 10,
-        rangeMin: {
-          x: 1000
-        },
         onPan: () => {
           this.isAlive = false;
-        },
-        onPanComplete: ({ chart }) => {
-          this.setGraphData(chart);
         }
       },
       zoom: {
         enabled: true,
         mode: 'x',
         sensitivity: 0.3,
-        rangeMin: {
-          x: 1000
-        },
         onZoomComplete: ({ chart }) => {
-          if (!this.panning) {
-            this.setGraphData(chart);
-          }
+          this.setGraphData(chart);
         }
       },
       responsive: true
@@ -296,12 +280,12 @@ export class ReadingsGraphComponent implements OnDestroy {
 
     if (this.panning) {
       // in pan mode set mode to empty from x-axis to stop chart drag
-      this.assetChartOptions.pan['mode'] = '';
+      this.assetChartOptions['pan']['mode'] = 'x';
 
-      this.assetChartOptions.zoom['drag'] = {};
-      this.assetChartOptions.zoom['drag']['enable'] = true;
-      this.assetChartOptions.zoom['drag']['borderWidth'] = 1;
-      this.assetChartOptions.zoom['drag']['backgroundColor'] = 'rgb(130, 202, 250, 0.4)';
+      this.assetChartOptions['zoom']['drag'] = {};
+      this.assetChartOptions['zoom']['drag']['enable'] = true;
+      this.assetChartOptions['zoom']['drag']['borderWidth'] = 1;
+      this.assetChartOptions['zoom']['drag']['backgroundColor'] = 'rgb(130, 202, 250, 0.4)';
     }
   }
 
@@ -310,8 +294,8 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.showResetZoomButton = true;
     const start = moment.utc(chart.scales['x-axis-0'].min);
     const end = moment.utc(chart.scales['x-axis-0'].max);
-    console.log('pan start', start);
-    console.log('pan end', end);
+    console.log('pan start', start.toDate());
+    console.log('pan end', end.toDate());
     const duration = moment.duration(end.diff(start));
     console.log('duration', duration.asSeconds());
     const seconds = duration.asSeconds();
@@ -342,11 +326,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   selectTab(id: number, showSpinner = true) {
     this.showSpinner = showSpinner;
     this.selectedTab = id;
-    const payload = {
-      assetCode: encodeURIComponent(this.assetCode),
-      bucketSize: 1
-    };
-    this.getAssetReadings(payload);
+    this.getAssetCode(this.assetCode);
   }
 
   isEmptyObject(obj) {
@@ -357,22 +337,10 @@ export class ReadingsGraphComponent implements OnDestroy {
     return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
   }
 
-  public resetZoom() {
-    this.isAlive = true;
+  public resetChartZoom() {
     this.showResetZoomButton = false;
     this.assetChart.chart.resetZoom();
-    const payload = {
-      assetCode: encodeURIComponent(this.assetCode),
-      bucketSize: 1
-    };
-
-    this.isAlive = true;
-    interval(this.graphRefreshInterval)
-      .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
-      .subscribe(() => {
-        this.autoRefresh = true;
-        this.getAssetReadings(payload);
-      });
+    this.getAssetCode(this.assetCode);
   }
 
   public ngOnDestroy(): void {
@@ -400,6 +368,10 @@ export class ReadingsGraphComponent implements OnDestroy {
 
   setPaning(isPanning: boolean) {
     this.panning = !isPanning;
-    this.resetZoom();
+    const payload = {
+      assetCode: encodeURIComponent(this.assetCode),
+      bucketSize: 1
+    };
+    this.getAssetReadings(payload);
   }
 }
