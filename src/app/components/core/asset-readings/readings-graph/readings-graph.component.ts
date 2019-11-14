@@ -252,11 +252,12 @@ export class ReadingsGraphComponent implements OnDestroy {
     return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
   }
 
-  public resetChartZoom() {
+  public resetChartZoomAndPannig() {
     this.showResetZoomButton = false;
     this.assetChart.chart.resetZoom();
     this.getAssetCode(this.assetCode);
-    this.setPaning(this.panning);
+    this.panning = false;
+    this.setChartOptions();
   }
 
   public ngOnDestroy(): void {
@@ -348,10 +349,15 @@ export class ReadingsGraphComponent implements OnDestroy {
       },
       pan: {
         enabled: true,
-        mode: '',
+        mode: 'x',
         speed: 10,
         onPan: () => {
           this.isAlive = false;
+        },
+        onPanComplete: ({ chart }) => {
+          if (!this.panning) {
+            this.setGraphData(chart);
+          }
         }
       },
       zoom: {
@@ -366,6 +372,9 @@ export class ReadingsGraphComponent implements OnDestroy {
     };
 
     if (this.panning) {
+      // in pan mode set mode to empty from x-axis to stop chart drag
+      this.assetChartOptions['pan']['mode'] = '';
+
       this.assetChartOptions['zoom']['drag'] = {};
       this.assetChartOptions['zoom']['drag']['enable'] = true;
       this.assetChartOptions['zoom']['drag']['borderWidth'] = 1;
