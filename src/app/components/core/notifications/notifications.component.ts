@@ -105,7 +105,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
     /** request started */
     this.ngProgress.start();
-    this.alertService.activityMessage('Installing ' + 'notification service ...', true);
+    this.alertService.activityMessage('Installing ' + 'notification service...', true);
     this.servicesApiService.installService(servicePayload).
       subscribe(
         (data: any) => {
