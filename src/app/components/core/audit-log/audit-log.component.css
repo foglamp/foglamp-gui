@@ -10,3 +10,7 @@ table tbody {
 
 .card { overflow: visible;}
 .card-content { overflow: visible; }
+
+.card-header-title {
+  padding: unset;
+}
