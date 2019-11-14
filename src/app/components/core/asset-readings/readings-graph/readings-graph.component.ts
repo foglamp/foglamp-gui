@@ -201,6 +201,93 @@ export class ReadingsGraphComponent implements OnDestroy {
       datasets: ds
     };
     this.assetChartType = 'line';
+    this.setChartOptions();
+  }
+
+  setGraphData(chart: Chart) {
+    this.isAlive = false;
+    this.showResetZoomButton = true;
+    const start = moment.utc(chart.scales['x-axis-0'].min);
+    const end = moment.utc(chart.scales['x-axis-0'].max);
+    console.log('pan start', start.toDate());
+    console.log('pan end', end.toDate());
+    const duration = moment.duration(end.diff(start));
+    console.log('duration', duration.asSeconds());
+    const seconds = duration.asSeconds();
+    const bucketSize = this.caluclateBucketSize(seconds);
+    const payload = {
+      assetCode: encodeURIComponent(this.assetCode),
+      start: start.unix(),
+      len: Math.round(seconds),
+      bucketSize: bucketSize
+    };
+    this.getAssetReadings(payload);
+  }
+
+  public toggleDropdown() {
+    const dropDown = document.querySelector('#time-dropdown');
+    dropDown.classList.toggle('is-active');
+    if (!dropDown.classList.contains('is-active')) {
+      this.timeDropDownOpened = false;
+    } else {
+      this.timeDropDownOpened = true;
+    }
+  }
+
+  public isNumber(val) {
+    return typeof val === 'number';
+  }
+
+  selectTab(id: number, showSpinner = true) {
+    this.showSpinner = showSpinner;
+    this.selectedTab = id;
+    this.getAssetCode(this.assetCode);
+  }
+
+  isEmptyObject(obj) {
+    return (obj && (Object.keys(obj).length === 0));
+  }
+
+  keyDescOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
+    return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
+  }
+
+  public resetChartZoom() {
+    this.showResetZoomButton = false;
+    this.assetChart.chart.resetZoom();
+    this.getAssetCode(this.assetCode);
+    this.setPaning(this.panning);
+  }
+
+  public ngOnDestroy(): void {
+    this.isAlive = false;
+  }
+
+  getAssetReadings(payload: any) {
+    this.assetService.getAssetReadingsBucket(payload).
+      subscribe(
+        (data: any[]) => {
+          this.showSpinner = false;
+          this.loadPage = false;
+          this.getBucketReadings(data);
+        },
+        error => {
+          this.showSpinner = false;
+          console.log('error in response', error);
+        });
+  }
+
+  public caluclateBucketSize(duration) {
+    let bucket = Math.round(duration / 10);
+    return bucket = bucket === 0 ? 1 : (bucket > 48 ? 48 : bucket);
+  }
+
+  setPaning(isPanning: boolean) {
+    this.panning = !isPanning;
+    this.setChartOptions();
+  }
+
+  setChartOptions() {
     this.assetChartOptions = {
       elements: {
         point: { radius: 0 }
@@ -279,99 +366,10 @@ export class ReadingsGraphComponent implements OnDestroy {
     };
 
     if (this.panning) {
-      // in pan mode set mode to empty from x-axis to stop chart drag
-      this.assetChartOptions['pan']['mode'] = 'x';
-
       this.assetChartOptions['zoom']['drag'] = {};
       this.assetChartOptions['zoom']['drag']['enable'] = true;
       this.assetChartOptions['zoom']['drag']['borderWidth'] = 1;
       this.assetChartOptions['zoom']['drag']['backgroundColor'] = 'rgb(130, 202, 250, 0.4)';
     }
-  }
-
-  setGraphData(chart: Chart) {
-    this.isAlive = false;
-    this.showResetZoomButton = true;
-    const start = moment.utc(chart.scales['x-axis-0'].min);
-    const end = moment.utc(chart.scales['x-axis-0'].max);
-    console.log('pan start', start.toDate());
-    console.log('pan end', end.toDate());
-    const duration = moment.duration(end.diff(start));
-    console.log('duration', duration.asSeconds());
-    const seconds = duration.asSeconds();
-    const bucketSize = this.caluclateBucketSize(seconds);
-    const payload = {
-      assetCode: encodeURIComponent(this.assetCode),
-      start: start.unix(),
-      len: Math.round(seconds),
-      bucketSize: bucketSize
-    };
-    this.getAssetReadings(payload);
-  }
-
-  public toggleDropdown() {
-    const dropDown = document.querySelector('#time-dropdown');
-    dropDown.classList.toggle('is-active');
-    if (!dropDown.classList.contains('is-active')) {
-      this.timeDropDownOpened = false;
-    } else {
-      this.timeDropDownOpened = true;
-    }
-  }
-
-  public isNumber(val) {
-    return typeof val === 'number';
-  }
-
-  selectTab(id: number, showSpinner = true) {
-    this.showSpinner = showSpinner;
-    this.selectedTab = id;
-    this.getAssetCode(this.assetCode);
-  }
-
-  isEmptyObject(obj) {
-    return (obj && (Object.keys(obj).length === 0));
-  }
-
-  keyDescOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
-    return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
-  }
-
-  public resetChartZoom() {
-    this.showResetZoomButton = false;
-    this.assetChart.chart.resetZoom();
-    this.getAssetCode(this.assetCode);
-  }
-
-  public ngOnDestroy(): void {
-    this.isAlive = false;
-  }
-
-  getAssetReadings(payload: any) {
-    this.assetService.getAssetReadingsBucket(payload).
-      subscribe(
-        (data: any[]) => {
-          this.showSpinner = false;
-          this.loadPage = false;
-          this.getBucketReadings(data);
-        },
-        error => {
-          this.showSpinner = false;
-          console.log('error in response', error);
-        });
-  }
-
-  public caluclateBucketSize(duration) {
-    let bucket = Math.round(duration / 10);
-    return bucket = bucket === 0 ? 1 : (bucket > 48 ? 48 : bucket);
-  }
-
-  setPaning(isPanning: boolean) {
-    this.panning = !isPanning;
-    const payload = {
-      assetCode: encodeURIComponent(this.assetCode),
-      bucketSize: 1
-    };
-    this.getAssetReadings(payload);
   }
 }
