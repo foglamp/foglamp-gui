@@ -14,3 +14,7 @@ table tbody {
 .card-header-title {
   padding: unset;
 }
+
+#card-title {
+  padding: 0.75rem 1.5rem;
+}
