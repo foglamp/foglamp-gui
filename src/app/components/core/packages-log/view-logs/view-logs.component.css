@@ -2,9 +2,8 @@
     width: 80%;
 }
 
-.modal-close {
-    right: 14px;
-    top: 50px;
+pre {
+    margin: 14px;
 }
 
 .modal {
