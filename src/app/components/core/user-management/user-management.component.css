@@ -1,3 +1,7 @@
 .fa::before {
     display: inline-block;
 }
+
+.tabs {
+    position: relative;
+}
