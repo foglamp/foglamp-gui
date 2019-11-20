@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
@@ -12,7 +13,7 @@ import { CertificateBaseLoginComponent } from '../certificate-base-login';
   styleUrls: ['./login.component.css']
 })
 
-export class LoginComponent implements OnInit {
+export class LoginComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   model: any = {};
   returnUrl: string;
 
@@ -25,6 +26,7 @@ export class LoginComponent implements OnInit {
     private userService: UserService,
     private ping: PingService,
     public ngProgress: ProgressBarService) {
+    super();
     this.sharedService.isUserLoggedIn.next({
       'loggedIn': false,
       'isAuthOptional': JSON.parse(sessionStorage.getItem('LOGIN_SKIPPED'))
@@ -47,17 +49,17 @@ export class LoginComponent implements OnInit {
   /**
   * Open certificate login modal dialog
   */
- openLoginWithCertificateModal() {
-  // call child component method to toggle modal
-  this.certificateBaseLogin.toggleModal(true);
-}
+  openLoginWithCertificateModal() {
+    // call child component method to toggle modal
+    this.certificateBaseLogin.toggleModal(true);
+  }
 
   /**
    *  login user into system
    */
   login() {
     this.ngProgress.start();
-    this.authService.login(this.model.username, this.model.password).
+    this.subs.sink = this.authService.login(this.model.username, this.model.password).
       subscribe(
         (data) => {
           const pingInterval = JSON.parse(localStorage.getItem('PING_INTERVAL'));
@@ -92,7 +94,7 @@ export class LoginComponent implements OnInit {
 
   getUser(id) {
     // Get SignedIn user details
-    this.userService.getUser(id)
+    this.subs.sink = this.userService.getUser(id)
       .subscribe(
         (userData) => {
           this.sharedService.isUserLoggedIn.next({

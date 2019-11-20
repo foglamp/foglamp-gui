@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
 import { AfterViewInit, Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { differenceWith, isEqual, isEmpty } from 'lodash';
 
@@ -10,7 +11,7 @@ import ConfigTypeValidation from '../configuration-type-validation';
   templateUrl: './config-children.component.html',
   styleUrls: ['./config-children.component.css']
 })
-export class ConfigChildrenComponent implements AfterViewInit {
+export class ConfigChildrenComponent extends UnsubscribeOnDestroyAdapter implements AfterViewInit {
 
   configuration = [];
   configItems = [];
@@ -20,10 +21,12 @@ export class ConfigChildrenComponent implements AfterViewInit {
   @ViewChild('f', { static: true }) form;
 
   constructor(private configService: ConfigurationService,
-    private validateFormService: ValidateFormService) { }
+    private validateFormService: ValidateFormService) {
+      super();
+     }
 
   ngAfterViewInit() {
-    this.form.control.valueChanges
+    this.subs.sink = this.form.control.valueChanges
       .subscribe(values => {
         const formData = [];
         for (const key in values) {
@@ -90,7 +93,7 @@ export class ConfigChildrenComponent implements AfterViewInit {
       return;
     }
     this.configAttributes = [];
-    this.configService.getCategory(categoryConfig.key).
+    this.subs.sink = this.configService.getCategory(categoryConfig.key).
       subscribe(
         (data: any) => {
           this.configItems = [];

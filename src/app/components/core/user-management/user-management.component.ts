@@ -1,17 +1,17 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { AlertService, AuthService, UserService, ProgressBarService, SharedService } from '../../../services';
 import { AlertDialogComponent } from '../../common/alert-dialog/alert-dialog.component';
 import { CreateUserComponent } from './create-user/create-user.component';
 import { UpdateUserComponent } from './update-user/update-user.component';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-user-management',
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.css']
 })
-export class UserManagementComponent implements OnInit, OnDestroy {
+export class UserManagementComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
 
   @ViewChild(AlertDialogComponent, { static: true }) child: AlertDialogComponent;
   @ViewChild(CreateUserComponent, { static: true }) createUserModal: CreateUserComponent;
@@ -23,7 +23,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   public uid: string;
   public roles = [];
   seletedTab: Number = 1;  // 1: user-management , 2 : roles
-  private viewPortSubscription: Subscription;
   viewPort: any = '';
 
   constructor(private authService: AuthService,
@@ -31,19 +30,21 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     private userService: UserService,
     public ngProgress: ProgressBarService,
     private sharedService: SharedService
-    ) { }
+  ) {
+    super();
+  }
 
   ngOnInit() {
     this.uid = sessionStorage.getItem('uid');
     this.getUsers();
-    this.viewPortSubscription = this.sharedService.viewport.subscribe(viewport => {
+    this.subs.sink = this.sharedService.viewport.subscribe(viewport => {
       this.viewPort = viewport;
     });
   }
 
   getUsers() {
     this.ngProgress.start();
-    this.userService.getAllUsers()
+    this.subs.sink = this.userService.getAllUsers()
       .subscribe(
         (userData) => {
           this.getRole(userData['users']);
@@ -61,7 +62,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   getRole(users) {
     this.ngProgress.start();
-    this.userService.getRole()
+    this.subs.sink = this.userService.getRole()
       .subscribe(
         (roleRecord) => {
           this.roles = roleRecord['roles'];
@@ -129,7 +130,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     console.log('Deleting User:', userId);
     /** request started */
     this.ngProgress.start();
-    this.userService.deleteUser(userId).
+    this.subs.sink = this.userService.deleteUser(userId).
       subscribe(
         (data) => {
           /** request completed */
@@ -153,7 +154,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
      */
   clearAllSessions(id) {
     this.ngProgress.start();
-    this.authService.clearAllSessions(id).
+    this.subs.sink = this.authService.clearAllSessions(id).
       subscribe(
         () => {
           this.ngProgress.done();
@@ -174,9 +175,5 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     if (id === 2) {
       this.seletedTab = id;
     }
-  }
-
-  public ngOnDestroy(): void {
-    this.viewPortSubscription.unsubscribe();
   }
 }

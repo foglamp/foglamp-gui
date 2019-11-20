@@ -1,8 +1,8 @@
-import { Component, Input, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { assign, cloneDeep, reduce, sortBy, map } from 'lodash';
-import { Subscription } from 'rxjs';
 
 import { AlertService, SchedulesService, SharedService, PluginService, ProgressBarService } from '../../../../services';
 import Utils from '../../../../utils';
@@ -15,7 +15,7 @@ import { ValidateFormService } from '../../../../services/validate-form.service'
   templateUrl: './add-task-wizard.component.html',
   styleUrls: ['./add-task-wizard.component.css']
 })
-export class AddTaskWizardComponent implements OnInit, OnDestroy {
+export class AddTaskWizardComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
 
   public plugins = [];
   public configurationData;
@@ -31,7 +31,6 @@ export class AddTaskWizardComponent implements OnInit, OnDestroy {
   public schedulesName = [];
   public selectedPluginDescription = '';
   public showSpinner = false;
-  private subscription: Subscription;
 
   public taskType = 'North';
 
@@ -60,14 +59,16 @@ export class AddTaskWizardComponent implements OnInit, OnDestroy {
     private ngProgress: ProgressBarService,
     private validateFormService: ValidateFormService,
     private sharedService: SharedService
-  ) { }
+  ) {
+    super();
+  }
 
   ngOnInit() {
     this.getSchedules();
     this.taskForm.get('repeatDays').setValue('0');
     this.taskForm.get('repeatTime').setValue('00:00:30');
     this.getInstalledNorthPlugins();
-    this.subscription = this.sharedService.showLogs.subscribe(showPackageLogs => {
+    this.subs.sink = this.sharedService.showLogs.subscribe(showPackageLogs => {
       if (showPackageLogs.isSubscribed) {
         // const closeBtn = <HTMLDivElement>document.querySelector('.modal .delete');
         // if (closeBtn) {
@@ -248,7 +249,7 @@ export class AddTaskWizardComponent implements OnInit, OnDestroy {
   private getInstalledNorthPlugins(isPluginInstalled?: boolean) {
     /** request started */
     this.showLoadingSpinner();
-    this.pluginService.getInstalledPlugins(this.taskType.toLowerCase()).subscribe(
+    this.subs.sink = this.pluginService.getInstalledPlugins(this.taskType.toLowerCase()).subscribe(
       (data: any) => {
         /** request completed */
         this.hideLoadingSpinner();
@@ -294,7 +295,7 @@ export class AddTaskWizardComponent implements OnInit, OnDestroy {
     this.taskForm.get('name').markAsTouched();
     /** request started */
     this.ngProgress.start();
-    this.schedulesService.createScheduledTask(payload)
+    this.subs.sink = this.schedulesService.createScheduledTask(payload)
       .subscribe(
         () => {
           /** request completed */
@@ -401,7 +402,7 @@ export class AddTaskWizardComponent implements OnInit, OnDestroy {
     this.schedulesName = [];
     /** request started */
     this.ngProgress.start();
-    this.schedulesService.getSchedules().
+    this.subs.sink = this.schedulesService.getSchedules().
       subscribe(
         (data) => {
           /** request completed */
@@ -458,9 +459,5 @@ export class AddTaskWizardComponent implements OnInit, OnDestroy {
 
   public hideLoadingSpinner() {
     this.showSpinner = false;
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
   }
 }

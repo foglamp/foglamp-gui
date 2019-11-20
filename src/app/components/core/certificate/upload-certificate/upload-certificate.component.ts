@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
 import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
@@ -8,7 +9,7 @@ import { AlertService, CertificateService, ProgressBarService } from '../../../.
   templateUrl: './upload-certificate.component.html',
   styleUrls: ['./upload-certificate.component.css']
 })
-export class UploadCertificateComponent implements OnInit {
+export class UploadCertificateComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   form: FormGroup;
   key;
   cert;
@@ -23,7 +24,9 @@ export class UploadCertificateComponent implements OnInit {
   constructor(private certificateService: CertificateService,
     public ngProgress: ProgressBarService,
     private alertService: AlertService,
-    public formBuilder: FormBuilder) { }
+    public formBuilder: FormBuilder) {
+    super();
+  }
 
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler() {
     this.toggleModal(false);
@@ -150,7 +153,7 @@ export class UploadCertificateComponent implements OnInit {
       formData.append('overwrite', this.overwrite);
       /** request started */
       this.ngProgress.start();
-      this.certificateService.uploadCertificate(formData).
+      this.subs.sink = this.certificateService.uploadCertificate(formData).
         subscribe(
           (data) => {
             /** request completed */

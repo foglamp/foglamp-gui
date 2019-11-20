@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
 import { Component, EventEmitter, OnInit, Output, HostListener } from '@angular/core';
 
 import { User } from '../../../../models';
@@ -8,7 +9,7 @@ import { AlertService, UserService } from '../../../../services';
   templateUrl: './update-user.component.html',
   styleUrls: ['./update-user.component.css']
 })
-export class UpdateUserComponent implements OnInit {
+export class UpdateUserComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   public userRecord: User;
   userRole = [];
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
@@ -16,7 +17,9 @@ export class UpdateUserComponent implements OnInit {
   selectedRole = 'user'; // set "user" as a default role
 
   constructor(private alertService: AlertService,
-    private userService: UserService) { }
+    private userService: UserService) {
+      super();
+     }
 
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler() {
     this.toggleModal(false);
@@ -72,7 +75,7 @@ export class UpdateUserComponent implements OnInit {
    *  Get all roles
    */
   getRole() {
-    this.userService.getRole()
+    this.subs.sink = this.userService.getRole()
       .subscribe(
         (roleRecord) => {
           this.userRole = roleRecord['roles'];
@@ -101,7 +104,7 @@ export class UpdateUserComponent implements OnInit {
    *  To update user role by admin
    */
   updateRole() {
-    this.userService.updateRole(this.userRecord).
+    this.subs.sink = this.userService.updateRole(this.userRecord).
       subscribe(
         (data) => {
           this.notify.emit();
@@ -122,7 +125,7 @@ export class UpdateUserComponent implements OnInit {
     *  To reset user password by admin
     */
   resetPassword() {
-    this.userService.resetPassword(this.userRecord).
+    this.subs.sink = this.userService.resetPassword(this.userRecord).
       subscribe(
         (data) => {
           this.notify.emit();

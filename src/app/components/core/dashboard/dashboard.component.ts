@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
+import { Component, OnInit } from '@angular/core';
 import { map } from 'lodash';
 import { interval } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
@@ -13,7 +14,7 @@ import { GRAPH_REFRESH_INTERVAL, STATS_HISTORY_TIME_FILTER } from '../../../util
   styleUrls: ['./dashboard.component.css']
 })
 
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   // Filtered array of received statistics data (having objects except key @FOGBENCH).
   statistics = [];
 
@@ -39,8 +40,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private alertService: AlertService,
     private dateFormatter: DateFormatterPipe,
     private ping: PingService) {
+    super();
     this.isAlive = true;
-    this.ping.refreshIntervalChanged.subscribe((timeInterval: number) => {
+    this.subs.sink = this.ping.refreshIntervalChanged.subscribe((timeInterval: number) => {
       if (timeInterval === -1) {
         this.isAlive = false;
       }
@@ -55,7 +57,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       localStorage.removeItem('OPTED_GRAPHS');
     }
     this.getStatistics();
-    interval(this.refreshInterval)
+    this.subs.sink = interval(this.refreshInterval)
       .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
       .subscribe(() => {
         this.refreshGraph();
@@ -84,7 +86,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   public getStatistics(): void {
-    this.statisticsService.getStatistics().
+    this.subs.sink = this.statisticsService.getStatistics().
       subscribe((data: any[]) => {
         // filter received data for FOGBENCH data
         this.statistics = data.filter(value => value['key'].toLowerCase().indexOf('fogbench') === -1);
@@ -151,7 +153,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
    *  Refresh graphs
    */
   public refreshGraph() {
-    this.statisticsService.getStatistics().
+    this.subs.sink = this.statisticsService.getStatistics().
       subscribe((data: any[]) => {
         this.statistics = data.filter(value => value['key'].toLowerCase().indexOf('fogbench') === -1);
         for (const stats of this.statistics) {
@@ -169,7 +171,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   public refreshStatisticsHistory(): void {
-    this.statisticsService.getStatisticsHistory(this.optedTime).
+    this.subs.sink = this.statisticsService.getStatisticsHistory(this.optedTime).
       subscribe((data: any[]) => {
         this.statisticsKeys.forEach(dt => {
           const labels = [];
@@ -206,7 +208,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       localStorage.setItem('STATS_HISTORY_TIME_FILTER', time);
     }
     this.optedTime = localStorage.getItem('STATS_HISTORY_TIME_FILTER');
-    this.statisticsService.getStatisticsHistory(this.optedTime, null, null).
+    this.subs.sink = this.statisticsService.getStatisticsHistory(this.optedTime, null, null).
       subscribe((data: any[]) => {
         this.statisticsKeys.forEach(dt => {
           const labels = [];
@@ -254,9 +256,5 @@ export class DashboardComponent implements OnInit, OnDestroy {
     };
     this.showGraph(data);
     this.toggleDropDown(id);
-  }
-
-  public ngOnDestroy(): void {
-    this.isAlive = false;
   }
 }

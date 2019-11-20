@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
 import { Component, OnInit, HostListener } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -10,7 +11,7 @@ import { ConnectedServiceStatus } from '../../../services/connected-service-stat
   templateUrl: './service-discovery.component.html',
   styleUrls: ['./service-discovery.component.css']
 })
-export class ServiceDiscoveryComponent implements OnInit {
+export class ServiceDiscoveryComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   discoveredServices = [];
   connectedServiceStatus = false;
   discoveryServiceStatus = false;
@@ -27,6 +28,7 @@ export class ServiceDiscoveryComponent implements OnInit {
   form: FormGroup;
   constructor(private discoveryService: DiscoveryService, private router: Router,
     public fb: FormBuilder, private status: ConnectedServiceStatus) {
+    super();
     this.JSON = JSON;
     this.discoveryHost = localStorage.getItem('DISCOVERY_HOST') != null ? localStorage.getItem('DISCOVERY_HOST') : 'localhost';
     this.discoveryPort = localStorage.getItem('DISCOVERY_PORT') != null ? localStorage.getItem('DISCOVERY_PORT') : '3000';
@@ -37,12 +39,12 @@ export class ServiceDiscoveryComponent implements OnInit {
       discoveryHostControl: ['', Validators.required],
       discoveryPortControl: ['', Validators.required],
       discoveryProtocol: [localStorage.getItem('DISCOVERY_PROTOCOL') != null ?
-                         localStorage.getItem('DISCOVERY_PROTOCOL') : 'http', Validators.required]
+        localStorage.getItem('DISCOVERY_PROTOCOL') : 'http', Validators.required]
     });
     this.connectedProtocol = localStorage.getItem('CONNECTED_PROTOCOL');
     this.connectedHost = localStorage.getItem('CONNECTED_HOST');
     this.connectedPort = localStorage.getItem('CONNECTED_PORT');
-    this.status.currentMessage.subscribe(status => {
+    this.subs.sink = this.status.currentMessage.subscribe(status => {
       this.connectedServiceStatus = status;
     });
   }
@@ -76,7 +78,7 @@ export class ServiceDiscoveryComponent implements OnInit {
 
   discoverService(discoveryURL) {
     const serviceRecord = [];
-    this.discoveryService.discover(discoveryURL)
+    this.subs.sink = this.discoveryService.discover(discoveryURL)
       .subscribe(
         (data) => {
           this.isLoading = false;

@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
 import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { sortBy } from 'lodash';
 
@@ -22,7 +23,7 @@ enum weekDays {
   styleUrls: ['./list-schedules.component.css']
 })
 
-export class ListSchedulesComponent implements OnInit {
+export class ListSchedulesComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   public scheduleData = [];
   public scheduleProcess = [];
   public scheduleType = [];
@@ -46,10 +47,11 @@ export class ListSchedulesComponent implements OnInit {
   constructor(private schedulesService: SchedulesService,
     private alertService: AlertService,
     public ngProgress: ProgressBarService
-  ) { }
+  ) {
+    super();
+  }
 
   ngOnInit() {
-
     this.getScheduleType();
     this.getSchedulesProcesses();
 
@@ -65,7 +67,7 @@ export class ListSchedulesComponent implements OnInit {
 
   public getSchedulesProcesses(): void {
     this.scheduleProcess = [];
-    this.schedulesService.getScheduledProcess().
+    this.subs.sink = this.schedulesService.getScheduledProcess().
       subscribe(
         (data) => {
           this.scheduleProcess = data['processes'];
@@ -81,7 +83,7 @@ export class ListSchedulesComponent implements OnInit {
   }
 
   public getScheduleType(): void {
-    this.schedulesService.getScheduleType().
+    this.subs.sink = this.schedulesService.getScheduleType().
       subscribe(
         (data) => {
           this.scheduleType = data['scheduleType'];
@@ -100,7 +102,7 @@ export class ListSchedulesComponent implements OnInit {
     this.scheduleData = [];
     /** request started */
     this.ngProgress.start();
-    this.schedulesService.getSchedules().
+    this.subs.sink = this.schedulesService.getSchedules().
       subscribe(
         (data: any) => {
           /** request completed */

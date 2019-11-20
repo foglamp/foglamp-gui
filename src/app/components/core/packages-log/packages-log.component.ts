@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertService, PackagesLogService, ProgressBarService } from '../../../services';
 import { sortBy } from 'lodash';
@@ -8,14 +9,16 @@ import { ViewLogsComponent } from './view-logs/view-logs.component';
   templateUrl: './packages-log.component.html',
   styleUrls: ['./packages-log.component.css']
 })
-export class PackagesLogComponent implements OnInit {
+export class PackagesLogComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   public logList = [];
 
   @ViewChild(ViewLogsComponent, { static: false }) viewLogsModal: ViewLogsComponent;
 
   constructor(private packagesLogService: PackagesLogService,
     private ngProgress: ProgressBarService,
-    private alertService: AlertService) { }
+    private alertService: AlertService) {
+      super();
+    }
 
   ngOnInit() {
     this.getPackagesLog();
@@ -24,7 +27,7 @@ export class PackagesLogComponent implements OnInit {
   public getPackagesLog() {
     /** request start */
     this.ngProgress.start();
-    this.packagesLogService.getPackageLogs().
+    this.subs.sink = this.packagesLogService.getPackageLogs().
     subscribe(
       (data) => {
         this.ngProgress.done();

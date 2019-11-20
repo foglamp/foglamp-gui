@@ -9998,6 +9998,11 @@ stylus@0.54.5:
     sax "0.5.x"
     source-map "0.1.x"
 
+subsink@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/subsink/-/subsink-1.0.0.tgz#48ca96dbc4fd57ed0ceaf9fdd302ace37c864eaf"
+  integrity sha512-HDzahJaoR9x1PAhFOMUB/Q3IUjNML6wY1bZ2m6bXAo74+PUm4k6Yb68XUyp/kpchOHegN6ickwMLIWYKIp6NEg==
+
 supercluster@^6.0.1:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/supercluster/-/supercluster-6.0.2.tgz#aa2eaae185ef97872f388c683ec29f6991721ee3"

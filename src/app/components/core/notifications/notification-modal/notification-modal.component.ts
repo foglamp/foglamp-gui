@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, ViewChild, HostListener } from '@angular/core';
 
 import { isEmpty } from 'lodash';
@@ -16,7 +17,7 @@ import { ValidateFormService } from '../../../../services/validate-form.service'
   templateUrl: './notification-modal.component.html',
   styleUrls: ['./notification-modal.component.css']
 })
-export class NotificationModalComponent implements OnInit, OnChanges {
+export class NotificationModalComponent extends UnsubscribeOnDestroyAdapter implements OnInit, OnChanges {
 
   @Input() notification: { notification: any };
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
@@ -43,7 +44,9 @@ export class NotificationModalComponent implements OnInit, OnChanges {
     private alertService: AlertService,
     private notificationService: NotificationsService,
     private validateFormService: ValidateFormService,
-    public ngProgress: ProgressBarService) { }
+    public ngProgress: ProgressBarService) {
+      super();
+    }
 
   ngOnInit() { }
 
@@ -75,7 +78,7 @@ export class NotificationModalComponent implements OnInit, OnChanges {
   public getRuleConfiguration(): void {
     const categoryValues = [];
     const notificationName = this.notification['name'];
-    this.configService.getCategory(`rule${notificationName}`).
+    this.subs.sink = this.configService.getCategory(`rule${notificationName}`).
       subscribe(
         (data) => {
           if (!isEmpty(data)) {
@@ -98,7 +101,7 @@ export class NotificationModalComponent implements OnInit, OnChanges {
     this.ngProgress.start();
     const categoryValues = [];
     const notificationName = this.notification['name'];
-    this.configService.getCategory(`delivery${notificationName}`).
+    this.subs.sink = this.configService.getCategory(`delivery${notificationName}`).
       subscribe(
         (data) => {
           if (!isEmpty(data)) {
@@ -121,7 +124,7 @@ export class NotificationModalComponent implements OnInit, OnChanges {
     this.ngProgress.start();
     const categoryValues = [];
     const notificationName = this.notification['name'];
-    this.configService.getCategory(notificationName).
+    this.subs.sink = this.configService.getCategory(notificationName).
       subscribe(
         (data: any) => {
           if (!isEmpty(data)) {
@@ -163,7 +166,7 @@ export class NotificationModalComponent implements OnInit, OnChanges {
 
   deleteNotification(notificationName: string) {
     this.ngProgress.start();
-    this.notificationService.deleteNotification(notificationName)
+    this.subs.sink = this.notificationService.deleteNotification(notificationName)
       .subscribe(
         (data: any) => {
           this.ngProgress.done();

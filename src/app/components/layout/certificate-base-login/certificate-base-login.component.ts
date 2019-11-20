@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
 import { Component, OnInit, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ProgressBarService, AlertService, AuthService, PingService, UserService } from '../../../services';
@@ -9,7 +10,7 @@ import { Router } from '@angular/router';
   templateUrl: './certificate-base-login.component.html',
   styleUrls: ['./certificate-base-login.component.css']
 })
-export class CertificateBaseLoginComponent implements OnInit {
+export class CertificateBaseLoginComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   form: FormGroup;
   isCertificateExt = true;
   certificateFile: any;
@@ -23,7 +24,9 @@ export class CertificateBaseLoginComponent implements OnInit {
     private router: Router,
     private userService: UserService,
     private sharedService: SharedService,
-    public formBuilder: FormBuilder) { }
+    public formBuilder: FormBuilder) {
+      super();
+    }
 
   ngOnInit() {
     this.form = this.formBuilder.group({
@@ -79,7 +82,7 @@ export class CertificateBaseLoginComponent implements OnInit {
     }
     /** request started */
     this.ngProgress.start();
-    this.authService.loginWithCertificate(this.certificateContent).
+    this.subs.sink = this.authService.loginWithCertificate(this.certificateContent).
       subscribe(
         (data) => {
           const pingInterval = JSON.parse(localStorage.getItem('PING_INTERVAL'));
@@ -121,7 +124,7 @@ export class CertificateBaseLoginComponent implements OnInit {
 
   getUser(id) {
     // Get SignedIn user details
-    this.userService.getUser(id)
+    this.subs.sink = this.userService.getUser(id)
       .subscribe(
         (userData) => {
           this.sharedService.isUserLoggedIn.next({

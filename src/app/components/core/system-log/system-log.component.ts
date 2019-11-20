@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
 import { Component, OnInit } from '@angular/core';
 
 import { AlertService, SystemLogService, ProgressBarService } from '../../../services';
@@ -7,7 +8,7 @@ import { AlertService, SystemLogService, ProgressBarService } from '../../../ser
   templateUrl: './system-log.component.html',
   styleUrls: ['./system-log.component.css']
 })
-export class SystemLogComponent implements OnInit {
+export class SystemLogComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   public logs: any;
   public source: String = '';
   public level: String = '';
@@ -24,7 +25,9 @@ export class SystemLogComponent implements OnInit {
   constructor(private systemLogService: SystemLogService,
     private alertService: AlertService,
     public ngProgress: ProgressBarService
-  ) { }
+  ) {
+    super();
+  }
 
   ngOnInit() {
     this.getSysLogs();
@@ -155,7 +158,7 @@ export class SystemLogComponent implements OnInit {
     if (this.limit === 0) {
       this.limit = this.DEFAULT_LIMIT;
     }
-    this.systemLogService.getSysLogs(this.limit, this.tempOffset, this.source, this.level).
+    this.subs.sink = this.systemLogService.getSysLogs(this.limit, this.tempOffset, this.source, this.level).
       subscribe(
         (data) => {
           /** request completed */

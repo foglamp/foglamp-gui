@@ -1,32 +1,33 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
+import { Component, OnInit } from '@angular/core';
 import { AlertService, SupportService, ProgressBarService, SharedService } from '../../../services';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-support',
   templateUrl: './support.component.html',
   styleUrls: ['./support.component.css']
 })
-export class SupportComponent implements OnInit, OnDestroy {
+export class SupportComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   public bundlesData = [];
-  private viewPortSubscription: Subscription;
   viewPort: any = '';
 
   constructor(private supportBundleService: SupportService,
     public ngProgress: ProgressBarService,
     private alertService: AlertService,
-    private sharedService: SharedService) { }
+    private sharedService: SharedService) {
+      super();
+    }
 
   ngOnInit() {
     this.getBundles();
-    this.viewPortSubscription = this.sharedService.viewport.subscribe(viewport => {
+    this.subs.sink = this.sharedService.viewport.subscribe(viewport => {
       this.viewPort = viewport;
     });
   }
 
   public getBundles() {
     this.ngProgress.start();
-    this.supportBundleService.get().
+    this.subs.sink = this.supportBundleService.get().
       subscribe(
         (data) => {
           this.ngProgress.done();
@@ -44,7 +45,7 @@ export class SupportComponent implements OnInit, OnDestroy {
 
   public requestNewBundle() {
     this.ngProgress.start();
-    this.supportBundleService.post().
+    this.subs.sink = this.supportBundleService.post().
       subscribe(
         () => {
           this.ngProgress.done();
@@ -71,10 +72,6 @@ export class SupportComponent implements OnInit, OnDestroy {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-  }
-
-  public ngOnDestroy(): void {
-    this.viewPortSubscription.unsubscribe();
   }
 }
 

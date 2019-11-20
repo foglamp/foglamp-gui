@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
 import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -10,7 +11,7 @@ import { AlertDialogComponent } from '../../../common/alert-dialog/alert-dialog.
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.css']
 })
-export class UserProfileComponent implements OnInit {
+export class UserProfileComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   public userRecord: any = {};
   public childData = {};
   isShow = false;
@@ -20,7 +21,9 @@ export class UserProfileComponent implements OnInit {
     private alertService: AlertService,
     private userService: UserService,
     public ngProgress: ProgressBarService,
-    private router: Router) { }
+    private router: Router) {
+    super();
+  }
 
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler() {
     this.toggleModal(false);
@@ -35,10 +38,10 @@ export class UserProfileComponent implements OnInit {
     this.ngProgress.start();
     const id = sessionStorage.getItem('uid');
     // Get SignedIn user details
-    this.userService.getUser(id)
+    this.subs.sink = this.userService.getUser(id)
       .subscribe(
         (userData) => {
-          this.userService.getRole()
+          this.subs.sink = this.userService.getRole()
             .subscribe(
               (roleRecord) => {
                 this.ngProgress.done();
@@ -96,7 +99,7 @@ export class UserProfileComponent implements OnInit {
       new_password: form.controls['password'].value
     };
     this.ngProgress.start();
-    this.userService.changePassword(passwordPayload, userName).
+    this.subs.sink = this.userService.changePassword(passwordPayload, userName).
       subscribe(
         (data) => {
           this.ngProgress.done();
@@ -139,7 +142,7 @@ export class UserProfileComponent implements OnInit {
     */
   clearAllSessions(id) {
     this.ngProgress.start();
-    this.authService.clearAllSessions(id).
+    this.subs.sink = this.authService.clearAllSessions(id).
       subscribe(
         () => {
           sessionStorage.clear();

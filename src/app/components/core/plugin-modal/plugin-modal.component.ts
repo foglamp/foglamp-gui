@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
 import { Component, OnInit, Input, OnChanges, Output, EventEmitter, HostListener } from '@angular/core';
 import { isEmpty } from 'lodash';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
@@ -9,7 +10,7 @@ import { ServicesApiService, AlertService, ProgressBarService } from '../../../s
   templateUrl: './plugin-modal.component.html',
   styleUrls: ['./plugin-modal.component.css']
 })
-export class PluginModalComponent implements OnInit, OnChanges {
+export class PluginModalComponent extends UnsubscribeOnDestroyAdapter implements OnInit, OnChanges {
 
   plugins = [];
   installButtonEnabled = true;
@@ -25,7 +26,9 @@ export class PluginModalComponent implements OnInit, OnChanges {
 
   constructor(private service: ServicesApiService,
     private alertService: AlertService,
-    private ngProgress: ProgressBarService) { }
+    private ngProgress: ProgressBarService) {
+      super();
+     }
 
   ngOnInit() {
     this.pluginForm = new FormGroup({
@@ -61,7 +64,7 @@ export class PluginModalComponent implements OnInit, OnChanges {
   }
 
   getAvailablePlugins(type: string) {
-    this.service.getAvailablePlugins(type).
+    this.subs.sink = this.service.getAvailablePlugins(type).
       subscribe(
         (data: any) => {
           this.installButtonEnabled = true;
@@ -106,7 +109,7 @@ export class PluginModalComponent implements OnInit, OnChanges {
     this.ngProgress.start();
     this.pluginForm.controls.pluginName.disable();
     this.alertService.activityMessage('Installing ' + pluginName + ' ' + this.data.type.toLowerCase() + ' plugin...', true);
-    this.service.installPlugin(pluginData).
+    this.subs.sink = this.service.installPlugin(pluginData).
       subscribe(
         (data: any) => {
           /** request done */

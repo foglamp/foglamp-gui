@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
 import { Component, EventEmitter, OnInit, Output, HostListener } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
@@ -9,7 +10,7 @@ import { AlertService, UserService } from '../../../../services';
   templateUrl: './create-user.component.html',
   styleUrls: ['./create-user.component.css']
 })
-export class CreateUserComponent implements OnInit {
+export class CreateUserComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   model: User;
   isUpdateForm = false;
   userRole = [];
@@ -17,7 +18,9 @@ export class CreateUserComponent implements OnInit {
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
 
   constructor(private userService: UserService,
-    private alertService: AlertService) { }
+    private alertService: AlertService) {
+    super();
+  }
 
   ngOnInit() {
     this.getRole();
@@ -53,7 +56,7 @@ export class CreateUserComponent implements OnInit {
   }
 
   public createUser(form: NgForm) {
-    this.userService.createUser(this.model).
+    this.subs.sink = this.userService.createUser(this.model).
       subscribe(
         (data) => {
           this.notify.emit();
@@ -73,7 +76,7 @@ export class CreateUserComponent implements OnInit {
   }
 
   getRole() {
-    this.userService.getRole()
+    this.subs.sink = this.userService.getRole()
       .subscribe(
         (roleRecord) => {
           this.userRole = roleRecord['roles'];

@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { sortBy } from 'lodash';
 import { map } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
 
 import {
   AlertService, NotificationsService, SharedService, ProgressBarService, SchedulesService, ServicesApiService
@@ -18,7 +18,7 @@ import { ViewLogsComponent } from '../packages-log/view-logs/view-logs.component
   styleUrls: ['./notifications.component.css'],
   providers: [ServicesApiService]
 })
-export class NotificationsComponent implements OnInit, OnDestroy {
+export class NotificationsComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
 
   isNotificationServiceAvailable = false;
   isNotificationServiceEnabled = false;
@@ -30,8 +30,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   public notificationServiceRecord: any;
   public availableServices = [];
-  private subscription: Subscription;
-  private viewPortSubscription: Subscription;
   public showSpinner = false;
   isNotificationModalOpen = false;
 
@@ -46,18 +44,20 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     public alertService: AlertService,
     private route: ActivatedRoute,
     public router: Router,
-    private sharedService: SharedService) { }
+    private sharedService: SharedService) {
+      super();
+    }
 
   ngOnInit() {
     this.checkNotificationServiceStatus();
     this.getNotificationInstance();
-    this.subscription = this.sharedService.showLogs.subscribe(showPackageLogs => {
+    this.subs.sink = this.sharedService.showLogs.subscribe(showPackageLogs => {
       if (showPackageLogs.isSubscribed) {
         this.viewLogsComponent.toggleModal(true, showPackageLogs.fileLink);
         showPackageLogs.isSubscribed = false;
       }
     });
-    this.viewPortSubscription = this.sharedService.viewport.subscribe(viewport => {
+    this.subs.sink = this.sharedService.viewport.subscribe(viewport => {
       this.viewPort = viewport;
     });
   }
@@ -106,7 +106,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     /** request started */
     this.ngProgress.start();
     this.alertService.activityMessage('Installing ' + 'notification service...', true);
-    this.servicesApiService.installService(servicePayload).
+    this.subs.sink = this.servicesApiService.installService(servicePayload).
       subscribe(
         (data: any) => {
           /** request done */
@@ -151,7 +151,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     /** request start */
     this.ngProgress.start();
 
-    this.servicesApiService.addService(payload)
+    this.subs.sink = this.servicesApiService.addService(payload)
       .subscribe(
         () => {
           this.alertService.success('Notification service added successfully.', true);
@@ -177,7 +177,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   enableNotificationService() {
     /** request started */
     this.ngProgress.start();
-    this.schedulesService.enableScheduleByName(this.notificationServiceName).
+    this.subs.sink = this.schedulesService.enableScheduleByName(this.notificationServiceName).
       subscribe(
         (data) => {
           /** request completed */
@@ -199,7 +199,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   disableNotificationService() {
     /** request started */
     this.ngProgress.start();
-    this.schedulesService.disableScheduleByName(this.notificationServiceName).
+    this.subs.sink = this.schedulesService.disableScheduleByName(this.notificationServiceName).
       subscribe(
         (data) => {
           /** request completed */
@@ -220,7 +220,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   public getNotificationInstance() {
     this.showLoadingSpinner();
-    this.notificationService.getNotificationInstance().
+    this.subs.sink = this.notificationService.getNotificationInstance().
       subscribe(
         (data: any) => {
           this.notificationInstances = data['notifications'];
@@ -291,7 +291,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   public checkServiceStatus() {
     /** request start */
     this.ngProgress.start();
-    this.servicesApiService.getAllServices()
+    this.subs.sink = this.servicesApiService.getAllServices()
       .subscribe((res: any) => {
         /** request done */
         this.ngProgress.done();
@@ -314,7 +314,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   }
 
   checkInstalledServices() {
-    this.route.data.pipe(map(data => data['service'].services))
+    this.subs.sink = this.route.data.pipe(map(data => data['service'].services))
       .subscribe(res => {
         const service = res.find((svc: any) => {
           if (svc.type === 'Notification') {
@@ -346,7 +346,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   }
 
   public getSchedules(): void {
-    this.schedulesService.getSchedules().
+    this.subs.sink = this.schedulesService.getSchedules().
       subscribe(
         (data: any) => {
           const schedule = data.schedules.find((item: any) => item.processName === 'notification_c');
@@ -368,10 +368,5 @@ export class NotificationsComponent implements OnInit, OnDestroy {
             this.alertService.error(error.statusText);
           }
         });
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
-    this.viewPortSubscription.unsubscribe();
   }
 }

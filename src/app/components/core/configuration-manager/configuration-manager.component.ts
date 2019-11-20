@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { TreeComponent } from 'angular-tree-component';
 import { isEmpty, findIndex } from 'lodash';
@@ -9,7 +10,7 @@ import { AlertService, ConfigurationService, ProgressBarService } from '../../..
   templateUrl: './configuration-manager.component.html',
   styleUrls: ['./configuration-manager.component.css']
 })
-export class ConfigurationManagerComponent implements OnInit {
+export class ConfigurationManagerComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   public categoryData = [];
   public rootCategories = [];
   public JSON;
@@ -27,6 +28,7 @@ export class ConfigurationManagerComponent implements OnInit {
     private alertService: AlertService,
     public ngProgress: ProgressBarService
   ) {
+    super();
     this.JSON = JSON;
   }
 
@@ -36,7 +38,7 @@ export class ConfigurationManagerComponent implements OnInit {
 
   public getRootCategories(onLoadingPage = false) {
     this.rootCategories = [];
-    this.configService.getRootCategories().
+    this.subs.sink = this.configService.getRootCategories().
       subscribe(
         (data) => {
           data['categories'].forEach(element => {
@@ -81,7 +83,7 @@ export class ConfigurationManagerComponent implements OnInit {
     this.tree.treeModel.nodes = [];
 
     this.nodes = [];
-    this.configService.getChildren(categoryName).
+    this.subs.sink = this.configService.getChildren(categoryName).
       subscribe(
         (data) => {
           /** request completed */
@@ -133,7 +135,7 @@ export class ConfigurationManagerComponent implements OnInit {
   public onNodeToggleExpanded(event) {
     event.node.data.children = [];
     if (event.node.isExpanded) {
-      this.configService.getChildren(event.node.data.id).
+      this.subs.sink = this.configService.getChildren(event.node.data.id).
         subscribe(
           (data) => {
             data['categories'].forEach(element => {
@@ -184,7 +186,7 @@ export class ConfigurationManagerComponent implements OnInit {
     /** request started */
     this.ngProgress.start();
     const categoryValues = [];
-    this.configService.getCategory(categoryKey).
+    this.subs.sink = this.configService.getCategory(categoryKey).
       subscribe(
         (data: any) => {
           /** request completed */
@@ -209,7 +211,7 @@ export class ConfigurationManagerComponent implements OnInit {
     /** request started */
     this.ngProgress.start();
     const categoryValues = [];
-    this.configService.getCategory(categoryKey).
+    this.subs.sink = this.configService.getCategory(categoryKey).
       subscribe(
         (data) => {
           /** request completed */

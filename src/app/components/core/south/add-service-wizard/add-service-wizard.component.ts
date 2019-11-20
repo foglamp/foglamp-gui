@@ -1,7 +1,7 @@
-import { Component, Input, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { assign, cloneDeep, reduce, sortBy, map } from 'lodash';
 
 import { AlertService, SchedulesService, SharedService, ServicesApiService, PluginService, ProgressBarService } from '../../../../services';
@@ -14,7 +14,7 @@ import { ValidateFormService } from '../../../../services/validate-form.service'
   templateUrl: './add-service-wizard.component.html',
   styleUrls: ['./add-service-wizard.component.css']
 })
-export class AddServiceWizardComponent implements OnInit, OnDestroy {
+export class AddServiceWizardComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
 
   public plugins = [];
   public configurationData;
@@ -28,7 +28,6 @@ export class AddServiceWizardComponent implements OnInit, OnDestroy {
   public payload: any;
   public schedulesName = [];
   public showSpinner = false;
-  private subscription: Subscription;
 
   serviceForm = new FormGroup({
     name: new FormControl(),
@@ -53,7 +52,9 @@ export class AddServiceWizardComponent implements OnInit, OnDestroy {
     private schedulesService: SchedulesService,
     private ngProgress: ProgressBarService,
     private sharedService: SharedService
-  ) { }
+  ) {
+    super();
+  }
 
   ngOnInit() {
     this.getSchedules();
@@ -62,7 +63,7 @@ export class AddServiceWizardComponent implements OnInit, OnDestroy {
       plugin: ['', Validators.required]
     });
     this.getInstalledSouthPlugins();
-    this.subscription = this.sharedService.showLogs.subscribe(showPackageLogs => {
+    this.subs.sink = this.sharedService.showLogs.subscribe(showPackageLogs => {
       if (showPackageLogs.isSubscribed) {
         // const closeBtn = <HTMLDivElement>document.querySelector('.modal .delete');
         // if (closeBtn) {
@@ -287,7 +288,7 @@ export class AddServiceWizardComponent implements OnInit, OnDestroy {
   public addService(payload) {
     /** request started */
     this.ngProgress.start();
-    this.servicesApiService.addService(payload)
+    this.subs.sink = this.servicesApiService.addService(payload)
       .subscribe(
         () => {
           /** request done */
@@ -315,7 +316,7 @@ export class AddServiceWizardComponent implements OnInit, OnDestroy {
   public getInstalledSouthPlugins(pluginInstalled?: boolean) {
     /** request started */
     this.showLoadingSpinner();
-    this.pluginService.getInstalledPlugins(this.serviceType.toLowerCase()).subscribe(
+    this.subs.sink = this.pluginService.getInstalledPlugins(this.serviceType.toLowerCase()).subscribe(
       (data: any) => {
         /** request completed */
         this.hideLoadingSpinner();
@@ -354,7 +355,7 @@ export class AddServiceWizardComponent implements OnInit, OnDestroy {
     this.schedulesName = [];
     /** request started */
     this.ngProgress.start();
-    this.schedulesService.getSchedules().
+    this.subs.sink = this.schedulesService.getSchedules().
       subscribe(
         (data) => {
           /** request completed */
@@ -399,9 +400,5 @@ export class AddServiceWizardComponent implements OnInit, OnDestroy {
 
   public hideLoadingSpinner() {
     this.showSpinner = false;
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
   }
 }

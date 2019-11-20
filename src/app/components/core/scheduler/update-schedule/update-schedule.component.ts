@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -10,7 +11,7 @@ import Utils from '../../../../utils';
   templateUrl: './update-schedule.component.html',
   styleUrls: ['./update-schedule.component.css']
 })
-export class UpdateScheduleComponent implements OnInit, OnChanges {
+export class UpdateScheduleComponent extends UnsubscribeOnDestroyAdapter implements OnInit, OnChanges {
   // Default selected schedule type is STARTUP = 1
   public selectedScheduleTypeIndex: Number = 1;
   public selectedScheduleTypeName: string;
@@ -27,10 +28,13 @@ export class UpdateScheduleComponent implements OnInit, OnChanges {
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
   regExp = '^(2[0-3]|[01]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])$'; // Regex to verify time format 00:00:00
   form: FormGroup;
-  constructor(private schedulesService: SchedulesService, public fb: FormBuilder, private alertService: AlertService) { }
-
-  ngOnInit() {
+  constructor(private schedulesService: SchedulesService,
+    public fb: FormBuilder,
+    private alertService: AlertService) {
+    super();
   }
+
+  ngOnInit() {}
 
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler() {
     this.toggleModal(false);
@@ -118,7 +122,7 @@ export class UpdateScheduleComponent implements OnInit, OnChanges {
     if (id === undefined) {
       return;
     }
-    this.schedulesService.getSchedule(id).
+    this.subs.sink = this.schedulesService.getSchedule(id).
       subscribe(
         (data) => {
           if (data['type'] === 'TIMED') {
@@ -199,7 +203,7 @@ export class UpdateScheduleComponent implements OnInit, OnChanges {
       enabled: this.form.get('enabled').value
     };
 
-    this.schedulesService.updateSchedule(this.childData.id, updatePayload).
+    this.subs.sink = this.schedulesService.updateSchedule(this.childData.id, updatePayload).
       subscribe(
         () => {
           this.alertService.success('Schedule updated successfully.');

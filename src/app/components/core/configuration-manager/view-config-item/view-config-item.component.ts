@@ -1,10 +1,10 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
 import {
   Component, EventEmitter, Input, OnChanges, OnInit,
-  Output, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy
+  Output, ViewChild, ElementRef, ChangeDetectorRef
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { differenceWith, sortBy, isEqual, isEmpty, cloneDeep, has, map, assign, find } from 'lodash';
-import { Subscription } from 'rxjs';
 
 import { AlertService, ConfigurationService, ProgressBarService, SharedService } from '../../../../services';
 import ConfigTypeValidation from '../configuration-type-validation';
@@ -15,7 +15,7 @@ import ConfigTypeValidation from '../configuration-type-validation';
   styleUrls: ['./view-config-item.component.css']
 })
 
-export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
+export class ViewConfigItemComponent extends UnsubscribeOnDestroyAdapter implements OnInit, OnChanges {
   @Input() categoryConfigurationData: any;
   @Input() useProxy = 'false';
   @Input() useFilterProxy = 'false';
@@ -38,7 +38,6 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
   public isValidJson = true;
   public selectedTheme = 'default';
   public isValidExtension = true;
-  private subscription: Subscription;
 
   @ViewChild('codeeditor', { static: false }) codeeditor: ElementRef;
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
@@ -57,11 +56,12 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
     private cdRef: ChangeDetectorRef,
     private sharedService: SharedService
   ) {
+    super();
     this.JSON = JSON;
   }
 
   ngOnInit() {
-    this.subscription = this.sharedService.theme.subscribe(theme => {
+    this.subs.sink = this.sharedService.theme.subscribe(theme => {
       if (theme === 'dark') {
         this.selectedTheme = 'darcula';
       }
@@ -191,7 +191,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
       return true;
     } catch (e) {
       this.isValidJson = false;
-      this.form.controls[key].setErrors({'jsonValue': true});
+      this.form.controls[key].setErrors({ 'jsonValue': true });
       return false;
     }
   }
@@ -241,7 +241,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
 
     /** request started */
     this.ngProgress.start();
-    this.configService.updateBulkConfiguration(categoryName, changedConfig).
+    this.subs.sink = this.configService.updateBulkConfiguration(categoryName, changedConfig).
       subscribe(
         (data: any) => {
           /** request completed */
@@ -303,7 +303,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
       const formData = new FormData();
       formData.append('script', file);
       this.ngProgress.start();
-      this.configService.uploadFile(this.categoryConfigurationData.key, configItem, formData)
+      this.subs.sink = this.configService.uploadFile(this.categoryConfigurationData.key, configItem, formData)
         .subscribe((content: any) => {
           this.newFileName = content.file.substr(content.file.lastIndexOf('/') + 1);
           this.filesToUpload = [];
@@ -394,10 +394,6 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
-  }
-
   checkValidityOnPageLoad() {
     if (!isEmpty(this.categoryConfigurationData)) {
       const data = this.categoryConfigurationData.value[0];
@@ -463,7 +459,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
       }
       if (configItem.hasOwnProperty('mandatory') && configItem['key'] === key) {
         if (configItem['mandatory'] === 'true' && configValue.trim().length === 0) {
-         this.form.controls[key].setErrors({'required': true});
+          this.form.controls[key].setErrors({ 'required': true });
         }
       }
     });

@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { orderBy } from 'lodash';
 import { interval } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
@@ -12,7 +13,7 @@ import { ReadingsGraphComponent } from '../readings-graph/readings-graph.compone
   templateUrl: './assets.component.html',
   styleUrls: ['./assets.component.css']
 })
-export class AssetsComponent implements OnInit, OnDestroy {
+export class AssetsComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
 
   selectedAsset: any; // Selected asset object (assetCode, count)
   MAX_RANGE = MAX_INT_SIZE / 2;
@@ -28,8 +29,9 @@ export class AssetsComponent implements OnInit, OnDestroy {
     private alertService: AlertService,
     private generateCsvService: GenerateCsvService,
     private ping: PingService) {
+    super();
     this.isAlive = true;
-    this.ping.pingIntervalChanged.subscribe((timeInterval: number) => {
+    this.subs.sink = this.ping.pingIntervalChanged.subscribe((timeInterval: number) => {
       if (timeInterval === -1) {
         this.isAlive = false;
       }
@@ -40,7 +42,7 @@ export class AssetsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.showLoadingSpinner();
     this.getAsset();
-    interval(this.refreshInterval)
+    this.subs.sink = interval(this.refreshInterval)
       .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
       .subscribe(() => {
         this.getAsset();
@@ -48,7 +50,7 @@ export class AssetsComponent implements OnInit, OnDestroy {
   }
 
   public getAsset(): void {
-    this.assetService.getAsset().
+    this.subs.sink = this.assetService.getAsset().
       subscribe(
         (data: any[]) => {
           this.assets = data;
@@ -104,7 +106,7 @@ export class AssetsComponent implements OnInit, OnDestroy {
   }
 
   exportReadings(assetCode: any, limit: number, offset: number, lastRequest: boolean, fileName: string) {
-    this.assetService.getAssetReadings(encodeURIComponent(assetCode), limit, offset).
+    this.subs.sink = this.assetService.getAssetReadings(encodeURIComponent(assetCode), limit, offset).
       subscribe(
         (data: any[]) => {
           data = data.map(r => {
@@ -138,14 +140,10 @@ export class AssetsComponent implements OnInit, OnDestroy {
 
   onNotify(event) {
     this.isAlive = event;
-    interval(this.refreshInterval)
+    this.subs.sink =  interval(this.refreshInterval)
       .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
       .subscribe(() => {
         this.getAsset();
       });
-  }
-
-  public ngOnDestroy(): void {
-    this.isAlive = false;
   }
 }

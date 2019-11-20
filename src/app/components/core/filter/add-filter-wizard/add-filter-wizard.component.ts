@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { assign, reduce, sortBy, isEmpty } from 'lodash';
@@ -11,7 +12,7 @@ import { ValidateFormService } from '../../../../services/validate-form.service'
   templateUrl: './add-filter-wizard.component.html',
   styleUrls: ['./add-filter-wizard.component.css']
 })
-export class AddFilterWizardComponent implements OnInit {
+export class AddFilterWizardComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
 
   public plugins = [];
   public categories = [];
@@ -48,7 +49,9 @@ export class AddFilterWizardComponent implements OnInit {
     private alertService: AlertService,
     private service: ServicesApiService,
     private validateFormService: ValidateFormService,
-    private ngProgress: ProgressBarService) { }
+    private ngProgress: ProgressBarService) {
+      super();
+    }
 
   ngOnInit() {
     this.getCategories();
@@ -71,7 +74,7 @@ export class AddFilterWizardComponent implements OnInit {
 
   getAvailablePlugins(type: string) {
     this.requestInProgress = true;
-    this.service.getAvailablePlugins(type).
+    this.subs.sink = this.service.getAvailablePlugins(type).
       subscribe(
         (data: any) => {
           this.pluginData = data['plugins'].map((p: string) => p.replace(`foglamp-filter-`, ''));
@@ -271,7 +274,7 @@ export class AddFilterWizardComponent implements OnInit {
     this.serviceForm.controls.plugin.disable();
     this.disabledBtn = true;
     this.alertService.activityMessage('Installing ' + pluginName + ' filter plugin...', true);
-    this.service.installPlugin(pluginData).
+    this.subs.sink = this.service.installPlugin(pluginData).
       subscribe(
         (data: any) => {
           /** request done */
@@ -351,7 +354,7 @@ export class AddFilterWizardComponent implements OnInit {
    * @param payload  to pass in request
    */
   public addFilter(payload) {
-    this.filterService.saveFilter(payload)
+    this.subs.sink = this.filterService.saveFilter(payload)
       .subscribe(
         (data: any) => {
           this.alertService.success(data.filter + ' filter added successfully.', true);
@@ -373,7 +376,7 @@ export class AddFilterWizardComponent implements OnInit {
       const file = data[configItem];
       const formData = new FormData();
       formData.append('script', file);
-      this.configService.uploadFile(this.configurationData.key, configItem, formData)
+      this.subs.sink = this.configService.uploadFile(this.configurationData.key, configItem, formData)
         .subscribe(() => {
           this.filesToUpload = [];
           this.alertService.success('configuration updated successfully.');
@@ -391,7 +394,7 @@ export class AddFilterWizardComponent implements OnInit {
 
 
   public addFilterPipeline(payload) {
-    this.filterService.addFilterPipeline(payload, this.serviceName)
+    this.subs.sink = this.filterService.addFilterPipeline(payload, this.serviceName)
       .subscribe((data: any) => {
         this.notify.emit(data);
         if (this.filesToUpload !== []) {
@@ -414,7 +417,7 @@ export class AddFilterWizardComponent implements OnInit {
   }
 
   public getInstalledFilterPlugins(pluginInstalled?: boolean) {
-    this.filterService.getInstalledFilterPlugins().subscribe(
+    this.subs.sink = this.filterService.getInstalledFilterPlugins().subscribe(
       (data: any) => {
         this.plugins = sortBy(data.plugins, p => {
           return p.name.toLowerCase();
@@ -433,7 +436,7 @@ export class AddFilterWizardComponent implements OnInit {
   }
 
   public getCategories(): void {
-    this.configurationService.getCategories().
+    this.subs.sink = this.configurationService.getCategories().
       subscribe(
         (data: any) => {
           this.categories = data.categories;

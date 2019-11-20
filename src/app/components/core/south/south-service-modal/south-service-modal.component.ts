@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
 import {
   Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild, HostListener, ViewChildren, QueryList
 } from '@angular/core';
@@ -27,7 +28,7 @@ import { ValidateFormService } from '../../../../services/validate-form.service'
   templateUrl: './south-service-modal.component.html',
   styleUrls: ['./south-service-modal.component.css']
 })
-export class SouthServiceModalComponent implements OnInit, OnChanges {
+export class SouthServiceModalComponent extends UnsubscribeOnDestroyAdapter implements OnInit, OnChanges {
 
   public category: any;
   public useProxy: 'true';
@@ -69,7 +70,9 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
     public generateCsv: GenerateCsvService,
     private servicesApiService: ServicesApiService,
     private validateFormService: ValidateFormService,
-    private schedulesService: SchedulesService) { }
+    private schedulesService: SchedulesService) {
+      super();
+    }
 
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler() {
     const alertModal = <HTMLDivElement>document.getElementById('modal-box');
@@ -79,7 +82,7 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    this.svcCheckbox.valueChanges.subscribe(val => {
+    this.subs.sink = this.svcCheckbox.valueChanges.subscribe(val => {
       this.isEnabled = val;
     });
   }
@@ -136,7 +139,7 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
     /** request started */
     this.ngProgress.start();
     const categoryValues = [];
-    this.configService.getCategory(this.service['name']).
+    this.subs.sink = this.configService.getCategory(this.service['name']).
       subscribe(
         (data) => {
           if (!isEmpty(data)) {
@@ -174,7 +177,7 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
   public disableSchedule(serviceName) {
     /** request started */
     this.ngProgress.start();
-    this.schedulesService.disableScheduleByName(serviceName).
+    this.subs.sink = this.schedulesService.disableScheduleByName(serviceName).
       subscribe(
         (data) => {
           /** request completed */
@@ -196,7 +199,7 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
   public enableSchedule(serviceName) {
     /** request started */
     this.ngProgress.start();
-    this.schedulesService.enableScheduleByName(serviceName).
+    this.subs.sink = this.schedulesService.enableScheduleByName(serviceName).
       subscribe(
         (data) => {
           /** request completed */
@@ -240,7 +243,7 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
   }
 
   checkIfAdvanceConfig(categoryName) {
-    this.configService.getCategoryConfigChildren(categoryName).
+    this.subs.sink = this.configService.getCategoryConfigChildren(categoryName).
       subscribe(
         (data: any) => {
           this.childConfiguration = data.categories.find(d => d.key.toString().includes('Advanced'));
@@ -313,7 +316,7 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
     }
     /** request started */
     this.ngProgress.start();
-    this.configService.updateBulkConfiguration(this.childConfiguration.key, configItems).
+    this.subs.sink = this.configService.updateBulkConfiguration(this.childConfiguration.key, configItems).
       subscribe(
         () => {
           this.changedChildConfig = [];  // clear the array
@@ -401,7 +404,7 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
 
   exportReadings(assets: [], fileName: string) {
     let assetReadings = [];
-    this.assetService.getMultiAssetsReadings(assets).
+    this.subs.sink = this.assetService.getMultiAssetsReadings(assets).
       subscribe(
         (result: any) => {
           assetReadings = [].concat.apply([], result);
@@ -419,7 +422,7 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
       this.isFilterDeleted = false;
     }
     this.ngProgress.start();
-    this.servicesApiService.deleteService(svc.name)
+    this.subs.sink = this.servicesApiService.deleteService(svc.name)
       .subscribe(
         (data) => {
           this.ngProgress.done();
@@ -453,7 +456,7 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
   }
 
   getFilterPipeline() {
-    this.filterService.getFilterPipeline(this.service['name'])
+    this.subs.sink = this.filterService.getFilterPipeline(this.service['name'])
       .subscribe((data: any) => {
         this.filterPipeline = data.result.pipeline;
       },
@@ -495,7 +498,7 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
 
   getFilterConfiguration(filterName: string) {
     const catName = this.service['name'] + '_' + filterName;
-    this.filterService.getFilterConfiguration(catName)
+    this.subs.sink = this.filterService.getFilterConfiguration(catName)
       .subscribe((data: any) => {
         this.filterConfiguration.push({ key: catName, 'value': [data] });
       },
@@ -524,10 +527,10 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
   deleteFilter() {
     this.isFilterDeleted = false;
     this.ngProgress.start();
-    this.filterService.updateFilterPipeline({ 'pipeline': this.filterPipeline }, this.service['name'])
+    this.subs.sink = this.filterService.updateFilterPipeline({ 'pipeline': this.filterPipeline }, this.service['name'])
       .subscribe(() => {
         this.deletedFilterPipeline.forEach((filter, index) => {
-          this.filterService.deleteFilter(filter).subscribe((data: any) => {
+          this.subs.sink = this.filterService.deleteFilter(filter).subscribe((data: any) => {
             this.ngProgress.done();
             if (this.deletedFilterPipeline.length === index + 1) {
               this.deletedFilterPipeline = []; // clear deleted filter reference
@@ -557,7 +560,7 @@ export class SouthServiceModalComponent implements OnInit, OnChanges {
   public updateFilterPipeline(filterPipeline) {
     this.isFilterOrderChanged = false;
     this.ngProgress.start();
-    this.filterService.updateFilterPipeline({ 'pipeline': filterPipeline }, this.service['name'])
+    this.subs.sink = this.filterService.updateFilterPipeline({ 'pipeline': filterPipeline }, this.service['name'])
       .subscribe(() => {
         this.ngProgress.done();
         this.alertService.success('Filter pipeline updated successfully.', true);

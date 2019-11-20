@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
 
 import { assign, cloneDeep, reduce, sortBy, isEmpty } from 'lodash';
 
@@ -19,7 +19,7 @@ import { ValidateFormService } from '../../../../services/validate-form.service'
   templateUrl: './add-notification-wizard.component.html',
   styleUrls: ['./add-notification-wizard.component.css']
 })
-export class AddNotificationWizardComponent implements OnInit, OnDestroy {
+export class AddNotificationWizardComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   @ViewChild('desc', { static: false }) description: ElementRef;
   @ViewChild('name', { static: false }) name: ElementRef;
 
@@ -46,7 +46,6 @@ export class AddNotificationWizardComponent implements OnInit, OnDestroy {
 
   public pageId: number;
   public notificationType: string;
-  private subscription: Subscription;
 
   notificationForm = new FormGroup({
     name: new FormControl(),
@@ -71,7 +70,9 @@ export class AddNotificationWizardComponent implements OnInit, OnDestroy {
     private configService: ConfigurationService,
     private sharedService: SharedService,
     private validateFormService: ValidateFormService,
-    private router: Router) { }
+    private router: Router) {
+      super();
+    }
 
   ngOnInit() {
     this.getNotificationPlugins();
@@ -82,7 +83,7 @@ export class AddNotificationWizardComponent implements OnInit, OnDestroy {
       rule: ['', Validators.required],
       delivery: ['', Validators.required]
     });
-    this.subscription = this.sharedService.showLogs.subscribe(showPackageLogs => {
+    this.subs.sink = this.sharedService.showLogs.subscribe(showPackageLogs => {
       if (showPackageLogs.isSubscribed) {
         // const closeBtn = <HTMLDivElement>document.querySelector('.modal .delete');
         // if (closeBtn) {
@@ -109,7 +110,7 @@ export class AddNotificationWizardComponent implements OnInit, OnDestroy {
     /** request started */
     this.ngProgress.start();
     setTimeout(() => {
-      this.notificationService.getNotificationPlugins()
+      this.subs.sink = this.notificationService.getNotificationPlugins()
         .pipe(retryWhen(errors => errors.pipe(delay(2000), take(3))))
         .subscribe(
           (data: any) => {
@@ -429,7 +430,7 @@ export class AddNotificationWizardComponent implements OnInit, OnDestroy {
   }
 
   getNotificationTypeList() {
-    this.notificationService.getNotificationTypeList()
+    this.subs.sink = this.notificationService.getNotificationTypeList()
       .subscribe(
         (data: []) => {
           this.notificationTypeList = data['notification_type'];
@@ -453,7 +454,7 @@ export class AddNotificationWizardComponent implements OnInit, OnDestroy {
   public addNotificationInstance(payload: any) {
     /** request started */
     this.ngProgress.start();
-    this.notificationService.addNotificationInstance(payload)
+    this.subs.sink = this.notificationService.addNotificationInstance(payload)
       .subscribe(
         (data: any) => {
           /** request done */
@@ -488,7 +489,7 @@ export class AddNotificationWizardComponent implements OnInit, OnDestroy {
       }
       return;
     }
-    this.configService.updateBulkConfiguration(categoryName, configItemsCopy).
+    this.subs.sink = this.configService.updateBulkConfiguration(categoryName, configItemsCopy).
       subscribe(
         (data: any) => {
           if ('script' in config) {
@@ -511,7 +512,7 @@ export class AddNotificationWizardComponent implements OnInit, OnDestroy {
     const file = config.script[0];
     const formData = new FormData();
     formData.append('script', file.script);
-    this.configService.uploadFile(categoryName, 'script', formData)
+    this.subs.sink = this.configService.uploadFile(categoryName, 'script', formData)
       .subscribe(() => {
         this.alertService.success('configuration updated successfully.');
       },
@@ -549,9 +550,5 @@ export class AddNotificationWizardComponent implements OnInit, OnDestroy {
         break;
       }
     }
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
   }
 }

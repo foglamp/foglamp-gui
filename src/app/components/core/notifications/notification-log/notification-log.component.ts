@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
 import { Component, OnInit } from '@angular/core';
 import { AlertService, ProgressBarService, AuditService } from '../../../../services';
 import { MAX_INT_SIZE } from '../../../../utils';
@@ -7,7 +8,7 @@ import { MAX_INT_SIZE } from '../../../../utils';
   templateUrl: './notification-log.component.html',
   styleUrls: ['./notification-log.component.css']
 })
-export class NotificationLogComponent implements OnInit {
+export class NotificationLogComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   public logSourceList = [];
   public logSeverityList = [];
   public notificationLogs: any;
@@ -30,7 +31,9 @@ export class NotificationLogComponent implements OnInit {
 
   constructor(private auditService: AuditService,
     private progress: ProgressBarService,
-    private alertService: AlertService) { }
+    private alertService: AlertService) {
+      super();
+    }
 
   ngOnInit() {
     this.getLogSource();
@@ -112,7 +115,7 @@ export class NotificationLogComponent implements OnInit {
   }
 
   public getLogSource() {
-    this.auditService.getLogSource().
+    this.subs.sink = this.auditService.getLogSource().
       subscribe(
         (data: any) => {
           this.logSourceList = data.logCode
@@ -129,7 +132,7 @@ export class NotificationLogComponent implements OnInit {
   }
 
   public getLogSeverity() {
-    this.auditService.getLogSeverity().
+    this.subs.sink = this.auditService.getLogSeverity().
       subscribe(
         (data: any) => {
           this.logSeverityList = data.logSeverity;
@@ -213,7 +216,7 @@ export class NotificationLogComponent implements OnInit {
       const codes = this.logSourceList.map(s => s.code);
       sourceCode = codes.toString();
     }
-    this.auditService.getAuditLogs(this.limit, this.tempOffset, sourceCode, this.severity).
+    this.subs.sink = this.auditService.getAuditLogs(this.limit, this.tempOffset, sourceCode, this.severity).
       subscribe(
         (data: any) => {
           /** request completed */

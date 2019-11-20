@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { interval } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
 
 import { DateFormatterPipe } from '../../../pipes';
 import { AlertService, PingService, ProgressBarService, SharedService } from '../../../services';
@@ -14,10 +14,10 @@ import { AlertDialogComponent } from '../../common/alert-dialog/alert-dialog.com
   templateUrl: './backup-restore.component.html',
   styleUrls: ['./backup-restore.component.css']
 })
-export class BackupRestoreComponent implements OnInit, OnDestroy {
+export class BackupRestoreComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   public backupData = [];
   private isAlive: boolean; // used to unsubscribe from the IntervalObservable
-                            // when OnDestroy is called.
+  // when OnDestroy is called.
 
   // Object to hold child data
   public childData = {
@@ -28,7 +28,6 @@ export class BackupRestoreComponent implements OnInit, OnDestroy {
   };
   public showSpinner = false;
   public refreshInterval = POLLING_INTERVAL;
-  private viewPortSubscription: Subscription;
   viewPort: any = '';
 
   @ViewChild(AlertDialogComponent, { static: true }) child: AlertDialogComponent;
@@ -39,8 +38,9 @@ export class BackupRestoreComponent implements OnInit, OnDestroy {
     public ngProgress: ProgressBarService,
     private dateFormatter: DateFormatterPipe,
     private ping: PingService) {
+    super();
     this.isAlive = true;
-    this.ping.pingIntervalChanged.subscribe((timeInterval: number) => {
+    this.subs.sink = this.ping.pingIntervalChanged.subscribe((timeInterval: number) => {
       if (timeInterval === -1) {
         this.isAlive = false;
       }
@@ -50,12 +50,12 @@ export class BackupRestoreComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.getBackup();
-    interval(this.refreshInterval)
+    this.subs.sink = interval(this.refreshInterval)
       .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
       .subscribe(() => {
         this.getBackup();
       });
-    this.viewPortSubscription = this.sharedService.viewport.subscribe(viewport => {
+    this.subs.sink = this.sharedService.viewport.subscribe(viewport => {
       this.viewPort = viewport;
     });
   }
@@ -76,7 +76,7 @@ export class BackupRestoreComponent implements OnInit, OnDestroy {
 
 
   public getBackup() {
-    this.backupRestoreService.get().
+    this.subs.sink = this.backupRestoreService.get().
       subscribe(
         (data) => {
           this.backupData = data['backups'];
@@ -97,7 +97,7 @@ export class BackupRestoreComponent implements OnInit, OnDestroy {
     if (this.backupData.length === 0) {
       this.showLoadingSpinner();
     }
-    this.backupRestoreService.requestBackup().
+    this.subs.sink = this.backupRestoreService.requestBackup().
       subscribe(
         (data) => {
           this.alertService.info(data['status']);
@@ -114,7 +114,7 @@ export class BackupRestoreComponent implements OnInit, OnDestroy {
 
   public restoreBackup(id) {
     this.ngProgress.start();
-    this.backupRestoreService.restoreBackup(id).
+    this.subs.sink = this.backupRestoreService.restoreBackup(id).
       subscribe(
         (data) => {
           this.alertService.info(data['status']);
@@ -134,7 +134,7 @@ export class BackupRestoreComponent implements OnInit, OnDestroy {
 
   public deleteBackup(id) {
     this.ngProgress.start();
-    this.backupRestoreService.deleteBackup(id).
+    this.subs.sink = this.backupRestoreService.deleteBackup(id).
       subscribe(
         (data) => {
           this.ngProgress.done();
@@ -171,10 +171,5 @@ export class BackupRestoreComponent implements OnInit, OnDestroy {
 
   public hideLoadingSpinner() {
     this.showSpinner = false;
-  }
-
-  ngOnDestroy() {
-    this.isAlive = false;
-    this.viewPortSubscription.unsubscribe();
   }
 }

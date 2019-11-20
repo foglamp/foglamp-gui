@@ -1,4 +1,5 @@
-import { Component, EventEmitter, OnDestroy, HostListener, Output, ViewChild, ElementRef } from '@angular/core';
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
+import { Component, EventEmitter, HostListener, Output, ViewChild, ElementRef } from '@angular/core';
 import { orderBy, chain, map, groupBy, mapValues, omit } from 'lodash';
 import { interval } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
@@ -16,7 +17,7 @@ declare var Plotly: any;
   templateUrl: './readings-graph.component.html',
   styleUrls: ['./readings-graph.component.css']
 })
-export class ReadingsGraphComponent implements OnDestroy {
+export class ReadingsGraphComponent extends UnsubscribeOnDestroyAdapter {
   public assetCode: string;
   public assetChartType: string;
   public assetReadingValues: any;
@@ -52,9 +53,10 @@ export class ReadingsGraphComponent implements OnDestroy {
 
   constructor(private assetService: AssetsService, private alertService: AlertService,
     private ping: PingService) {
+    super();
     this.assetChartType = 'line';
     this.assetReadingValues = [];
-    this.ping.pingIntervalChanged.subscribe((timeInterval: number) => {
+    this.subs.sink = this.ping.pingIntervalChanged.subscribe((timeInterval: number) => {
       if (timeInterval === -1) {
         this.isAlive = false;
       }
@@ -135,7 +137,7 @@ export class ReadingsGraphComponent implements OnDestroy {
       this.autoRefresh = false;
       this.plotReadingsGraph(assetCode, this.limit, this.optedTime);
     }
-    interval(this.graphRefreshInterval)
+    this.subs.sink = interval(this.graphRefreshInterval)
       .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
       .subscribe(() => {
         this.autoRefresh = true;
@@ -148,7 +150,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   public showAssetReadingsSummary(assetCode, limit: number = 0, time: number = 0) {
-    this.assetService.getAllAssetSummary(assetCode, limit, time).subscribe(
+    this.subs.sink = this.assetService.getAllAssetSummary(assetCode, limit, time).subscribe(
       (data: any) => {
         this.showSpinner = false;
         this.assetReadingSummary = data
@@ -193,7 +195,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     }
 
     this.limit = limit;
-    this.assetService.getAssetReadings(encodeURIComponent(assetCode), +limit, 0, time).
+    this.subs.sink = this.assetService.getAssetReadings(encodeURIComponent(assetCode), +limit, 0, time).
       subscribe(
         (data: any[]) => {
           this.loadPage = false;
@@ -509,9 +511,5 @@ export class ReadingsGraphComponent implements OnDestroy {
 
   keyDescOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
     return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
-  }
-
-  public ngOnDestroy(): void {
-    this.isAlive = false;
   }
 }

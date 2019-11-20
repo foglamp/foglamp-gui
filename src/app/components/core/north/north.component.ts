@@ -1,8 +1,9 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { sortBy } from 'lodash';
 import { takeWhile } from 'rxjs/operators';
-import { interval, Subscription } from 'rxjs';
+import { interval } from 'rxjs';
 
 import { AlertService, NorthService, PingService, SharedService } from '../../../services';
 import { POLLING_INTERVAL } from '../../../utils';
@@ -15,30 +16,29 @@ import { ViewLogsComponent } from '../packages-log/view-logs/view-logs.component
   styleUrls: ['./north.component.css']
 })
 
-export class NorthComponent implements OnInit, OnDestroy {
+export class NorthComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   public task: string;
   public tasks: any;
   viewPort: any = '';
 
-  private viewPortSubscription: Subscription;
   public refreshInterval = POLLING_INTERVAL;
   public showSpinner = false;
   private isAlive: boolean;
-  private subscription: Subscription;
 
   constructor(private northService: NorthService,
     private ping: PingService,
     private alertService: AlertService,
     private router: Router,
     private sharedService: SharedService) {
+    super();
     this.isAlive = true;
-    this.ping.pingIntervalChanged.subscribe((timeInterval: number) => {
+    this.subs.sink = this.ping.pingIntervalChanged.subscribe((timeInterval: number) => {
       if (timeInterval === -1) {
         this.isAlive = false;
       }
       this.refreshInterval = timeInterval;
     });
-    this.subscription = this.sharedService.showLogs.subscribe(showPackageLogs => {
+    this.subs.sink = this.sharedService.showLogs.subscribe(showPackageLogs => {
       if (showPackageLogs.isSubscribed) {
         // const closeBtn = <HTMLDivElement>document.querySelector('.modal .delete');
         // if (closeBtn) {
@@ -56,12 +56,12 @@ export class NorthComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.showLoadingSpinner();
     this.getNorthTasks(false);
-    interval(this.refreshInterval)
+    this.subs.sink = interval(this.refreshInterval)
       .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
       .subscribe(() => {
         this.getNorthTasks(true);
       });
-    this.viewPortSubscription = this.sharedService.viewport.subscribe(viewport => {
+      this.subs.sink = this.sharedService.viewport.subscribe(viewport => {
       this.viewPort = viewport;
     });
   }
@@ -71,7 +71,7 @@ export class NorthComponent implements OnInit, OnDestroy {
   }
 
   public getNorthTasks(caching: boolean): void {
-    this.northService.getNorthTasks(caching).
+    this.subs.sink = this.northService.getNorthTasks(caching).
       subscribe(
         (data) => {
           this.tasks = data;
@@ -106,12 +106,6 @@ export class NorthComponent implements OnInit, OnDestroy {
 
   public hideLoadingSpinner() {
     this.showSpinner = false;
-  }
-
-  public ngOnDestroy(): void {
-    this.isAlive = false;
-    this.subscription.unsubscribe();
-    this.viewPortSubscription.unsubscribe();
   }
 }
 

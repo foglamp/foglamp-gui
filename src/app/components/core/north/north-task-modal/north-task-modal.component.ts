@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
 import {
   Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild, HostListener, QueryList, ViewChildren
 } from '@angular/core';
@@ -23,7 +24,7 @@ import { ValidateFormService } from '../../../../services/validate-form.service'
   templateUrl: './north-task-modal.component.html',
   styleUrls: ['./north-task-modal.component.css']
 })
-export class NorthTaskModalComponent implements OnInit, OnChanges {
+export class NorthTaskModalComponent extends UnsubscribeOnDestroyAdapter implements OnInit, OnChanges {
   category: any;
   useProxy: 'true';
   useFilterProxy: 'true';
@@ -74,7 +75,9 @@ export class NorthTaskModalComponent implements OnInit, OnChanges {
     private validateFormService: ValidateFormService,
     public fb: FormBuilder,
     public ngProgress: ProgressBarService,
-  ) { }
+  ) {
+    super();
+  }
 
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler() {
     const alertModal = <HTMLDivElement>document.getElementById('modal-box');
@@ -104,7 +107,7 @@ export class NorthTaskModalComponent implements OnInit, OnChanges {
   public updateFilterPipeline(filterPipeline) {
     this.isFilterOrderChanged = false;
     this.ngProgress.start();
-    this.filterService.updateFilterPipeline({ 'pipeline': filterPipeline }, this.task['name'])
+    this.subs.sink = this.filterService.updateFilterPipeline({ 'pipeline': filterPipeline }, this.task['name'])
       .subscribe(() => {
         this.ngProgress.done();
         this.alertService.success('Filter pipeline updated successfully.', true);
@@ -165,7 +168,7 @@ export class NorthTaskModalComponent implements OnInit, OnChanges {
     this.repeatDays = repeatInterval.days;
     this.name = this.task['name'];
     const categoryValues = [];
-    this.configService.getCategory(this.name).subscribe(
+    this.subs.sink = this.configService.getCategory(this.name).subscribe(
       (data: any) => {
         if (!isEmpty(data)) {
           categoryValues.push(data);
@@ -254,7 +257,7 @@ export class NorthTaskModalComponent implements OnInit, OnChanges {
     };
     /** request started */
     this.ngProgress.start();
-    this.schedulesService.updateSchedule(this.task['id'], updatePayload).
+    this.subs.sink = this.schedulesService.updateSchedule(this.task['id'], updatePayload).
       subscribe(
         () => {
           /** request completed */
@@ -326,7 +329,7 @@ export class NorthTaskModalComponent implements OnInit, OnChanges {
       this.isFilterDeleted = false;
     }
     this.ngProgress.start();
-    this.northService.deleteTask(task.name)
+    this.subs.sink = this.northService.deleteTask(task.name)
       .subscribe(
         (data) => {
           this.ngProgress.done();
@@ -346,7 +349,7 @@ export class NorthTaskModalComponent implements OnInit, OnChanges {
 
   getFilterConfiguration(filterName) {
     const catName = this.task['name'] + '_' + filterName;
-    this.filterService.getFilterConfiguration(catName)
+    this.subs.sink = this.filterService.getFilterConfiguration(catName)
       .subscribe((data: any) => {
         this.filterConfiguration.push({ key: catName, 'value': [data] });
       },
@@ -378,7 +381,7 @@ export class NorthTaskModalComponent implements OnInit, OnChanges {
   }
 
   getFilterPipeline() {
-    this.filterService.getFilterPipeline(this.task['name'])
+    this.subs.sink = this.filterService.getFilterPipeline(this.task['name'])
       .subscribe((data: any) => {
         this.filterPipeline = data.result.pipeline;
       },
@@ -402,7 +405,7 @@ export class NorthTaskModalComponent implements OnInit, OnChanges {
   deleteFilter() {
     this.isFilterDeleted = false;
     this.ngProgress.start();
-    this.filterService.updateFilterPipeline({ 'pipeline': this.filterPipeline }, this.task['name'])
+    this.subs.sink = this.filterService.updateFilterPipeline({ 'pipeline': this.filterPipeline }, this.task['name'])
       .subscribe(() => {
         this.deletedFilterPipeline.forEach((filter, index) => {
           this.filterService.deleteFilter(filter).subscribe((data: any) => {
@@ -433,7 +436,7 @@ export class NorthTaskModalComponent implements OnInit, OnChanges {
   }
 
   checkIfAdvanceConfig(categoryName: string) {
-    this.configService.getCategoryConfigChildren(categoryName).
+    this.subs.sink = this.configService.getCategoryConfigChildren(categoryName).
       subscribe(
         (data: any) => {
           this.childConfiguration = data.categories.find(d => d.key.toString().includes('Advanced'));
@@ -482,7 +485,7 @@ export class NorthTaskModalComponent implements OnInit, OnChanges {
     }
     /** request started */
     this.ngProgress.start();
-    this.configService.updateBulkConfiguration(this.childConfiguration.key, configItems).
+    this.subs.sink = this.configService.updateBulkConfiguration(this.childConfiguration.key, configItems).
       subscribe(
         () => {
           this.changedChildConfig = [];  // clear the array

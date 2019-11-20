@@ -1,21 +1,20 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { AlertService, CertificateService, ProgressBarService, SharedService } from '../../../../services';
 import { AlertDialogComponent } from '../../../common/alert-dialog/alert-dialog.component';
 import { UploadCertificateComponent } from '../upload-certificate/upload-certificate.component';
 import { sortBy } from 'lodash';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-cert-store',
   templateUrl: './certificate-store.component.html',
   styleUrls: ['./certificate-store.component.css']
 })
-export class CertificateStoreComponent implements OnInit, OnDestroy {
+export class CertificateStoreComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   public keys = [];
   public certificates = [];
   public certificateName = '';
-  private viewPortSubscription: Subscription;
   viewPort: any = '';
 
   // Object to hold data of certificate to delete
@@ -32,11 +31,13 @@ export class CertificateStoreComponent implements OnInit, OnDestroy {
   constructor(private certService: CertificateService,
     public ngProgress: ProgressBarService,
     private alertService: AlertService,
-    private sharedService: SharedService) { }
+    private sharedService: SharedService) {
+      super();
+    }
 
   ngOnInit() {
     this.getCertificates();
-    this.viewPortSubscription = this.sharedService.viewport.subscribe(viewport => {
+    this.sharedService.viewport.subscribe(viewport => {
       this.viewPort = viewport;
     });
   }
@@ -53,7 +54,7 @@ export class CertificateStoreComponent implements OnInit, OnDestroy {
     this.certificates = [];
     /** request started */
     this.ngProgress.start();
-    this.certService.getCertificates().
+    this.subs.sink = this.certService.getCertificates().
       subscribe(
         (data) => {
           /** request completed */
@@ -114,7 +115,7 @@ export class CertificateStoreComponent implements OnInit, OnDestroy {
   deleteCertificate(certificate) {
     /** request started */
     this.ngProgress.start();
-    this.certService.deleteCertificate(certificate['name'], certificate['type']).
+    this.subs.sink = this.certService.deleteCertificate(certificate['name'], certificate['type']).
       subscribe(
         (data) => {
           /** request completed */
@@ -139,9 +140,5 @@ export class CertificateStoreComponent implements OnInit, OnDestroy {
    */
   onNotify() {
     this.getCertificates();
-  }
-
-  public ngOnDestroy(): void {
-    this.viewPortSubscription.unsubscribe();
   }
 }

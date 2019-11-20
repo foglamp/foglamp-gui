@@ -1,3 +1,4 @@
+import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 
@@ -8,17 +9,19 @@ import { SharedService } from '../../../services/shared.service';
   templateUrl: './side-menu.component.html',
   styleUrls: ['./side-menu.component.css']
 })
-export class SideMenuComponent implements OnInit {
+export class SideMenuComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   public step = '';
   @Output() toggle: EventEmitter<any> = new EventEmitter();
 
   isAdmin = false;
-  constructor(private router: Router, private sharedService: SharedService) { }
+  constructor(private router: Router, private sharedService: SharedService) {
+    super();
+  }
   ngOnInit() {
-    this.sharedService.isAdmin.subscribe(value => {
+    this.subs.sink = this.sharedService.isAdmin.subscribe(value => {
       this.isAdmin = value;
     });
-    this.router.events.subscribe(() => {
+    this.subs.sink = this.router.events.subscribe(() => {
       if (this.router.url === '/' || this.router.url === '/dashboard') {
         this.step = '/dashboard';
       } else {
