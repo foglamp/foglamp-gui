@@ -1,5 +1,5 @@
 import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { sortBy } from 'lodash';
 import { interval } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
@@ -12,7 +12,7 @@ import { POLLING_INTERVAL } from '../../../../utils';
   templateUrl: './list-tasks.component.html',
   styleUrls: ['./list-tasks.component.css']
 })
-export class ListTasksComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
+export class ListTasksComponent extends UnsubscribeOnDestroyAdapter implements OnInit, OnDestroy {
   public tasksData = [];
   public refreshInterval = POLLING_INTERVAL;
   private REQUEST_TIMEOUT_INTERVAL = 5000;
@@ -100,5 +100,9 @@ export class ListTasksComponent extends UnsubscribeOnDestroyAdapter implements O
           this.alertService.error(error.statusText);
         }
       });
+  }
+
+  public ngOnDestroy(): void {
+    this.isAlive = false;
   }
 }

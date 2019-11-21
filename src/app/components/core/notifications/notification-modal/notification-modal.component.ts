@@ -73,6 +73,7 @@ export class NotificationModalComponent extends UnsubscribeOnDestroyAdapter impl
     }
     this.notify.emit(false);
     modalWindow.classList.remove('is-active');
+    super.ngOnDestroy(); // call to unsubscribes all subscriptions
   }
 
   public getRuleConfiguration(): void {

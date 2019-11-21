@@ -170,6 +170,7 @@ export class UpdateScheduleComponent extends UnsubscribeOnDestroyAdapter impleme
     if (activeDropDown.length > 0) {
       activeDropDown[0].classList.remove('is-active');
     }
+    super.ngOnDestroy(); // call to unsubscribes all subscriptions
   }
 
   public updateSchedule() {

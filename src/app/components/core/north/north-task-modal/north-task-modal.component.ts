@@ -156,6 +156,7 @@ export class NorthTaskModalComponent extends UnsubscribeOnDestroyAdapter impleme
       this.viewConfigItemComponent.passwordOnChangeFired = false;
       this.viewConfigItemComponent.passwordMatched = true;
     }
+    super.ngOnDestroy(); // call to unsubscribes all subscriptions
   }
 
   public getCategory(): void {

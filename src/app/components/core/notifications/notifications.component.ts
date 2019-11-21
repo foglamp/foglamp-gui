@@ -45,8 +45,8 @@ export class NotificationsComponent extends UnsubscribeOnDestroyAdapter implemen
     private route: ActivatedRoute,
     public router: Router,
     private sharedService: SharedService) {
-      super();
-    }
+    super();
+  }
 
   ngOnInit() {
     this.checkNotificationServiceStatus();

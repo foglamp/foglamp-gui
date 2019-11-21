@@ -1,5 +1,5 @@
 import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { orderBy } from 'lodash';
 import { interval } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
@@ -13,7 +13,7 @@ import { ReadingsGraphComponent } from '../readings-graph/readings-graph.compone
   templateUrl: './assets.component.html',
   styleUrls: ['./assets.component.css']
 })
-export class AssetsComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
+export class AssetsComponent extends UnsubscribeOnDestroyAdapter implements OnInit, OnDestroy {
 
   selectedAsset: any; // Selected asset object (assetCode, count)
   MAX_RANGE = MAX_INT_SIZE / 2;
@@ -140,10 +140,14 @@ export class AssetsComponent extends UnsubscribeOnDestroyAdapter implements OnIn
 
   onNotify(event) {
     this.isAlive = event;
-    this.subs.sink =  interval(this.refreshInterval)
+    this.subs.sink = interval(this.refreshInterval)
       .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
       .subscribe(() => {
         this.getAsset();
       });
+  }
+
+  public ngOnDestroy(): void {
+    this.isAlive = false;
   }
 }

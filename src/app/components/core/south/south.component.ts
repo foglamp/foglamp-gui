@@ -1,6 +1,6 @@
 import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
 
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { sortBy } from 'lodash';
 import { takeWhile } from 'rxjs/operators';
@@ -17,7 +17,7 @@ import { ViewLogsComponent } from '../packages-log/view-logs/view-logs.component
   templateUrl: './south.component.html',
   styleUrls: ['./south.component.css']
 })
-export class SouthComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
+export class SouthComponent extends UnsubscribeOnDestroyAdapter implements OnInit, OnDestroy {
   public service;
   public southboundServices = [];
   public refreshSouthboundServiceInterval = POLLING_INTERVAL;
@@ -110,5 +110,9 @@ export class SouthComponent extends UnsubscribeOnDestroyAdapter implements OnIni
 
   public hideLoadingSpinner() {
     this.showSpinner = false;
+  }
+
+  public ngOnDestroy(): void {
+    this.isAlive = false;
   }
 }

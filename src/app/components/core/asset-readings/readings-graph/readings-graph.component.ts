@@ -1,5 +1,5 @@
 import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
-import { Component, EventEmitter, HostListener, Output, ViewChild, ElementRef } from '@angular/core';
+import { Component, EventEmitter, HostListener, Output, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { orderBy, chain, map, groupBy, mapValues, omit } from 'lodash';
 import { interval } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
@@ -17,7 +17,7 @@ declare var Plotly: any;
   templateUrl: './readings-graph.component.html',
   styleUrls: ['./readings-graph.component.css']
 })
-export class ReadingsGraphComponent extends UnsubscribeOnDestroyAdapter {
+export class ReadingsGraphComponent extends UnsubscribeOnDestroyAdapter implements OnDestroy {
   public assetCode: string;
   public assetChartType: string;
   public assetReadingValues: any;
@@ -112,6 +112,7 @@ export class ReadingsGraphComponent extends UnsubscribeOnDestroyAdapter {
       activeDropDowns[0].classList.remove('is-active');
     }
     this.optedTime = ASSET_READINGS_TIME_FILTER;
+    super.ngOnDestroy(); // call to unsubscribes all subscriptions
   }
 
   getTimeBasedAssetReadingsAndSummary(time) {

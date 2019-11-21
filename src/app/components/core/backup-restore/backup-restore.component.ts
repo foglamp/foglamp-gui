@@ -1,5 +1,5 @@
 import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { interval } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
 
@@ -14,7 +14,7 @@ import { AlertDialogComponent } from '../../common/alert-dialog/alert-dialog.com
   templateUrl: './backup-restore.component.html',
   styleUrls: ['./backup-restore.component.css']
 })
-export class BackupRestoreComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
+export class BackupRestoreComponent extends UnsubscribeOnDestroyAdapter implements OnInit, OnDestroy {
   public backupData = [];
   private isAlive: boolean; // used to unsubscribe from the IntervalObservable
   // when OnDestroy is called.
@@ -171,5 +171,9 @@ export class BackupRestoreComponent extends UnsubscribeOnDestroyAdapter implemen
 
   public hideLoadingSpinner() {
     this.showSpinner = false;
+  }
+
+  public ngOnDestroy(): void {
+    this.isAlive = false;
   }
 }

@@ -1,5 +1,5 @@
 import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { sortBy } from 'lodash';
 import { takeWhile } from 'rxjs/operators';
@@ -16,7 +16,7 @@ import { ViewLogsComponent } from '../packages-log/view-logs/view-logs.component
   styleUrls: ['./north.component.css']
 })
 
-export class NorthComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
+export class NorthComponent extends UnsubscribeOnDestroyAdapter implements OnInit, OnDestroy {
   public task: string;
   public tasks: any;
   viewPort: any = '';
@@ -106,6 +106,10 @@ export class NorthComponent extends UnsubscribeOnDestroyAdapter implements OnIni
 
   public hideLoadingSpinner() {
     this.showSpinner = false;
+  }
+
+  public ngOnDestroy(): void {
+    this.isAlive = false;
   }
 }
 

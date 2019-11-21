@@ -1,5 +1,5 @@
 import { UnsubscribeOnDestroyAdapter } from './../../../unsubscribe-on-destroy-adapter';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { map } from 'lodash';
 import { interval } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
@@ -14,7 +14,7 @@ import { GRAPH_REFRESH_INTERVAL, STATS_HISTORY_TIME_FILTER } from '../../../util
   styleUrls: ['./dashboard.component.css']
 })
 
-export class DashboardComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
+export class DashboardComponent extends UnsubscribeOnDestroyAdapter implements OnInit, OnDestroy {
   // Filtered array of received statistics data (having objects except key @FOGBENCH).
   statistics = [];
 
@@ -256,5 +256,9 @@ export class DashboardComponent extends UnsubscribeOnDestroyAdapter implements O
     };
     this.showGraph(data);
     this.toggleDropDown(id);
+  }
+
+  public ngOnDestroy(): void {
+    this.isAlive = false;
   }
 }

@@ -133,6 +133,7 @@ export class SouthServiceModalComponent extends UnsubscribeOnDestroyAdapter impl
     this.getAdvanceConfig(null);
     this.filterConfiguration = [];
     modalWindow.classList.remove('is-active');
+    super.ngOnDestroy(); // call to unsubscribes all subscriptions
   }
 
   public getCategory(): void {

@@ -8,6 +8,7 @@ import {
   OnInit,
   Output,
   ViewChild,
+  OnDestroy,
 } from '@angular/core';
 import { sortBy } from 'lodash';
 import { Router } from '@angular/router';
@@ -25,7 +26,7 @@ import { ShutdownModalComponent } from '../../common/shut-down/shutdown-modal.co
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
-export class NavbarComponent extends UnsubscribeOnDestroyAdapter implements OnInit, AfterViewInit {
+export class NavbarComponent extends UnsubscribeOnDestroyAdapter implements OnInit, AfterViewInit, OnDestroy {
   @Output() toggle = new EventEmitter<string>();
   public timer: any = '';
   public pingData = {};
@@ -359,6 +360,10 @@ export class NavbarComponent extends UnsubscribeOnDestroyAdapter implements OnIn
 
   public hideLoadingSpinner() {
     this.showSpinner = false;
+  }
+
+  public ngOnDestroy(): void {
+    clearInterval(this.timer);
   }
 }
 

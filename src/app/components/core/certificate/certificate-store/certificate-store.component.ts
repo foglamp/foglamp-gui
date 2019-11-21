@@ -1,5 +1,5 @@
 import { UnsubscribeOnDestroyAdapter } from './../../../../unsubscribe-on-destroy-adapter';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 
 import { AlertService, CertificateService, ProgressBarService, SharedService } from '../../../../services';
 import { AlertDialogComponent } from '../../../common/alert-dialog/alert-dialog.component';
@@ -32,8 +32,8 @@ export class CertificateStoreComponent extends UnsubscribeOnDestroyAdapter imple
     public ngProgress: ProgressBarService,
     private alertService: AlertService,
     private sharedService: SharedService) {
-      super();
-    }
+    super();
+  }
 
   ngOnInit() {
     this.getCertificates();
