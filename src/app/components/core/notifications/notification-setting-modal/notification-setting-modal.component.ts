@@ -1,0 +1,291 @@
+import { Component, EventEmitter, Output, OnChanges, Input, SimpleChanges, ViewChild } from '@angular/core';
+import { FormBuilder, NgForm } from '@angular/forms';
+import { ProgressBarService, AlertService, ServicesApiService, SchedulesService, ConfigurationService } from '../../../../services';
+import {
+  ViewConfigItemComponent
+} from '../../configuration-manager/view-config-item/view-config-item.component';
+import { isEmpty } from 'lodash';
+
+@Component({
+  selector: 'app-notification-setting-modal',
+  templateUrl: './notification-setting-modal.component.html',
+  styleUrls: ['./notification-setting-modal.component.css']
+})
+export class NotificationSettingModalComponent implements OnChanges {
+  enabled: Boolean;
+  name: string;
+  public category: any;
+  public useProxy: 'true';
+  isNotificationServiceAvailable = false;
+  isNotificationServiceEnabled = false;
+  notificationServiceName = '';
+  public changedChildConfig = [];
+  public availableServices = [];
+  notificationServicePackageName = 'foglamp-service-notification';
+
+  @Output() notifySettingEmitter: EventEmitter<any> = new EventEmitter<any>();
+  @Input() childData: { isNotificationServiceAvailable: boolean, isNotificationServiceEnabled: boolean, notificationServiceName: string };
+  @ViewChild('notificationConfigView', { static: false }) viewConfigItemComponent: ViewConfigItemComponent;
+  @ViewChild('fg', { static: false }) form: NgForm;
+
+  constructor(public fb: FormBuilder, public ngProgress: ProgressBarService,
+    private configService: ConfigurationService, public schedulesService: SchedulesService,
+    public servicesApiService: ServicesApiService, public alertService: AlertService) { }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['childData']) {
+      this.notificationServiceName = this.childData.notificationServiceName;
+      this.isNotificationServiceEnabled = this.childData.isNotificationServiceEnabled;
+      this.isNotificationServiceAvailable = this.childData.isNotificationServiceAvailable;
+    }
+    this.name = this.notificationServiceName;
+    this.enabled = this.isNotificationServiceEnabled;
+    if (this.notificationServiceName) {
+      this.getCategory();
+    }
+  }
+
+  public toggleModal(isOpen: Boolean) {
+    const notification_setting_modal = <HTMLDivElement>document.getElementById('notification_setting_modal');
+    if (isOpen) {
+      notification_setting_modal.classList.add('is-active');
+      return;
+    }
+    notification_setting_modal.classList.remove('is-active');
+  }
+
+  addNotificationService() {
+    const name = this.form.controls['name'].value ? this.form.controls['name'].value : 'FogLAMP Notifications';
+    const payload = {
+      name: name,
+      type: 'notification',
+      enabled: this.form.controls['enabled'].value
+    };
+    /** request start */
+    this.ngProgress.start();
+
+    this.servicesApiService.addService(payload)
+      .subscribe(
+        () => {
+          this.ngProgress.done();
+          this.alertService.success('Notification service added successfully.', true);
+          this.isNotificationServiceAvailable = true;
+          this.toggleModal(false);
+        },
+        (error) => {
+          /** request done */
+          this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
+        });
+  }
+
+  public async getInstalledServicesList() {
+    /** request start */
+    this.ngProgress.start();
+    await this.servicesApiService.getInstalledServices().
+      then(data => {
+        /** request done */
+        this.ngProgress.done();
+        this.availableServices = data['services'];
+      })
+      .catch(error => {
+        /** request done */
+        this.ngProgress.done();
+        if (error.status === 0) {
+          console.log('service down ', error);
+        } else {
+          this.alertService.error(error.statusText);
+        }
+      });
+  }
+
+  installNotificationService() {
+    const servicePayload = {
+      format: 'repository',
+      name: this.notificationServicePackageName,
+      version: ''
+    };
+
+    /** request started */
+    this.ngProgress.start();
+    this.alertService.activityMessage('Installing ' + 'notification service...', true);
+    this.servicesApiService.installService(servicePayload).
+      subscribe(
+        (data: any) => {
+          /** request done */
+          this.ngProgress.done();
+          this.alertService.closeMessage();
+          this.alertService.success(data.message, true);
+        },
+        error => {
+          /** request done */
+          this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else if (error.status === 500) {
+            this.alertService.error('Failed to install from repository');
+          } else {
+            let errorText = error.statusText;
+            if (typeof error.error.link === 'string') {
+              errorText += ` <a>${error.error.link}</a>`;
+            }
+            this.alertService.error(errorText);
+          }
+        }, () => {
+          this.addNotificationService();
+        });
+  }
+
+  public getCategory(): void {
+    /** request started */
+    this.ngProgress.start();
+    const categoryValues = [];
+    this.configService.getCategory(this.notificationServiceName).
+      subscribe(
+        (data) => {
+          if (!isEmpty(data)) {
+            categoryValues.push(data);
+            this.category = { key: this.notificationServiceName, value: categoryValues };
+            this.useProxy = 'true';
+          }
+          /** request completed */
+          this.ngProgress.done();
+        },
+        error => {
+          /** request completed */
+          this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText, true);
+          }
+        }
+      );
+  }
+
+  enableNotificationService() {
+    /** request started */
+    this.ngProgress.start();
+    this.schedulesService.enableScheduleByName(this.notificationServiceName).
+      subscribe(
+        (data) => {
+          /** request completed */
+          this.ngProgress.done();
+          this.alertService.success(data['message'], true);
+          this.isNotificationServiceEnabled = true;
+          this.notifySettingEmitter.next({isEnabled: this.isNotificationServiceEnabled});
+        },
+        error => {
+          /** request completed */
+          this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
+        });
+  }
+
+  disableNotificationService() {
+    /** request started */
+    this.ngProgress.start();
+    this.schedulesService.disableScheduleByName(this.notificationServiceName).
+      subscribe(
+        (data) => {
+          /** request completed */
+          this.ngProgress.done();
+          this.alertService.success(data['message'], true);
+          this.isNotificationServiceEnabled = false;
+          this.notifySettingEmitter.next({isEnabled: this.isNotificationServiceEnabled});
+        },
+        error => {
+          /** request completed */
+          this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
+        });
+  }
+
+  public async addServiceEvent() {
+    await this.getInstalledServicesList();
+    if (!this.availableServices.includes('notification')) {
+      this.installNotificationService();
+    } else {
+      this.addNotificationService();
+    }
+  }
+
+  saveChanges() {
+    if (!this.isNotificationServiceAvailable) {
+      this.addServiceEvent();
+      this.notifySettingEmitter.next({isServiceAdded: true});
+    } else {
+      if (this.isNotificationServiceEnabled && !this.form.controls['enabled'].value) {
+        this.disableNotificationService();
+      }
+      if (!this.isNotificationServiceEnabled && this.form.controls['enabled'].value) {
+        this.enableNotificationService();
+      }
+    }
+    this.toggleModal(false);
+  }
+
+  proxy() {
+   if (this.useProxy) {
+      document.getElementById('vci-proxy').click();
+    }
+    this.updateConfigConfiguration(this.changedChildConfig);
+    document.getElementById('hidden-save').click();
+    this.notifySettingEmitter.next({isConfigChanged: true});
+  }
+
+  /**
+   * Get edited configuration from child config page
+   * @param changedConfig changed configuration of a selected plugin
+   */
+  getChangedConfig(changedConfig) {
+    if (isEmpty(changedConfig)) {
+      return;
+    }
+    changedConfig = changedConfig.map(el => {
+      return {
+        [el.key]: el.value !== undefined ? el.value : el.default,
+      };
+    });
+
+    changedConfig = Object.assign({}, ...changedConfig); // merge all object into one
+    this.changedChildConfig = changedConfig;
+  }
+
+  public updateConfigConfiguration(configItems) {
+    if (isEmpty(configItems)) {
+      return;
+    }
+    /** request started */
+    this.ngProgress.start();
+    this.configService.updateBulkConfiguration(this.notificationServiceName, configItems).
+      subscribe(
+        () => {
+          this.changedChildConfig = [];  // clear the array
+          /** request completed */
+          this.ngProgress.done();
+          this.alertService.success('Configuration updated successfully.', true);
+        },
+        error => {
+          /** request completed */
+          this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
+        });
+  }
+}

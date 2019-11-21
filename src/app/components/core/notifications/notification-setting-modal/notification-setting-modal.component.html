@@ -1,0 +1,74 @@
+<div id="notification_setting_modal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title is-size-5">Notification Service</p>
+            <button class="delete" aria-label="close" (click)="toggleModal(false)"></button>
+        </header>
+        <section class="modal-card-body">
+            <!-- <form [formGroup]="form" name="notification-form" (ngSubmit)="saveChanges()" id="ngForm" novalidate> -->
+            <form name="notification-form" id="notificationForm" #fg="ngForm" (ngSubmit)="saveChanges()" novalidate>
+                <div class="columns is-mobile">
+                    <!-- <div class="column">
+                        <div class="field">
+                            <div class="form-group">
+                                <label class="label is-small">Name</label>
+                                <p class="control is-fullwidth">
+                                    <input *ngIf="isNotificationServiceAvailable" type="text" class="input is-small" disabled formControlName="name" placeholder="FogLAMP Notifications"
+                                        required trim="blur" />
+                                    <input *ngIf="!isNotificationServiceAvailable" type="text" class="input is-small" formControlName="name" placeholder="FogLAMP Notifications"
+                                        required trim="blur" />
+                                </p>
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="column">
+                        <div class="field is-horizontal">
+                            <div class="field-label has-text-left">
+                                <label class="label">Name</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <input *ngIf="isNotificationServiceAvailable" type="text" class="input is-small" disabled name="name" required trim="blur" [(ngModel)]="name" />
+                                    <input *ngIf="!isNotificationServiceAvailable" type="text" class="input is-small" name="name" [(ngModel)]="name" placeholder="FogLAMP Notifications"
+                                    required trim="blur" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="columns">
+                    <!-- <div class="column">
+                        <div class="field">
+                            <label class="label is-small">Enabled</label>
+                            <div class="control">
+                                <input type="checkbox" checked formControlName="enabled">
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="column">
+                        <div class="field is-horizontal">
+                            <div class="field-label has-text-left">
+                                <label class="label">Enabled</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <input class="checkbox" name="enabled" type="checkbox" [checked]="enabled" [value]="enabled"
+                                    [(ngModel)]="enabled">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="hidden-save" class="is-hidden button is-small is-link is-pulled-right" form="notificationForm">Save</button>
+            </form>
+            <app-view-config-item #notificationConfigView *ngIf="category" [categoryConfigurationData]="category"
+                [useProxy]="useProxy" (onConfigChanged)="getChangedConfig($event)" [pageId]="'modal'"></app-view-config-item>
+        </section>
+        <footer class="modal-card-foot">
+            <button type="button" id="cancel" class="button is-small" (click)="toggleModal(false)">Cancel</button>
+            <button class="button is-small is-link" (click)="proxy()">Save</button>
+        </footer>
+    </div>
+    
+</div>
