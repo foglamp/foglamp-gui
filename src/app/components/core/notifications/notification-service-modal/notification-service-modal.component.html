@@ -6,7 +6,8 @@
             <button class="delete" aria-label="close" (click)="toggleModal(false)"></button>
         </header>
         <section class="modal-card-body">
-            <form name="notification-form" id="notificationForm" #fg="ngForm" (ngSubmit)="fg.form.valid && saveChanges()" novalidate>
+            <form name="notification-form" id="notificationForm" #fg="ngForm"
+                (ngSubmit)="fg.form.valid && saveChanges()" novalidate>
                 <div class="columns is-mobile">
                     <div class="column">
                         <div class="field is-horizontal">
@@ -15,17 +16,21 @@
                             </div>
                             <div class="field-body">
                                 <div class="field">
-                                    <input *ngIf="isNotificationServiceAvailable" type="text" class="input is-small" disabled name="name" required trim="blur" [(ngModel)]="name" />
-                                    <input *ngIf="!isNotificationServiceAvailable" type="text" class="input is-small" name="name" [(ngModel)]="name" placeholder="FogLAMP Notifications"
-                                    required trim="blur" />
-                                    <small *ngIf="fg?.controls['name']?.invalid" class="help is-danger level-left">*required</small>
+                                    <input *ngIf="isNotificationServiceAvailable" type="text" class="input is-small"
+                                        disabled name="name" required trim="blur" [(ngModel)]="name" />
+                                    <input *ngIf="!isNotificationServiceAvailable" type="text" class="input is-small"
+                                        name="name" [(ngModel)]="name" placeholder="FogLAMP Notifications" required
+                                        trim="blur" />
+                                    <small *ngIf="fg?.controls['name']?.invalid"
+                                        class="help is-danger level-left">*required</small>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <app-view-config-item #notificationConfigView *ngIf="category" [categoryConfigurationData]="category"
-                [useProxy]="useProxy" (onConfigChanged)="getChangedConfig($event)" [pageId]="'modal'"></app-view-config-item>
+                    [useProxy]="useProxy" (onConfigChanged)="getChangedConfig($event)" [pageId]="'modal'">
+                </app-view-config-item>
                 <div class="columns">
                     <div class="column">
                         <div class="field is-horizontal">
@@ -34,19 +39,33 @@
                             </div>
                             <div class="field-body">
                                 <div class="field">
-                                    <input class="checkbox" name="enabled" type="checkbox" [checked]="enabled" [value]="enabled"
-                                    [(ngModel)]="enabled">
+                                    <input class="checkbox" name="enabled" type="checkbox" [checked]="enabled"
+                                        [value]="enabled" [(ngModel)]="enabled">
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <button id="hidden-save" class="is-hidden button is-small is-link is-pulled-right" form="notificationForm">Save</button>
+                <button id="hidden-save" class="is-hidden button is-small is-link is-pulled-right"
+                    form="notificationForm">Save</button>
             </form>
+            <hr class="hr-text" data-content="">
+                <div class="columns">
+                    <div class="column">
+                        <div class="field is-grouped is-pulled-right">
+                            <p class="control">
+                                <button class="button is-small">Delete Service
+                                </button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- <app-alert-dialog *ngIf="!isNotificationModalOpen" (deleteNotificationService)='deleteNotificationService()'
+        [notificationServiceRecord]='notificationServiceRecord'> -->
         </section>
         <footer class="modal-card-foot">
             <button type="button" id="cancel" class="button is-small" (click)="toggleModal(false)">Cancel</button>
             <button class="button is-small is-link" (click)="proxy()">{{btnText}}</button>
         </footer>
-    </div>    
+    </div>
 </div>

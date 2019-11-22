@@ -94,6 +94,16 @@ export class NotificationServiceModalComponent implements OnChanges {
         });
   }
 
+  // openDeleteModal() {
+  //   this.notificationServiceRecord = {
+  //     name: this.notificationServiceName,
+  //     message: `Do you really want to delete ${this.notificationServiceName}`,
+  //     key: 'deleteNotification'
+  //   };
+  //   // call child component method to toggle modal
+  //   this.child.toggleModal(true);
+  // }
+
   public async getInstalledServicesList() {
     /** request start */
     this.ngProgress.start();
