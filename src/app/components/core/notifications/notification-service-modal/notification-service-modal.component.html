@@ -18,7 +18,7 @@
                                     <input *ngIf="isNotificationServiceAvailable" type="text" class="input is-small" disabled name="name" required trim="blur" [(ngModel)]="name" />
                                     <input *ngIf="!isNotificationServiceAvailable" type="text" class="input is-small" name="name" [(ngModel)]="name" placeholder="FogLAMP Notifications"
                                     required trim="blur" />
-                                    <small *ngIf="fg?.controls['name']?.invalid" class="help is-danger level-left">Name is required</small>
+                                    <small *ngIf="fg?.controls['name']?.invalid" class="help is-danger level-left">*required</small>
                                 </div>
                             </div>
                         </div>
@@ -46,7 +46,7 @@
         </section>
         <footer class="modal-card-foot">
             <button type="button" id="cancel" class="button is-small" (click)="toggleModal(false)">Cancel</button>
-            <button class="button is-small is-link" (click)="proxy()">Save</button>
+            <button class="button is-small is-link" (click)="proxy()">{{btnText}}</button>
         </footer>
     </div>    
 </div>

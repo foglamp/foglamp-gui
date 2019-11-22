@@ -34,7 +34,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
   private viewPortSubscription: Subscription;
   public showSpinner = false;
-  public childData = {};
+  public notificationServiceData = {};
 
   @ViewChild(NotificationModalComponent, { static: true }) notificationModal: NotificationModalComponent;
   @ViewChild(AlertDialogComponent, { static: false }) child: AlertDialogComponent;
@@ -248,11 +248,11 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   /**
    * Open Notification Settings modal
    */
-  openNotificationSettingsModal() {
-    this.childData = {
-      'isNotificationServiceAvailable': this.isNotificationServiceAvailable,
-      'isNotificationServiceEnabled': this.isNotificationServiceEnabled,
-      'notificationServiceName': this.notificationServiceName
+  openNotificationServiceModal() {
+    this.notificationServiceData = {
+      notificationServiceAvailable: this.isNotificationServiceAvailable,
+      notificationServiceEnabled: this.isNotificationServiceEnabled,
+      notificationServiceName: this.notificationServiceName
     };
     this.notificationSettingModal.toggleModal(true);
   }

@@ -4,7 +4,7 @@
       <article class="message is-warning">
         <div class="message-body">
           Notification service is not added
-          and enabled.&nbsp; <a (click)="openNotificationSettingsModal()"><strong>add & enable now</strong></a>
+          and enabled.&nbsp; <a (click)="openNotificationServiceModal()"><strong>add & enable now</strong></a>
           <button (click)="checkNotificationServiceStatus(true)" class="button is-small" id="refresh-check">
             <i class="fa fa-sync" aria-hidden="true"></i>
           </button>
@@ -14,7 +14,7 @@
     <ng-container *ngIf="isNotificationServiceAvailable && !isNotificationServiceEnabled">
       <article class="message is-warning">
         <div class="message-body">
-          Notification service is not enabled.&nbsp;<a (click)="openNotificationSettingsModal()"><strong>enable
+          Notification service is not enabled.&nbsp;<a (click)="openNotificationServiceModal()"><strong>enable
               now</strong></a>
           <button (click)="checkNotificationServiceStatus(true)" class="button is-small" id="refresh-check">
             <i class="fa fa-sync" aria-hidden="true"></i>
@@ -40,7 +40,7 @@
         <p *ngIf="viewPort !== 'mobile'">Create Notification Instance &nbsp;</p>
         <i class="fa fa-plus" aria-hidden="true"></i>
       </button>
-      <a class="button" (click)="openNotificationSettingsModal()" id="refresh-check">
+      <a class="button" (click)="openNotificationServiceModal()" id="refresh-check">
         <span class="icon">
           <i class="fa fa-cog" aria-hidden="true"></i>
         </span>
@@ -103,4 +103,4 @@
 </div>
 <app-notification-modal (notify)='onNotify()' [notification]="notification"></app-notification-modal>
 <app-view-logs></app-view-logs>
-<app-notification-service-modal (notifySettingEmitter)='onNotifySettingModal($event)' [childData]="childData"></app-notification-service-modal>
+<app-notification-service-modal (notifyServiceEmitter)='onNotifySettingModal($event)' [notificationServiceData]="notificationServiceData"></app-notification-service-modal>

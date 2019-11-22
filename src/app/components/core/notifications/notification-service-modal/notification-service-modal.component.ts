@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, OnChanges, Input, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, OnChanges, Input, SimpleChanges, ViewChild, HostListener } from '@angular/core';
 import { FormBuilder, NgForm } from '@angular/forms';
 import { ProgressBarService, AlertService, ServicesApiService, SchedulesService, ConfigurationService } from '../../../../services';
 import {
@@ -22,9 +22,11 @@ export class NotificationServiceModalComponent implements OnChanges {
   changedChildConfig = [];
   availableServices = [];
   notificationServicePackageName = 'foglamp-service-notification';
+  btnText = 'Add';
 
-  @Output() notifySettingEmitter: EventEmitter<any> = new EventEmitter<any>();
-  @Input() childData: { isNotificationServiceAvailable: boolean, isNotificationServiceEnabled: boolean, notificationServiceName: string };
+  @Output() notifyServiceEmitter: EventEmitter<any> = new EventEmitter<any>();
+  @Input() notificationServiceData: { notificationServiceAvailable: boolean, notificationServiceEnabled: boolean,
+    notificationServiceName: string };
   @ViewChild('notificationConfigView', { static: false }) viewConfigItemComponent: ViewConfigItemComponent;
   @ViewChild('fg', { static: false }) form: NgForm;
 
@@ -33,16 +35,21 @@ export class NotificationServiceModalComponent implements OnChanges {
     public servicesApiService: ServicesApiService, public alertService: AlertService) { }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['childData']) {
-      this.notificationServiceName = this.childData.notificationServiceName;
-      this.isNotificationServiceEnabled = this.childData.isNotificationServiceEnabled;
-      this.isNotificationServiceAvailable = this.childData.isNotificationServiceAvailable;
+    if (changes['notificationServiceData']) {
+      this.notificationServiceName = this.notificationServiceData.notificationServiceName;
+      this.isNotificationServiceEnabled = this.notificationServiceData.notificationServiceEnabled;
+      this.isNotificationServiceAvailable = this.notificationServiceData.notificationServiceAvailable;
     }
     this.name = this.notificationServiceName;
     this.enabled = this.isNotificationServiceEnabled;
     if (this.notificationServiceName) {
+      this.btnText = 'Save';
       this.getCategory();
     }
+  }
+
+  @HostListener('document:keydown.escape', ['$event']) onKeydownHandler() {
+    this.toggleModal(false);
   }
 
   public toggleModal(isOpen: Boolean) {
@@ -70,7 +77,11 @@ export class NotificationServiceModalComponent implements OnChanges {
           this.ngProgress.done();
           this.alertService.success('Notification service added successfully.', true);
           this.isNotificationServiceAvailable = true;
+          this.btnText = 'Save';
           this.toggleModal(false);
+          setTimeout(() => {
+            this.notifyServiceEmitter.next({isServiceAdded: true});
+          }, 2000);
         },
         (error) => {
           /** request done */
@@ -177,7 +188,7 @@ export class NotificationServiceModalComponent implements OnChanges {
           this.ngProgress.done();
           this.alertService.success(data['message'], true);
           this.isNotificationServiceEnabled = true;
-          this.notifySettingEmitter.next({isEnabled: this.isNotificationServiceEnabled});
+          this.notifyServiceEmitter.next({isEnabled: this.isNotificationServiceEnabled});
         },
         error => {
           /** request completed */
@@ -200,7 +211,7 @@ export class NotificationServiceModalComponent implements OnChanges {
           this.ngProgress.done();
           this.alertService.success(data['message'], true);
           this.isNotificationServiceEnabled = false;
-          this.notifySettingEmitter.next({isEnabled: this.isNotificationServiceEnabled});
+          this.notifyServiceEmitter.next({isEnabled: this.isNotificationServiceEnabled});
         },
         error => {
           /** request completed */
@@ -225,7 +236,6 @@ export class NotificationServiceModalComponent implements OnChanges {
   saveChanges() {
     if (!this.isNotificationServiceAvailable) {
       this.addServiceEvent();
-      this.notifySettingEmitter.next({isServiceAdded: true});
     } else {
       if (this.isNotificationServiceEnabled && !this.form.controls['enabled'].value) {
         this.disableNotificationService();
@@ -246,7 +256,7 @@ export class NotificationServiceModalComponent implements OnChanges {
     }
     this.updateConfigConfiguration(this.changedChildConfig);
     document.getElementById('hidden-save').click();
-    this.notifySettingEmitter.next({isConfigChanged: true});
+    this.notifyServiceEmitter.next({isConfigChanged: true});
   }
 
   /**
