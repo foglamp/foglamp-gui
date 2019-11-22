@@ -14,13 +14,13 @@ import { isEmpty } from 'lodash';
 export class NotificationServiceModalComponent implements OnChanges {
   enabled: Boolean;
   name: string;
-  public category: any;
-  public useProxy: 'true';
+  category: any;
+  useProxy: 'true';
   isNotificationServiceAvailable = false;
   isNotificationServiceEnabled = false;
   notificationServiceName = '';
-  public changedChildConfig = [];
-  public availableServices = [];
+  changedChildConfig = [];
+  availableServices = [];
   notificationServicePackageName = 'foglamp-service-notification';
 
   @Output() notifySettingEmitter: EventEmitter<any> = new EventEmitter<any>();
@@ -46,12 +46,12 @@ export class NotificationServiceModalComponent implements OnChanges {
   }
 
   public toggleModal(isOpen: Boolean) {
-    const notification_setting_modal = <HTMLDivElement>document.getElementById('notification-setting-modal');
+    const notificationServiceModal = <HTMLDivElement>document.getElementById('notification-service-modal');
     if (isOpen) {
-      notification_setting_modal.classList.add('is-active');
+      notificationServiceModal.classList.add('is-active');
       return;
     }
-    notification_setting_modal.classList.remove('is-active');
+    notificationServiceModal.classList.remove('is-active');
   }
 
   addNotificationService() {
