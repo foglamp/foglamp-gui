@@ -7,11 +7,11 @@ import {
 import { isEmpty } from 'lodash';
 
 @Component({
-  selector: 'app-notification-setting-modal',
-  templateUrl: './notification-setting-modal.component.html',
-  styleUrls: ['./notification-setting-modal.component.css']
+  selector: 'app-notification-service-modal',
+  templateUrl: './notification-service-modal.component.html',
+  styleUrls: ['./notification-service-modal.component.css']
 })
-export class NotificationSettingModalComponent implements OnChanges {
+export class NotificationServiceModalComponent implements OnChanges {
   enabled: Boolean;
   name: string;
   public category: any;
@@ -46,7 +46,7 @@ export class NotificationSettingModalComponent implements OnChanges {
   }
 
   public toggleModal(isOpen: Boolean) {
-    const notification_setting_modal = <HTMLDivElement>document.getElementById('notification_setting_modal');
+    const notification_setting_modal = <HTMLDivElement>document.getElementById('notification-setting-modal');
     if (isOpen) {
       notification_setting_modal.classList.add('is-active');
       return;
@@ -55,7 +55,7 @@ export class NotificationSettingModalComponent implements OnChanges {
   }
 
   addNotificationService() {
-    const name = this.form.controls['name'].value ? this.form.controls['name'].value : 'FogLAMP Notifications';
+    const name = this.form.controls['name'].value;
     const payload = {
       name: name,
       type: 'notification',
@@ -238,6 +238,9 @@ export class NotificationSettingModalComponent implements OnChanges {
   }
 
   proxy() {
+    if (!this.form.valid) {
+      return;
+    }
    if (this.useProxy) {
       document.getElementById('vci-proxy').click();
     }

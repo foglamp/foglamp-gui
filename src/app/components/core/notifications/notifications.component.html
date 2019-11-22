@@ -1,6 +1,6 @@
 <div class="container is-fluid">
   <div>
-    <ng-container *ngIf="!isNotificationServiceAvailable && !isNotificationServiceEnabled">
+    <ng-container *ngIf="isNotificationServiceAvailable == false && isNotificationServiceEnabled == false">
       <article class="message is-warning">
         <div class="message-body">
           Notification service is not added
@@ -103,4 +103,4 @@
 </div>
 <app-notification-modal (notify)='onNotify()' [notification]="notification"></app-notification-modal>
 <app-view-logs></app-view-logs>
-<app-notification-setting-modal (notifySettingEmitter)='onNotifySettingModal($event)' [childData]="childData"></app-notification-setting-modal>
+<app-notification-service-modal (notifySettingEmitter)='onNotifySettingModal($event)' [childData]="childData"></app-notification-service-modal>

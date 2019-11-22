@@ -17,7 +17,6 @@ import ConfigTypeValidation from '../configuration-type-validation';
 
 export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
   @Input() categoryConfigurationData: any;
-  @Input() notificationConfigurationData: any;
   @Input() useProxy = 'false';
   @Input() useFilterProxy = 'false';
   @Input() useRuleProxy = 'false';

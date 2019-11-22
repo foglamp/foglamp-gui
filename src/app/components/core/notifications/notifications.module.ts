@@ -13,7 +13,7 @@ import { NotificationsComponent } from './notifications.component';
 import { ServicesApiService, NotificationsService } from '../../../services';
 import { AddNotificationWizardComponent } from './add-notification-wizard/add-notification-wizard.component';
 import { NotificationModalComponent } from './notification-modal/notification-modal.component';
-import { NotificationSettingModalComponent } from './notification-setting-modal/notification-setting-modal.component';
+import { NotificationServiceModalComponent } from './notification-service-modal/notification-service-modal.component';
 import { ServiceResolver } from '../../../resolver/service.resolver';
 import { NotificationLogComponent } from './notification-log/notification-log.component';
 import { NumberInputDebounceModule } from '../../common/number-input-debounce/number-input-debounce.module';
@@ -44,7 +44,7 @@ const routes: Routes = [
     AddNotificationWizardComponent,
     NotificationLogComponent,
     NotificationModalComponent,
-    NotificationSettingModalComponent
+    NotificationServiceModalComponent
   ],
   imports: [
     FormsModule,

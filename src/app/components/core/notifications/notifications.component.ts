@@ -11,7 +11,7 @@ import {
 import { AlertDialogComponent } from '../../common/alert-dialog/alert-dialog.component';
 import { NotificationModalComponent } from './notification-modal/notification-modal.component';
 import { ViewLogsComponent } from '../packages-log/view-logs/view-logs.component';
-import { NotificationSettingModalComponent } from './notification-setting-modal/notification-setting-modal.component';
+import { NotificationServiceModalComponent } from './notification-service-modal/notification-service-modal.component';
 
 @Component({
   selector: 'app-notifications',
@@ -21,10 +21,10 @@ import { NotificationSettingModalComponent } from './notification-setting-modal/
 })
 export class NotificationsComponent implements OnInit, OnDestroy {
 
-  isNotificationServiceAvailable = true;
-  isNotificationServiceEnabled = true;
+  isNotificationServiceAvailable: boolean;
+  isNotificationServiceEnabled: boolean;
+  isNotificationModalOpen = false;
   notificationServiceName = '';
-  notificationServicePackageName = 'foglamp-service-notification';
   notificationInstances = [];
   notification: any;
   viewPort: any = '';
@@ -34,13 +34,12 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
   private viewPortSubscription: Subscription;
   public showSpinner = false;
-  isNotificationModalOpen = false;
   public childData = {};
 
   @ViewChild(NotificationModalComponent, { static: true }) notificationModal: NotificationModalComponent;
   @ViewChild(AlertDialogComponent, { static: false }) child: AlertDialogComponent;
   @ViewChild(ViewLogsComponent, { static: false }) viewLogsComponent: ViewLogsComponent;
-  @ViewChild(NotificationSettingModalComponent, { static: true }) notificationSettingModal: NotificationSettingModalComponent;
+  @ViewChild(NotificationServiceModalComponent, { static: true }) notificationSettingModal: NotificationServiceModalComponent;
 
   constructor(public servicesApiService: ServicesApiService,
     public schedulesService: SchedulesService,
@@ -52,7 +51,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     private sharedService: SharedService) { }
 
   ngOnInit() {
-    this.checkNotificationServiceStatus(true);
+    this.checkNotificationServiceStatus();
     this.getNotificationInstance();
     this.subscription = this.sharedService.showLogs.subscribe(showPackageLogs => {
       if (showPackageLogs.isSubscribed) {
@@ -66,7 +65,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   }
 
   public async checkNotificationServiceStatus(refresh: boolean = false) {
-    console.log('checkNotificationServiceStatus');
     await this.getInstalledServicesList();
     if (this.availableServices.includes('notification')) {
       if (refresh) {
@@ -99,15 +97,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
         }
       });
   }
-
-  // public async addServiceEvent() {
-  //   await this.getInstalledServicesList();
-  //   if (!this.availableServices.includes('notification')) {
-  //     this.notificationSettingModal.installNotificationService();
-  //   } else {
-  //     this.notificationSettingModal.addNotificationService();
-  //   }
-  // }
 
   public getNotificationInstance() {
     this.showLoadingSpinner();
@@ -142,7 +131,9 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       this.isNotificationServiceEnabled = event.isEnabled;
     }
     if (event.isServiceAdded !== undefined) {
-      this.checkNotificationServiceStatus();
+      setTimeout(() => {
+        this.checkNotificationServiceStatus(true);
+      }, 2000);
     }
     if (event.isConfigChanged !== undefined) {
       this.checkServiceStatus();
@@ -170,15 +161,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   addNotificationInstance() {
     this.router.navigate(['/notification/add']);
-  }
-
-  public closeMessage(isOpen: Boolean) {
-    const modalName = <HTMLElement>document.getElementById('messageDiv');
-    if (isOpen) {
-      modalName.classList.add('is-hidden');
-      return;
-    }
-    modalName.classList.remove('is-hidden');
   }
 
   public checkServiceStatus() {
