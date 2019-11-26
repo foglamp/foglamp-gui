@@ -173,7 +173,8 @@ export class BackupRestoreComponent extends UnsubscribeOnDestroyAdapter implemen
     this.showSpinner = false;
   }
 
-  public ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this.isAlive = false;
+    super.ngOnDestroy();
   }
 }

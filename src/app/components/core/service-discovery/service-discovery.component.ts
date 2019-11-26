@@ -61,6 +61,7 @@ export class ServiceDiscoveryComponent extends UnsubscribeOnDestroyAdapter imple
       return;
     }
     serviceDiscoveryModal.classList.remove('is-active');
+    super.ngOnDestroy();
   }
 
   setServiceDiscoveryURL() {

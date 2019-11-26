@@ -258,7 +258,8 @@ export class DashboardComponent extends UnsubscribeOnDestroyAdapter implements O
     this.toggleDropDown(id);
   }
 
-  public ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this.isAlive = false;
+    super.ngOnDestroy();
   }
 }

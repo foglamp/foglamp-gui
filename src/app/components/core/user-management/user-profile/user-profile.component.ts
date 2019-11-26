@@ -91,6 +91,7 @@ export class UserProfileComponent extends UnsubscribeOnDestroyAdapter implements
       return;
     }
     userProfileModal.classList.remove('is-active');
+    super.ngOnDestroy();
   }
 
   public changePassword(form: NgForm, userName) {

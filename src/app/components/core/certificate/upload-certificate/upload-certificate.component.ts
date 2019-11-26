@@ -68,6 +68,7 @@ export class UploadCertificateComponent extends UnsubscribeOnDestroyAdapter impl
       return;
     }
     certificate_modal.classList.remove('is-active');
+    super.ngOnDestroy();
   }
 
   onKeyChange(event) {

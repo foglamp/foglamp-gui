@@ -47,6 +47,7 @@ export class CertificateBaseLoginComponent extends UnsubscribeOnDestroyAdapter i
       return;
     }
     certificate_modal.classList.remove('is-active');
+    super.ngOnDestroy();
   }
 
   selectOptionOfCertificateLogin() {

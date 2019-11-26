@@ -69,6 +69,7 @@ export class UpdateUserComponent extends UnsubscribeOnDestroyAdapter implements 
     if (activeDropDown.length > 0) {
       activeDropDown[0].classList.remove('is-active');
     }
+    super.ngOnDestroy();
   }
 
   /**

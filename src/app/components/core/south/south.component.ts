@@ -114,5 +114,6 @@ export class SouthComponent extends UnsubscribeOnDestroyAdapter implements OnIni
 
   public ngOnDestroy(): void {
     this.isAlive = false;
+    super.ngOnDestroy();
   }
 }

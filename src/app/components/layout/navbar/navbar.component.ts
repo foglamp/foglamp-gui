@@ -364,6 +364,7 @@ export class NavbarComponent extends UnsubscribeOnDestroyAdapter implements OnIn
 
   public ngOnDestroy(): void {
     clearInterval(this.timer);
+    super.ngOnDestroy();
   }
 }
 

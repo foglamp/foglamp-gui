@@ -110,6 +110,7 @@ export class NorthComponent extends UnsubscribeOnDestroyAdapter implements OnIni
 
   public ngOnDestroy(): void {
     this.isAlive = false;
+    super.ngOnDestroy();
   }
 }
 
