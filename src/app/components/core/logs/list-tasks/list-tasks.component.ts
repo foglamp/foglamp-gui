@@ -104,5 +104,6 @@ export class ListTasksComponent extends UnsubscribeOnDestroyAdapter implements O
 
   public ngOnDestroy(): void {
     this.isAlive = false;
+    super.ngOnDestroy();
   }
 }

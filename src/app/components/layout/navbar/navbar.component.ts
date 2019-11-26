@@ -26,7 +26,7 @@ import { ShutdownModalComponent } from '../../common/shut-down/shutdown-modal.co
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
-export class NavbarComponent extends UnsubscribeOnDestroyAdapter implements OnInit, AfterViewInit, OnDestroy {
+export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() toggle = new EventEmitter<string>();
   public timer: any = '';
   public pingData = {};
@@ -61,10 +61,9 @@ export class NavbarComponent extends UnsubscribeOnDestroyAdapter implements OnIn
     private changeDetectorRef: ChangeDetectorRef,
     private ping: PingService,
     private router: Router) {
-    super();
     // Subscribe to automatically update
     // "isUserLoggedIn" whenever a change to the subject is made.
-    this.subs.sink = this.sharedService.isUserLoggedIn.subscribe(value => {
+    this.sharedService.isUserLoggedIn.subscribe(value => {
       this.isUserLoggedIn = value.loggedIn;
       this.userName = value.userName;
       this.isAuthOptional = value.isAuth;
@@ -75,7 +74,7 @@ export class NavbarComponent extends UnsubscribeOnDestroyAdapter implements OnIn
   ngOnInit() {
     this.getServiceStatus();
     this.pingService();
-    this.subs.sink = this.ping.pingIntervalChanged.subscribe((pingTime: number) => {
+    this.ping.pingIntervalChanged.subscribe((pingTime: number) => {
       if (pingTime === -1) {
         this.stop();
       } else {
@@ -121,7 +120,7 @@ export class NavbarComponent extends UnsubscribeOnDestroyAdapter implements OnIn
 
   public getServiceStatus() {
     this.showLoadingSpinner();
-    this.subs.sink = this.servicesApiService.getAllServices()
+    this.servicesApiService.getAllServices()
       .subscribe(
         (data: any) => {
           this.servicesRecord = [];
@@ -243,7 +242,7 @@ export class NavbarComponent extends UnsubscribeOnDestroyAdapter implements OnIn
   restart() {
     /** request started */
     this.ngProgress.start();
-    this.subs.sink = this.ping.restart()
+    this.ping.restart()
       .subscribe(
         (data) => {
           /** request completed */
@@ -265,7 +264,7 @@ export class NavbarComponent extends UnsubscribeOnDestroyAdapter implements OnIn
   shutdown() {
     /** request started */
     this.ngProgress.start();
-    this.subs.sink = this.ping.shutdown()
+    this.ping.shutdown()
       .subscribe(
         (data) => {
           /** request completed */
@@ -364,7 +363,6 @@ export class NavbarComponent extends UnsubscribeOnDestroyAdapter implements OnIn
 
   public ngOnDestroy(): void {
     clearInterval(this.timer);
-    super.ngOnDestroy();
   }
 }
 

@@ -13,7 +13,7 @@ import { CertificateBaseLoginComponent } from '../certificate-base-login';
   styleUrls: ['./login.component.css']
 })
 
-export class LoginComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
+export class LoginComponent implements OnInit {
   model: any = {};
   returnUrl: string;
 
@@ -26,7 +26,6 @@ export class LoginComponent extends UnsubscribeOnDestroyAdapter implements OnIni
     private userService: UserService,
     private ping: PingService,
     public ngProgress: ProgressBarService) {
-    super();
     this.sharedService.isUserLoggedIn.next({
       'loggedIn': false,
       'isAuthOptional': JSON.parse(sessionStorage.getItem('LOGIN_SKIPPED'))
@@ -59,7 +58,7 @@ export class LoginComponent extends UnsubscribeOnDestroyAdapter implements OnIni
    */
   login() {
     this.ngProgress.start();
-    this.subs.sink = this.authService.login(this.model.username, this.model.password).
+    this.authService.login(this.model.username, this.model.password).
       subscribe(
         (data) => {
           const pingInterval = JSON.parse(localStorage.getItem('PING_INTERVAL'));
@@ -94,7 +93,7 @@ export class LoginComponent extends UnsubscribeOnDestroyAdapter implements OnIni
 
   getUser(id) {
     // Get SignedIn user details
-    this.subs.sink = this.userService.getUser(id)
+    this.userService.getUser(id)
       .subscribe(
         (userData) => {
           this.sharedService.isUserLoggedIn.next({
