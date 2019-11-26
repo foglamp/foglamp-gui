@@ -154,7 +154,7 @@ export class AlertDialogComponent implements OnInit, OnChanges {
     }
     if (this.notificationServiceRecord) {
       if (this.notificationServiceRecord.key === 'deleteNotificationService') {
-        this.deleteNotificationService.emit();
+        this.deleteNotificationService.emit(this.notificationServiceRecord.name);
         this.toggleModal(false);
       }
     }

@@ -25,7 +25,7 @@ export class NotificationServiceModalComponent implements OnChanges {
   availableServices = [];
   notificationServicePackageName = 'foglamp-service-notification';
   btnText = 'Add';
-  public notificationServiceRecord: any;
+  public notificationServiceRecord;
 
   @Output() notifyServiceEmitter: EventEmitter<any> = new EventEmitter<any>();
   @Input() notificationServiceData: { notificationServiceAvailable: boolean, notificationServiceEnabled: boolean,
@@ -101,8 +101,6 @@ export class NotificationServiceModalComponent implements OnChanges {
 
   /**
    * Open delete modal
-   * @param message   message to show on alert
-   * @param action here action is 'deleteNotificationService'
    */
   openDeleteModal(name: string) {
     this.notificationServiceRecord = {

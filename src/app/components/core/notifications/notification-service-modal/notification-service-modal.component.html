@@ -2,13 +2,14 @@
     <div class="modal-background"></div>
     <div class="modal-card">
         <header class="modal-card-head">
-            <p class="modal-card-title is-size-5">Notification Service</p>
+            <p *ngIf="name != undefined" class="modal-card-title is-size-5">{{name}} Notification Service</p>
+            <p *ngIf="name == undefined" class="modal-card-title is-size-5">Notification Service</p>
             <button class="delete" aria-label="close" (click)="toggleModal(false)"></button>
         </header>
         <section class="modal-card-body">
             <form name="notification-form" id="notificationForm" #fg="ngForm"
                 (ngSubmit)="fg.form.valid && saveChanges()" novalidate>
-                <div class="columns is-mobile">
+                <div *ngIf="name == undefined" class="columns is-mobile">
                     <div class="column">
                         <div class="field is-horizontal">
                             <div class="field-label has-text-left">
@@ -50,23 +51,31 @@
                     form="notificationForm">Save</button>
             </form>
             <hr class="hr-text" data-content="">
-                <div class="columns">
-                    <div class="column">
-                        <div class="field is-grouped is-pulled-right">
-                            <p class="control">
-                                <button (click)="openDeleteModal(name)" class="button is-small">Delete Service
-                                </button>
-                            </p>
-                        </div>
+            <div class="columns">
+                <div class="column">
+                    <div class="field is-grouped is-pulled-right">
+                        <p class="control">
+                            <button class="button is-small" id="cancel" (click)="toggleModal(false)">Cancel</button>
+                        </p>
+                        <p class="control">
+                            <button class="button is-small is-link" (click)="proxy()">{{btnText}}</button>
+                        </p>
                     </div>
                 </div>
-                <app-alert-dialog (deleteNotificationService)='deleteNotificationService($event)' [notificationServiceRecord]='notificationServiceRecord'></app-alert-dialog>
-                <!-- <app-alert-dialog *ngIf="!isNotificationModalOpen" (deleteNotificationService)='deleteNotificationService()'
-        [serviceData]='serviceData'> -->
+            </div>
+            <hr class="hr-text" data-content="">
+            <div class="columns">
+                <div class="column">
+                    <div class="field is-grouped is-pulled-right">
+                        <p class="control">
+                            <button (click)="openDeleteModal(name)" class="button is-small">Delete Service
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
         </section>
-        <footer class="modal-card-foot">
-            <button type="button" id="cancel" class="button is-small" (click)="toggleModal(false)">Cancel</button>
-            <button class="button is-small is-link" (click)="proxy()">{{btnText}}</button>
-        </footer>
     </div>
+    <app-alert-dialog (deleteNotificationService)='deleteNotificationService($event)'
+                [notificationServiceRecord]='notificationServiceRecord'></app-alert-dialog>
 </div>
