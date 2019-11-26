@@ -130,7 +130,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     if (event.isEnabled !== undefined) {
       this.isNotificationServiceEnabled = event.isEnabled;
     }
-    if (event.isServiceAdded !== undefined) {
+    if (event.isAddDeleteAction !== undefined) {
       setTimeout(() => {
         this.checkNotificationServiceStatus(true);
       }, 2000);

@@ -14,7 +14,7 @@ export class AlertDialogComponent implements OnInit, OnChanges {
   @Output() delete = new EventEmitter<Number>();
   @Output() deleteService = new EventEmitter<Object>();
   @Output() deleteNotification = new EventEmitter<Object>();
-  @Output() disableNotificationService = new EventEmitter<Object>();
+  @Output() deleteNotificationService = new EventEmitter<Object>();
   @Output() deleteTask = new EventEmitter<Object>();
   @Output() deleteUserService = new EventEmitter<Number>();
   @Output() deleteCertificate = new EventEmitter<Object>();
@@ -77,8 +77,8 @@ export class AlertDialogComponent implements OnInit, OnChanges {
       }
     }
     if (this.notificationServiceRecord) {
-      if (this.notificationServiceRecord.key === 'disableNotification') {
-       this.notificationServiceRecord.headerTextValue = 'Disable Service';
+      if (this.notificationServiceRecord.key === 'deleteNotificationService') {
+       this.notificationServiceRecord.headerTextValue = 'Delete Service';
       }
     }
   }
@@ -153,8 +153,8 @@ export class AlertDialogComponent implements OnInit, OnChanges {
       }
     }
     if (this.notificationServiceRecord) {
-      if (this.notificationServiceRecord.key === 'disableNotification') {
-        this.disableNotificationService.emit();
+      if (this.notificationServiceRecord.key === 'deleteNotificationService') {
+        this.deleteNotificationService.emit();
         this.toggleModal(false);
       }
     }

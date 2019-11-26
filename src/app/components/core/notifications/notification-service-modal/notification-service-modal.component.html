@@ -54,14 +54,15 @@
                     <div class="column">
                         <div class="field is-grouped is-pulled-right">
                             <p class="control">
-                                <button class="button is-small">Delete Service
+                                <button (click)="openDeleteModal(name)" class="button is-small">Delete Service
                                 </button>
                             </p>
                         </div>
                     </div>
                 </div>
+                <app-alert-dialog (deleteNotificationService)='deleteNotificationService($event)' [notificationServiceRecord]='notificationServiceRecord'></app-alert-dialog>
                 <!-- <app-alert-dialog *ngIf="!isNotificationModalOpen" (deleteNotificationService)='deleteNotificationService()'
-        [notificationServiceRecord]='notificationServiceRecord'> -->
+        [serviceData]='serviceData'> -->
         </section>
         <footer class="modal-card-foot">
             <button type="button" id="cancel" class="button is-small" (click)="toggleModal(false)">Cancel</button>

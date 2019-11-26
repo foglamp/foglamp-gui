@@ -1,9 +1,11 @@
 import { Component, EventEmitter, Output, OnChanges, Input, SimpleChanges, ViewChild, HostListener } from '@angular/core';
 import { FormBuilder, NgForm } from '@angular/forms';
-import { ProgressBarService, AlertService, ServicesApiService, SchedulesService, ConfigurationService } from '../../../../services';
+import { ProgressBarService, NotificationsService, AlertService, ServicesApiService, SchedulesService,
+  ConfigurationService } from '../../../../services';
 import {
   ViewConfigItemComponent
 } from '../../configuration-manager/view-config-item/view-config-item.component';
+import { AlertDialogComponent } from '../../../common/alert-dialog/alert-dialog.component';
 import { isEmpty } from 'lodash';
 
 @Component({
@@ -23,16 +25,19 @@ export class NotificationServiceModalComponent implements OnChanges {
   availableServices = [];
   notificationServicePackageName = 'foglamp-service-notification';
   btnText = 'Add';
+  public notificationServiceRecord: any;
 
   @Output() notifyServiceEmitter: EventEmitter<any> = new EventEmitter<any>();
   @Input() notificationServiceData: { notificationServiceAvailable: boolean, notificationServiceEnabled: boolean,
     notificationServiceName: string };
   @ViewChild('notificationConfigView', { static: false }) viewConfigItemComponent: ViewConfigItemComponent;
   @ViewChild('fg', { static: false }) form: NgForm;
+  @ViewChild(AlertDialogComponent, { static: true }) child: AlertDialogComponent;
 
   constructor(public fb: FormBuilder, public ngProgress: ProgressBarService,
     private configService: ConfigurationService, public schedulesService: SchedulesService,
-    public servicesApiService: ServicesApiService, public alertService: AlertService) { }
+    public servicesApiService: ServicesApiService, public alertService: AlertService,
+    private notificationService: NotificationsService) { }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['notificationServiceData']) {
@@ -80,7 +85,7 @@ export class NotificationServiceModalComponent implements OnChanges {
           this.btnText = 'Save';
           this.toggleModal(false);
           setTimeout(() => {
-            this.notifyServiceEmitter.next({isServiceAdded: true});
+            this.notifyServiceEmitter.next({isAddDeleteAction: true});
           }, 2000);
         },
         (error) => {
@@ -94,15 +99,20 @@ export class NotificationServiceModalComponent implements OnChanges {
         });
   }
 
-  // openDeleteModal() {
-  //   this.notificationServiceRecord = {
-  //     name: this.notificationServiceName,
-  //     message: `Do you really want to delete ${this.notificationServiceName}`,
-  //     key: 'deleteNotification'
-  //   };
-  //   // call child component method to toggle modal
-  //   this.child.toggleModal(true);
-  // }
+  /**
+   * Open delete modal
+   * @param message   message to show on alert
+   * @param action here action is 'deleteNotificationService'
+   */
+  openDeleteModal(name: string) {
+    this.notificationServiceRecord = {
+      name: name,
+      message: 'Deleting this notification service can not be undone. Continue',
+      key: 'deleteNotificationService'
+    };
+    // call child component method to toggle modal
+    this.child.toggleModal(true);
+  }
 
   public async getInstalledServicesList() {
     /** request start */
@@ -225,6 +235,26 @@ export class NotificationServiceModalComponent implements OnChanges {
         },
         error => {
           /** request completed */
+          this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
+        });
+  }
+
+  deleteNotificationService(notificationName: string) {
+    this.ngProgress.start();
+    this.notificationService.deleteNotification(notificationName)
+      .subscribe(
+        (data: any) => {
+          this.ngProgress.done();
+          this.alertService.success(data['result'], true);
+          this.toggleModal(false);
+          this.notifyServiceEmitter.next({isAddDeleteAction: true});
+        },
+        error => {
           this.ngProgress.done();
           if (error.status === 0) {
             console.log('service down ', error);
