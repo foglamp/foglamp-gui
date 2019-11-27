@@ -17,7 +17,7 @@ export class NotificationServiceModalComponent implements OnChanges {
   enabled: Boolean;
   name: string;
   category: any;
-  useProxy: 'true';
+  useProxy: string;
   isNotificationServiceAvailable = false;
   isNotificationServiceEnabled = false;
   notificationServiceName = '';
@@ -25,6 +25,7 @@ export class NotificationServiceModalComponent implements OnChanges {
   availableServices = [];
   notificationServicePackageName = 'foglamp-service-notification';
   btnText = 'Add';
+  showDeleteBtn = true;
   public notificationServiceRecord;
 
   @Output() notifyServiceEmitter: EventEmitter<any> = new EventEmitter<any>();
@@ -47,7 +48,10 @@ export class NotificationServiceModalComponent implements OnChanges {
     }
     this.name = this.notificationServiceName;
     this.enabled = this.isNotificationServiceEnabled;
-    if (this.notificationServiceName) {
+    this.btnText = 'Add';
+    this.useProxy = 'false';
+    if (this.isNotificationServiceAvailable) {
+      this.showDeleteBtn = true;
       this.btnText = 'Save';
       this.getCategory();
     }
@@ -64,6 +68,7 @@ export class NotificationServiceModalComponent implements OnChanges {
       return;
     }
     notificationServiceModal.classList.remove('is-active');
+    this.category = '';
   }
 
   addNotificationService() {
@@ -109,7 +114,7 @@ export class NotificationServiceModalComponent implements OnChanges {
       key: 'deleteNotificationService'
     };
     // call child component method to toggle modal
-    this.child.toggleModal(true);
+    this.child.toggleModal(true, '#notification-service-modal ');
   }
 
   public async getInstalledServicesList() {
@@ -189,6 +194,8 @@ export class NotificationServiceModalComponent implements OnChanges {
           this.ngProgress.done();
           if (error.status === 0) {
             console.log('service down ', error);
+          } else if (error.status === 404) {
+            this.showDeleteBtn = false;
           } else {
             this.alertService.error(error.statusText, true);
           }
@@ -244,13 +251,13 @@ export class NotificationServiceModalComponent implements OnChanges {
 
   deleteNotificationService(notificationName: string) {
     this.ngProgress.start();
-    this.notificationService.deleteNotification(notificationName)
+    this.notificationService.deleteNotificationService(notificationName)
       .subscribe(
         (data: any) => {
           this.ngProgress.done();
           this.alertService.success(data['result'], true);
-          this.toggleModal(false);
           this.notifyServiceEmitter.next({isAddDeleteAction: true});
+          this.toggleModal(false);
         },
         error => {
           this.ngProgress.done();
@@ -289,7 +296,7 @@ export class NotificationServiceModalComponent implements OnChanges {
     if (!this.form.valid) {
       return;
     }
-   if (this.useProxy) {
+   if (this.useProxy === 'true') {
       document.getElementById('vci-proxy').click();
     }
     this.updateConfigConfiguration(this.changedChildConfig);

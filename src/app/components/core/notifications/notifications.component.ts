@@ -228,6 +228,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
           if (schedule === undefined) {
             this.isNotificationServiceAvailable = false;
             this.isNotificationServiceEnabled = false;
+            this.notificationServiceName = '';
             return;
           }
           this.notificationServiceName = schedule.name;

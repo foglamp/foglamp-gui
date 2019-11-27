@@ -23,6 +23,7 @@ export class AlertDialogComponent implements OnInit, OnChanges {
   @Output() restoreBackup = new EventEmitter<Number>();
   @Output() deleteBackup = new EventEmitter<Number>();
   @Output() logoutAllUserSessionsService = new EventEmitter<Number>();
+  modalId = '';
 
   constructor() { }
 
@@ -87,13 +88,17 @@ export class AlertDialogComponent implements OnInit, OnChanges {
     this.toggleModal(false);
   }
 
-  public toggleModal(isOpen: Boolean) {
-    const alertModal = <HTMLDivElement>document.getElementById('modal-box');
+  public toggleModal(isOpen: Boolean, id = '') {
+    if (id !== '' && this.modalId === '') {
+      this.modalId = id;
+    }
+    const alertModal = <HTMLDivElement>document.querySelector(this.modalId + '#modal-box');
     if (isOpen) {
       alertModal.classList.add('is-active');
       return;
     }
     alertModal.classList.remove('is-active');
+    this.modalId = '';
   }
 
   triggerAction() {

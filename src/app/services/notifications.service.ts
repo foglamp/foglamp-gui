@@ -42,7 +42,7 @@ export class NotificationsService {
   }
 
   deleteNotificationService(notificationName: string) {
-    return this.http.delete(environment.BASE_URL + '/service/' + encodeURIComponent(notificationName)).pipe(
+    return this.http.delete(environment.BASE_URL + 'service/' + encodeURIComponent(notificationName)).pipe(
       map(response => response),
       catchError((error) => throwError(error)));
   }
