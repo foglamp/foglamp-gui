@@ -39,7 +39,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   @ViewChild(NotificationModalComponent, { static: true }) notificationModal: NotificationModalComponent;
   @ViewChild(AlertDialogComponent, { static: false }) child: AlertDialogComponent;
   @ViewChild(ViewLogsComponent, { static: false }) viewLogsComponent: ViewLogsComponent;
-  @ViewChild(NotificationServiceModalComponent, { static: true }) notificationSettingModal: NotificationServiceModalComponent;
+  @ViewChild(NotificationServiceModalComponent, { static: true }) notificationServiceModal: NotificationServiceModalComponent;
 
   constructor(public servicesApiService: ServicesApiService,
     public schedulesService: SchedulesService,
@@ -220,6 +220,10 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     }
   }
 
+  public enableNotificationService() {
+    this.notificationServiceModal.enableNotificationService(this.notificationServiceName);
+  }
+
   public getSchedules(): void {
     this.schedulesService.getSchedules().
       subscribe(
@@ -255,7 +259,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       notificationServiceEnabled: this.isNotificationServiceEnabled,
       notificationServiceName: this.notificationServiceName
     };
-    this.notificationSettingModal.toggleModal(true);
+    this.notificationServiceModal.toggleModal(true);
   }
 
   ngOnDestroy() {

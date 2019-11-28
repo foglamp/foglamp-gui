@@ -194,7 +194,7 @@ export class NotificationServiceModalComponent implements OnChanges {
           this.ngProgress.done();
           if (error.status === 0) {
             console.log('service down ', error);
-          } else if (error.status === 404) {
+          } else if (error.status === 404) {   // TODO: FOGL-3499
             this.showDeleteBtn = false;
           } else {
             this.alertService.error(error.statusText, true);
@@ -203,10 +203,14 @@ export class NotificationServiceModalComponent implements OnChanges {
       );
   }
 
-  enableNotificationService() {
+  enableNotificationService(serviceName = null) {
+    let notificationServiceName = this.notificationServiceName;
+    if (serviceName != null) {
+      notificationServiceName = serviceName;
+    }
     /** request started */
     this.ngProgress.start();
-    this.schedulesService.enableScheduleByName(this.notificationServiceName).
+    this.schedulesService.enableScheduleByName(notificationServiceName).
       subscribe(
         (data) => {
           /** request completed */

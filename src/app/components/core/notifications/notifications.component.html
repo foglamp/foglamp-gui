@@ -11,7 +11,7 @@
     <ng-container *ngIf="isNotificationServiceAvailable && !isNotificationServiceEnabled">
       <article class="message is-warning">
         <div class="message-body">
-          Notification service is not enabled.&nbsp;<a (click)="openNotificationServiceModal()"><strong>enable
+          Notification service is not enabled.&nbsp;<a (click)="enableNotificationService()"><strong>enable
               now</strong></a>
           <button (click)="checkNotificationServiceStatus(true)" class="button is-small" id="refresh-check">
             <i class="fa fa-sync" aria-hidden="true"></i>
