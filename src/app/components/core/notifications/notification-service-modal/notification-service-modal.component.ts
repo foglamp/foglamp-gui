@@ -265,6 +265,7 @@ export class NotificationServiceModalComponent implements OnChanges {
           this.alertService.success(data['result'], true);
           this.notifyServiceEmitter.next({isAddDeleteAction: true});
           this.toggleModal(false);
+          this.form.reset();
         },
         error => {
           this.ngProgress.done();
