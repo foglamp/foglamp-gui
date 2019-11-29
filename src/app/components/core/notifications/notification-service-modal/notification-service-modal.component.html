@@ -2,7 +2,8 @@
     <div class="modal-background"></div>
     <div class="modal-card">
         <header class="modal-card-head">
-            <p *ngIf="isNotificationServiceAvailable" class="modal-card-title is-size-5">{{notificationServiceName}} Notification Service</p>
+            <p *ngIf="isNotificationServiceAvailable" class="modal-card-title is-size-5">{{notificationServiceName}}
+                Notification Service</p>
             <p *ngIf="!isNotificationServiceAvailable" class="modal-card-title is-size-5">Notification Service</p>
             <button class="delete" aria-label="close" (click)="toggleModal(false)"></button>
         </header>
@@ -18,9 +19,11 @@
                             <div class="field-body">
                                 <div class="field">
                                     <input *ngIf="!isNotificationServiceAvailable" type="text" class="input is-small"
-                                        name="notificationServiceName" [(ngModel)]="notificationServiceName" placeholder="FogLAMP Notifications" required
-                                        trim="blur" />
-                                        <small *ngIf="(fg?.touched || fg?.controls['notificationServiceName']?.dirty) && fg?.controls['notificationServiceName']?.invalid" class="help is-danger level-left">*required</small>
+                                        name="notificationServiceName" [(ngModel)]="notificationServiceName"
+                                        placeholder="FogLAMP Notifications" required trim="blur" />
+                                    <small
+                                        *ngIf="(fg?.touched || fg?.controls['notificationServiceName']?.dirty) && fg?.controls['notificationServiceName']?.invalid"
+                                        class="help is-danger level-left">*required</small>
                                 </div>
                             </div>
                         </div>
@@ -65,7 +68,8 @@
                 <div class="column">
                     <div class="field is-grouped is-pulled-right">
                         <p class="control">
-                            <button (click)="openDeleteModal(name)" class="button is-small">Delete Service
+                            <button (click)="openDeleteModal(notificationServiceName)" class="button is-small">Delete
+                                Service
                             </button>
                         </p>
                     </div>
@@ -74,5 +78,5 @@
         </section>
     </div>
     <app-alert-dialog (deleteNotificationService)='deleteNotificationService($event)'
-                [notificationServiceRecord]='notificationServiceRecord'></app-alert-dialog>
+        [notificationServiceRecord]='notificationServiceRecord'></app-alert-dialog>
 </div>

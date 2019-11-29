@@ -62,16 +62,20 @@ export class NotificationServiceModalComponent implements OnChanges {
   public toggleModal(isOpen: Boolean) {
     const notificationServiceModal = <HTMLDivElement>document.getElementById('notification-service-modal');
     if (isOpen) {
+      if (this.form.controls['notificationServiceName'] !== undefined) {
+        this.form.controls['notificationServiceName'].markAsPristine();
+        this.form.controls['enabled'].markAsUntouched();
+        this.form.controls['notificationServiceName'].reset();
+      }
       notificationServiceModal.classList.add('is-active');
       return;
     }
     notificationServiceModal.classList.remove('is-active');
     this.category = '';
-    this.form.controls['notificationServiceName'].markAsUntouched();
   }
 
   addNotificationService() {
-    const name = this.form.controls['name'].value;
+    const name = this.form.controls['notificationServiceName'].value;
     const payload = {
       name: name,
       type: 'notification',
