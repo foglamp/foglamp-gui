@@ -15,7 +15,6 @@ import { isEmpty } from 'lodash';
 })
 export class NotificationServiceModalComponent implements OnChanges {
   enabled: Boolean;
-  name: string;
   category: any;
   useProxy: string;
   isNotificationServiceAvailable = false;
@@ -46,7 +45,6 @@ export class NotificationServiceModalComponent implements OnChanges {
       this.isNotificationServiceEnabled = this.notificationServiceData.notificationServiceEnabled;
       this.isNotificationServiceAvailable = this.notificationServiceData.notificationServiceAvailable;
     }
-    this.name = this.notificationServiceName;
     this.enabled = this.isNotificationServiceEnabled;
     this.btnText = 'Add';
     this.useProxy = 'false';

@@ -2,7 +2,7 @@
     <div class="modal-background"></div>
     <div class="modal-card">
         <header class="modal-card-head">
-            <p *ngIf="isNotificationServiceAvailable" class="modal-card-title is-size-5">{{name}} Notification Service</p>
+            <p *ngIf="isNotificationServiceAvailable" class="modal-card-title is-size-5">{{notificationServiceName}} Notification Service</p>
             <p *ngIf="!isNotificationServiceAvailable" class="modal-card-title is-size-5">Notification Service</p>
             <button class="delete" aria-label="close" (click)="toggleModal(false)"></button>
         </header>
@@ -18,9 +18,9 @@
                             <div class="field-body">
                                 <div class="field">
                                     <input *ngIf="!isNotificationServiceAvailable" type="text" class="input is-small"
-                                        name="name" [(ngModel)]="name" placeholder="FogLAMP Notifications" required
+                                        name="notificationServiceName" [(ngModel)]="notificationServiceName" placeholder="FogLAMP Notifications" required
                                         trim="blur" />
-                                    <small *ngIf="fg?.controls['name']?.invalid"
+                                    <small *ngIf="fg?.controls['notificationServiceName']?.invalid"
                                         class="help is-danger level-left">*required</small>
                                 </div>
                             </div>
