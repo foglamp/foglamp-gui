@@ -67,6 +67,7 @@ export class NotificationServiceModalComponent implements OnChanges {
     }
     notificationServiceModal.classList.remove('is-active');
     this.category = '';
+    this.form.controls['notificationServiceName'].markAsUntouched();
   }
 
   addNotificationService() {
@@ -296,9 +297,10 @@ export class NotificationServiceModalComponent implements OnChanges {
 
   proxy() {
     if (!this.form.valid) {
+      this.form.controls['notificationServiceName'].markAsTouched();
       return;
     }
-   if (this.useProxy === 'true') {
+    if (this.useProxy === 'true') {
       document.getElementById('vci-proxy').click();
     }
     this.updateConfigConfiguration(this.changedChildConfig);
