@@ -1,46 +1,46 @@
 <ul class="menu-list">
   <li>
-    <a id="dashboard" [ngClass]="{'is-active': step==='/dashboard'}" (click)="onToggle('/dashboard')">
+    <a id="dashboard" (contextmenu)="onRightClick('dashboard')" [routerLink]="location" [ngClass]="{'is-active': step==='/dashboard'}" (click)="onToggle('/dashboard')">
       Dashboard
     </a>
   </li>
   <li>
-    <a id="asset" [ngClass]="{'is-active': step==='/asset'}" (click)="onToggle('/asset')">
+    <a id="asset" (contextmenu)="onRightClick('asset')" [routerLink]="location" [ngClass]="{'is-active': step==='/asset'}" (click)="onToggle('/asset')">
       Assets &amp; Readings
     </a>
   </li>
   <li>
-    <a id="south" [ngClass]="{'is-active': step==='/south'}" (click)="onToggle('/south')">
+    <a id="south" (contextmenu)="onRightClick('south')" [routerLink]="location" [ngClass]="{'is-active': step==='/south'}" (click)="onToggle('/south')">
       South
     </a>
   </li>
   <li>
-    <a id="north" [ngClass]="{'is-active': step==='/north'}" (click)="onToggle('/north')">
+    <a id="north" (contextmenu)="onRightClick('north')" [routerLink]="location" [ngClass]="{'is-active': step==='/north'}" (click)="onToggle('/north')">
       North
     </a>
   </li>
   <li>
-    <a id="notification" [ngClass]="{'is-active': step==='/notification'}" (click)="onToggle('/notification')">
+    <a id="notification" (contextmenu)="onRightClick('notification')" [routerLink]="location" [ngClass]="{'is-active': step==='/notification'}" (click)="onToggle('/notification')">
       Notifications
     </a>
   </li>
   <li>
-    <a id="configuration" [ngClass]="{'is-active': step==='/configuration'}" (click)="onToggle('/configuration')">
+    <a id="configuration" (contextmenu)="onRightClick('notification')" [routerLink]="location" [ngClass]="{'is-active': step==='/notification'}" (click)="onToggle('/configuration')">
       Configuration
     </a>
   </li>
   <li>
-    <a id="schedules" [ngClass]="{'is-active': step==='/schedules'}" (click)="onToggle('/schedules')">
+    <a id="schedules" (contextmenu)="onRightClick('schedules')" [routerLink]="location" [ngClass]="{'is-active': step==='/schedules'}" (click)="onToggle('/schedules')">
       Schedules
     </a>
   </li>
   <li>
-    <a id="certificate" [ngClass]="{'is-active': step==='/certificate'}" (click)="onToggle('/certificate')">
+    <a id="certificate" (contextmenu)="onRightClick('certificate')" [routerLink]="location" [ngClass]="{'is-active': step==='/certificate'}" (click)="onToggle('/certificate')">
       Certificate Store
     </a>
   </li>
   <li>
-    <a id="backup-restore" [ngClass]="{'is-active': step==='/backup-restore'}" (click)="onToggle('/backup-restore')">
+    <a id="backup-restore" (contextmenu)="onRightClick('backup-restore')" [routerLink]="location" [ngClass]="{'is-active': step==='/backup-restore'}" (click)="onToggle('/backup-restore')">
       Backup &amp; Restore
     </a>
   </li>
@@ -48,38 +48,38 @@
     <a>Logs</a>
     <ul>
       <li>
-        <a id="audit" [ngClass]="{'is-active': step==='/audit'}" (click)="onToggle('/audit')">Audit</a>
+        <a id="audit" (contextmenu)="onRightClick('audit')" [routerLink]="location" [ngClass]="{'is-active': step==='/audit'}" (click)="onToggle('/audit')">Audit</a>
       </li>
       <li>
-        <a id="notification-log" [ngClass]="{'is-active': step==='/notification/logs'}"
+        <a id="notification-log" (contextmenu)="onRightClick('notification/logs')" [routerLink]="location" [ngClass]="{'is-active': step==='/notification/logs'}"
           (click)="onToggle('/notification/logs')">Notifications</a>
       </li>
       <li>
-        <a id="packages" [ngClass]="{'is-active': step==='/packages'}" (click)="onToggle('/packages')">Packages</a>
+        <a id="packages" (contextmenu)="onRightClick('packages')" [routerLink]="location" [ngClass]="{'is-active': step==='/packages'}" (click)="onToggle('/packages')">Packages</a>
       </li>
       <li>
-        <a id="syslog" [ngClass]="{'is-active': step==='/syslog'}" (click)="onToggle('/syslog')">System</a>
+        <a id="syslog" (contextmenu)="onRightClick('syslog')" [routerLink]="location" [ngClass]="{'is-active': step==='/syslog'}" (click)="onToggle('/syslog')">System</a>
       </li>
       <li>
-        <a id="tasks" [ngClass]="{'is-active': step==='/tasks'}" (click)="onToggle('/tasks')">Tasks</a>
+        <a id="tasks" (contextmenu)="onRightClick('tasks')" [routerLink]="location" [ngClass]="{'is-active': step==='/tasks'}" (click)="onToggle('/tasks')">Tasks</a>
       </li>
     </ul>
   </li>
   <li>
-    <a id="user-management" *ngIf="isAdmin" [ngClass]="{'is-active': step==='/user-management'}"
+    <a id="user-management" *ngIf="isAdmin" (contextmenu)="onRightClick('user-management')" [routerLink]="location" [ngClass]="{'is-active': step==='/user-management'}"
       (click)="onToggle('/user-management')">
       User Management
     </a>
   </li>
 
   <li>
-    <a id="support" [ngClass]="{'is-active': step==='/support'}" (click)="onToggle('/support')">
+    <a id="support" (contextmenu)="onRightClick('support')" [routerLink]="location" [ngClass]="{'is-active': step==='/support'}" (click)="onToggle('/support')">
       Support
     </a>
   </li>
 
   <li>
-    <a id="setting" [ngClass]="{'is-active': step==='/setting'}" (click)="onToggle('/setting')">
+    <a id="setting" (contextmenu)="onRightClick('setting')" [routerLink]="location" [ngClass]="{'is-active': step==='/setting'}" (click)="onToggle('/setting')">
       Settings
     </a>
   </li>

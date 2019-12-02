@@ -10,6 +10,7 @@ import { SharedService } from '../../../services/shared.service';
 })
 export class SideMenuComponent implements OnInit {
   public step = '';
+  public location = '';
   @Output() toggle: EventEmitter<any> = new EventEmitter();
 
   isAdmin = false;
@@ -25,6 +26,10 @@ export class SideMenuComponent implements OnInit {
         this.step = this.router.url;
       }
     });
+  }
+
+  onRightClick(clickedLink) {
+    this.location = clickedLink;
   }
 
   onToggle(step) {
