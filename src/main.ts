@@ -21,6 +21,19 @@ declare global {
 
 window.jsonlint = jsonlint;
 
+if (localStorage.getItem('token')) {
+  // Save required data in Session Storage (get it from localStorage)
+  sessionStorage.setItem('token', localStorage.getItem('token'));
+  sessionStorage.setItem('uid', localStorage.getItem('uid'));
+  sessionStorage.setItem('isAdmin', localStorage.getItem('isAdmin'));
+  sessionStorage.setItem('userName', localStorage.getItem('userName'));
+  // Remove data from localStorage
+  localStorage.removeItem('token');
+  localStorage.removeItem('uid');
+  localStorage.removeItem('isAdmin');
+  localStorage.removeItem('userName');
+}
+
 if (environment.production) {
   enableProdMode();
   if (window) {
