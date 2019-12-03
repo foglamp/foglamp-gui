@@ -30,7 +30,7 @@ export class SideMenuComponent implements OnInit {
 
   onRightClick(clickedLink) {
     this.location = clickedLink;
-    // Right click on menu item, get data in sessionStorage from localStorage
+    // Right click on menu item, get data in localStorage from sessionStorage
     if (sessionStorage.getItem('token')) {
       localStorage.setItem('token', sessionStorage.getItem('token'));
       localStorage.setItem('uid', sessionStorage.getItem('uid'));
