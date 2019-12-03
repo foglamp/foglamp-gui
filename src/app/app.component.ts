@@ -30,17 +30,11 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (localStorage.getItem('token')) {
-      localStorage.removeItem('token');
-    }
-    if (localStorage.getItem('uid')) {
-      localStorage.removeItem('uid');
-    }
-    if (localStorage.getItem('isAdmin')) {
-      localStorage.removeItem('isAdmin');
-    }
-    if (localStorage.getItem('userName')) {
-      localStorage.removeItem('userName');
+    const storageItems = ['token', 'uid', 'isAdmin', 'userName'];
+    for (const s of storageItems) {
+      if (localStorage.getItem(s)) {
+        localStorage.removeItem(s);
+      }
     }
     if (window.innerWidth < 1024) {
       this.navMode = 'over';
