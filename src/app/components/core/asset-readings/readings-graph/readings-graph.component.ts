@@ -1,7 +1,8 @@
 import { Component, EventEmitter, OnDestroy, HostListener, Output, ViewChild } from '@angular/core';
 import { chain, map } from 'lodash';
-import { interval } from 'rxjs';
-import { takeWhile } from 'rxjs/operators';
+import { interval, Subject } from 'rxjs';
+import { takeWhile, takeUntil } from 'rxjs/operators';
+
 import { Chart } from 'chart.js';
 
 import * as moment from 'moment';
@@ -39,16 +40,20 @@ export class ReadingsGraphComponent implements OnDestroy {
   public selectedTab = 1;
   public timestamps = [];
 
+  destroy$: Subject<boolean> = new Subject<boolean>();
+
   constructor(private assetService: AssetsService,
     private ping: PingService) {
     this.assetChartType = 'line';
     this.assetReadingValues = [];
-    this.ping.pingIntervalChanged.subscribe((timeInterval: number) => {
-      if (timeInterval === -1) {
-        this.isAlive = false;
-      }
-      this.graphRefreshInterval = timeInterval;
-    });
+    this.ping.pingIntervalChanged
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((timeInterval: number) => {
+        if (timeInterval === -1) {
+          this.isAlive = false;
+        }
+        this.graphRefreshInterval = timeInterval;
+      });
   }
 
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler() {
@@ -103,7 +108,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     } else {
       this.isAlive = true;
       interval(this.graphRefreshInterval)
-        .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
+        .pipe(takeWhile(() => this.isAlive), takeUntil(this.destroy$)) // only fires when component is alive
         .subscribe(() => {
           this.autoRefresh = true;
           this.getAssetReadings(payload);
@@ -260,10 +265,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.setChartOptions();
   }
 
-  public ngOnDestroy(): void {
-    this.isAlive = false;
-  }
-
   getAssetReadings(payload: any) {
     this.assetService.getAssetReadingsBucket(payload).
       subscribe(
@@ -380,5 +381,12 @@ export class ReadingsGraphComponent implements OnDestroy {
       this.assetChartOptions['zoom']['drag']['borderWidth'] = 1;
       this.assetChartOptions['zoom']['drag']['backgroundColor'] = 'rgb(130, 202, 250, 0.4)';
     }
+  }
+
+  public ngOnDestroy(): void {
+    this.isAlive = false;
+    this.destroy$.next(true);
+    // Now let's also unsubscribe from the subject itself
+    this.destroy$.unsubscribe();
   }
 }

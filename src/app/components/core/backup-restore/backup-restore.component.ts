@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { interval } from 'rxjs';
-import { takeWhile } from 'rxjs/operators';
+import { interval, Subject } from 'rxjs';
+import { takeWhile, takeUntil } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import { DateFormatterPipe } from '../../../pipes';
-import { AlertService, PingService, ProgressBarService } from '../../../services';
+import { AlertService, PingService, ProgressBarService, SharedService } from '../../../services';
 import { BackupRestoreService } from '../../../services/backup-restore.service';
 import { POLLING_INTERVAL } from '../../../utils';
 import { AlertDialogComponent } from '../../common/alert-dialog/alert-dialog.component';
@@ -16,7 +17,7 @@ import { AlertDialogComponent } from '../../common/alert-dialog/alert-dialog.com
 export class BackupRestoreComponent implements OnInit, OnDestroy {
   public backupData = [];
   private isAlive: boolean; // used to unsubscribe from the IntervalObservable
-                            // when OnDestroy is called.
+  // when OnDestroy is called.
 
   // Object to hold child data
   public childData = {
@@ -27,30 +28,40 @@ export class BackupRestoreComponent implements OnInit, OnDestroy {
   };
   public showSpinner = false;
   public refreshInterval = POLLING_INTERVAL;
+  private viewPortSubscription: Subscription;
+  viewPort: any = '';
 
   @ViewChild(AlertDialogComponent, { static: true }) child: AlertDialogComponent;
 
+  destroy$: Subject<boolean> = new Subject<boolean>();
+
   constructor(private backupRestoreService: BackupRestoreService,
     private alertService: AlertService,
+    private sharedService: SharedService,
     public ngProgress: ProgressBarService,
     private dateFormatter: DateFormatterPipe,
     private ping: PingService) {
     this.isAlive = true;
-    this.ping.pingIntervalChanged.subscribe((timeInterval: number) => {
-      if (timeInterval === -1) {
-        this.isAlive = false;
-      }
-      this.refreshInterval = timeInterval;
-    });
+    this.ping.pingIntervalChanged
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((timeInterval: number) => {
+        if (timeInterval === -1) {
+          this.isAlive = false;
+        }
+        this.refreshInterval = timeInterval;
+      });
   }
 
   ngOnInit() {
     this.getBackup();
     interval(this.refreshInterval)
-      .pipe(takeWhile(() => this.isAlive)) // only fires when component is alive
+      .pipe(takeWhile(() => this.isAlive), takeUntil(this.destroy$)) // only fires when component is alive
       .subscribe(() => {
         this.getBackup();
       });
+    this.viewPortSubscription = this.sharedService.viewport.subscribe(viewport => {
+      this.viewPort = viewport;
+    });
   }
 
   /**
@@ -69,8 +80,9 @@ export class BackupRestoreComponent implements OnInit, OnDestroy {
 
 
   public getBackup() {
-    this.backupRestoreService.get().
-      subscribe(
+    this.backupRestoreService.get()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(
         (data) => {
           this.backupData = data['backups'];
           this.hideLoadingSpinner();
@@ -90,8 +102,9 @@ export class BackupRestoreComponent implements OnInit, OnDestroy {
     if (this.backupData.length === 0) {
       this.showLoadingSpinner();
     }
-    this.backupRestoreService.requestBackup().
-      subscribe(
+    this.backupRestoreService.requestBackup()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(
         (data) => {
           this.alertService.info(data['status']);
         },
@@ -107,8 +120,9 @@ export class BackupRestoreComponent implements OnInit, OnDestroy {
 
   public restoreBackup(id) {
     this.ngProgress.start();
-    this.backupRestoreService.restoreBackup(id).
-      subscribe(
+    this.backupRestoreService.restoreBackup(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(
         (data) => {
           this.alertService.info(data['status']);
           this.getBackup();
@@ -127,8 +141,9 @@ export class BackupRestoreComponent implements OnInit, OnDestroy {
 
   public deleteBackup(id) {
     this.ngProgress.start();
-    this.backupRestoreService.deleteBackup(id).
-      subscribe(
+    this.backupRestoreService.deleteBackup(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(
         (data) => {
           this.ngProgress.done();
           this.alertService.success(data['message']);
@@ -168,5 +183,8 @@ export class BackupRestoreComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.isAlive = false;
+    this.viewPortSubscription.unsubscribe();
+    this.destroy$.next(true);
+    this.destroy$.unsubscribe();
   }
 }
