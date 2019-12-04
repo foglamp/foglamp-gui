@@ -21,17 +21,13 @@ declare global {
 
 window.jsonlint = jsonlint;
 
+// Save required data in Session Storage (get it from localStorage) and delete from localStorage
+const storageItems = ['token', 'uid', 'isAdmin', 'userName'];
 if (localStorage.getItem('token')) {
-  // Save required data in Session Storage (get it from localStorage)
-  sessionStorage.setItem('token', localStorage.getItem('token'));
-  sessionStorage.setItem('uid', localStorage.getItem('uid'));
-  sessionStorage.setItem('isAdmin', localStorage.getItem('isAdmin'));
-  sessionStorage.setItem('userName', localStorage.getItem('userName'));
-  // Remove data from localStorage
-  localStorage.removeItem('token');
-  localStorage.removeItem('uid');
-  localStorage.removeItem('isAdmin');
-  localStorage.removeItem('userName');
+  for (const s of storageItems) {
+    sessionStorage.setItem(s, localStorage.getItem(s));
+    localStorage.removeItem(s);
+  }
 }
 
 if (environment.production) {

@@ -30,12 +30,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    const storageItems = ['token', 'uid', 'isAdmin', 'userName'];
-    for (const s of storageItems) {
-      if (localStorage.getItem(s)) {
-        localStorage.removeItem(s);
-      }
-    }
+    this.removeStorageItems();
     if (window.innerWidth < 1024) {
       this.navMode = 'over';
       this._opened = false;
@@ -59,6 +54,15 @@ export class AppComponent implements OnInit {
     if (event.target.innerWidth >= 1024) {
       this.navMode = 'side';
       this._opened = true;
+    }
+  }
+
+  removeStorageItems() {
+    const storageItems = ['token', 'uid', 'isAdmin', 'userName'];
+    for (const s of storageItems) {
+      if (localStorage.getItem(s)) {
+        localStorage.removeItem(s);
+      }
     }
   }
 

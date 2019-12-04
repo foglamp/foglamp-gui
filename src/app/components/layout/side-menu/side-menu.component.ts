@@ -31,11 +31,11 @@ export class SideMenuComponent implements OnInit {
   onRightClick(clickedLink) {
     this.location = clickedLink;
     // Right click on menu item, get data in localStorage from sessionStorage
+    const storageItems = ['token', 'uid', 'isAdmin', 'userName'];
     if (sessionStorage.getItem('token')) {
-      localStorage.setItem('token', sessionStorage.getItem('token'));
-      localStorage.setItem('uid', sessionStorage.getItem('uid'));
-      localStorage.setItem('isAdmin', sessionStorage.getItem('isAdmin'));
-      localStorage.setItem('userName', sessionStorage.getItem('userName'));
+      for (const s of storageItems) {
+        localStorage.setItem(s, sessionStorage.getItem(s));
+      }
     }
   }
 

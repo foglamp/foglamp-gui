@@ -1,7 +1,7 @@
 <div class="app-navbar">
     <app-navbar (toggle)="toggleSidebar()"></app-navbar>
 </div>
-<ng-sidebar-container>
+<ng-sidebar-container (mouseup)="removeStorageItems()">
     <ng-sidebar *ngIf="!isLoginView" #sidebar [(opened)]="_opened" sidebarClass="column is-2 sidebar">
         <app-side-menu (toggle)="toggleSidebar()"></app-side-menu>
     </ng-sidebar>
