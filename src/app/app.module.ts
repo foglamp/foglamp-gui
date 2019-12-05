@@ -5,8 +5,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { SidebarModule } from 'ng-sidebar';
 import { NgProgressModule } from '@ngx-progressbar/core';
 
-import 'chartjs-plugin-zoom';
-
 import { AppComponent } from './app.component';
 import { routing } from './app.routing';
 import { AlertDialogModule } from './components/common/alert-dialog/alert-dialog.module';

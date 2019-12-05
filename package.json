@@ -33,7 +33,6 @@
     "angular-tree-component": "~8.4.0",
     "animate.css": "^3.7.2",
     "chart.js": "~2.8.0",
-    "chartjs-plugin-zoom": "^0.7.4",
     "codemirror": "^5.49.2",
     "core-js": "^3.3.3",
     "jsonlint-mod": "^1.7.5",
