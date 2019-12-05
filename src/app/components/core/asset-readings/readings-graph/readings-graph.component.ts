@@ -1,15 +1,12 @@
 import { Component, EventEmitter, OnDestroy, HostListener, Output, ViewChild } from '@angular/core';
-import { chain, map } from 'lodash';
+import { uniq } from 'lodash';
 import { interval, Subject } from 'rxjs';
 import { takeWhile, takeUntil } from 'rxjs/operators';
-
-import { Chart } from 'chart.js';
-
 import * as moment from 'moment';
 
 import { AssetsService, PingService } from '../../../../services';
-import { ASSET_READINGS_TIME_FILTER, COLOR_CODES, MAX_INT_SIZE, POLLING_INTERVAL } from '../../../../utils';
-import { KeyValue } from '@angular/common';
+import { COLOR_CODES, MAX_INT_SIZE, POLLING_INTERVAL } from '../../../../utils';
+import { PlotlyService } from 'angular-plotly.js';
 
 @Component({
   selector: 'app-readings-graph',
@@ -18,34 +15,70 @@ import { KeyValue } from '@angular/common';
 })
 export class ReadingsGraphComponent implements OnDestroy {
   public assetCode: string;
-  public assetChartType: string;
-  public assetReadingValues: any;
-  public assetChartOptions = {};
-  public loadPage = true;
   public MAX_RANGE = MAX_INT_SIZE;
   public graphRefreshInterval = POLLING_INTERVAL;
-  public optedTime = ASSET_READINGS_TIME_FILTER;
   public readKeyColorLabel = [];
+
+  public loadPage = true;
   private isAlive: boolean;
-  public autoRefresh = false;
-  public showSpinner = false;
-  public timeDropDownOpened = false;
-  public showResetZoomButton = false;
-  public panning = false;
-
+  numReadings = [];
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
-  @ViewChild('assetChart', { static: false }) assetChart: Chart;
-
-  public numberTypeReadingsList = [];
-  public selectedTab = 1;
-  public timestamps = [];
-
+  @ViewChild('assetChart', { static: false }) assetChart: any;
   destroy$: Subject<boolean> = new Subject<boolean>();
 
+  layout = {
+    autosize: true,
+    dragmode: 'pan',
+    xaxis: {
+      tickformat: '%H:%M:%S'
+    },
+    yaxis: {
+      fixedrange: true
+    },
+    height: 500,
+    margin: {
+      l: 50,
+      r: 50,
+      b: 30,
+      t: 50,
+      pad: 1
+    },
+  };
+
+  config = {
+    displaylogo: false,
+    responsive: true,
+    modeBarButtonsToRemove: ['resetScale2d', 'hoverClosestCartesian',
+      'hoverCompareCartesian', 'lasso2d', 'zoom2d', 'autoScale2d',
+      'toImage', 'toggleSpikelines'],
+    modeBarButtonsToAdd: [[{
+      name: 'autoScale2d',
+      icon: {
+        'width': 1000,
+        'height': 1000,
+        // tslint:disable-next-line: max-line-length
+        'path': 'm250 850l-187 0-63 0 0-62 0-188 63 0 0 188 187 0 0 62z m688 0l-188 0 0-62 188 0 0-188 62 0 0 188 0 62-62 0z m-875-938l0 188-63 0 0-188 0-62 63 0 187 0 0 62-187 0z m875 188l0-188-188 0 0-62 188 0 62 0 0 62 0 188-62 0z m-125 188l-1 0-93-94-156 156 156 156 92-93 2 0 0 250-250 0 0-2 93-92-156-156-156 156 94 92 0 2-250 0 0-250 0 0 93 93 157-156-157-156-93 94 0 0 0-250 250 0 0 0-94 93 156 157 156-157-93-93 0 0 250 0 0 250z',
+        'transform': 'matrix(1 0 0 -1 0 850)'
+      },
+      click: () => {
+        this.isAlive = true;
+        this.resetGraphToDefault();
+        if (this.assetCode !== undefined) {
+          this.getAssetCode(this.assetCode);
+        }
+      }
+    }
+    ]]
+  };
+  payload = {
+    assetCode: '',
+    start: 0,
+    len: 600,
+    bucketSize: 1
+  };
+
   constructor(private assetService: AssetsService,
-    private ping: PingService) {
-    this.assetChartType = 'line';
-    this.assetReadingValues = [];
+    private ping: PingService, public plotly: PlotlyService) {
     this.ping.pingIntervalChanged
       .pipe(takeUntil(this.destroy$))
       .subscribe((timeInterval: number) => {
@@ -61,20 +94,10 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.toggleModal(false);
   }
 
-  public roundTo(num, to) {
-    const _to = Math.pow(10, to);
-    return Math.round(num * _to) / _to;
-  }
-
   public toggleModal(shouldOpen: Boolean) {
     // reset all variable and array to default state
-    this.assetReadingValues = [];
     this.readKeyColorLabel = [];
-    this.assetChartOptions = {};
     sessionStorage.removeItem(this.assetCode);
-    this.showResetZoomButton = false;
-    this.panning = false;
-
     const chart_modal = <HTMLDivElement>document.getElementById('chart_modal');
     if (shouldOpen) {
       chart_modal.classList.add('is-active');
@@ -91,55 +114,40 @@ export class ReadingsGraphComponent implements OnDestroy {
     if (activeDropDowns.length > 0) {
       activeDropDowns[0].classList.remove('is-active');
     }
-    this.optedTime = ASSET_READINGS_TIME_FILTER;
+    this.resetGraphToDefault();
+  }
+
+  public resetGraphToDefault() {
+    // reset payload to default
+    this.payload = {
+      assetCode: this.assetCode,
+      start: 0,
+      len: 600,
+      bucketSize: 1
+    };
+    const Plotly = this.plotly.getPlotly();
+    Plotly.relayout(this.assetChart.plotEl.nativeElement, {
+      'xaxis.autorange': true,
+      'yaxis.autorange': true
+    });
   }
 
   public getAssetCode(assetCode: string) {
+    this.payload.assetCode = encodeURIComponent(assetCode);
     this.assetCode = assetCode;
-    const payload = {
-      assetCode: encodeURIComponent(this.assetCode),
-      bucketSize: 1
-    };
     this.loadPage = true;
     this.notify.emit(false);
     if (this.graphRefreshInterval === -1) {
       this.isAlive = false;
-      this.getAssetReadings(payload);
+      this.getAssetReadings(this.payload);
     } else {
       this.isAlive = true;
       interval(this.graphRefreshInterval)
         .pipe(takeWhile(() => this.isAlive), takeUntil(this.destroy$)) // only fires when component is alive
         .subscribe(() => {
-          this.autoRefresh = true;
-          this.getAssetReadings(payload);
+          this.getAssetReadings(this.payload);
         });
     }
-  }
-
-  getBucketReadings(readings: any) {
-    const numReadings = [];
-    this.timestamps = readings.map((r: any) => r.timestamp);
-    for (const r of readings) {
-      Object.entries(r.reading).forEach(([k, value]) => {
-        if (typeof value['average'] === 'number') {
-          numReadings.push({
-            key: k,
-            read: { x: r.timestamp, y: value['average'] }
-          });
-        }
-      });
-    }
-    this.numberTypeReadingsList = numReadings.length > 0 ? this.mergeObjects(numReadings) : [];
-    this.statsAssetReadingsGraph(this.numberTypeReadingsList, this.timestamps);
-  }
-
-  mergeObjects(assetReadings: any) {
-    return chain(assetReadings).groupBy('key').map(function (group, key) {
-      return {
-        key: key,
-        read: map(group, 'read')
-      };
-    }).value();
   }
 
   getColorCode(readKey, cnt, fill) {
@@ -165,223 +173,91 @@ export class ReadingsGraphComponent implements OnDestroy {
     return cc;
   }
 
-  private statsAssetReadingsGraph(assetReadings: any, timestamps: any): void {
-    const dataset = [];
-    this.readKeyColorLabel = [];
-    let count = 0;
-    for (const r of assetReadings) {
-      const dt = {
-        label: r.key,
-        data: r.read,
-        fill: false,
-        lineTension: 0.1,
-        spanGaps: true,
-        hidden: this.getLegendState(r.key),
-        backgroundColor: this.getColorCode(r.key.trim(), count, true),
-        borderColor: this.getColorCode(r.key.trim(), count, false)
-      };
-      if (dt.data.length) {
-        dataset.push(dt);
-      }
-      count++;
-    }
-    this.setAssetReadingValues(dataset, timestamps);
-  }
-
-  public getLegendState(key) {
-    const selectedLegends = JSON.parse(sessionStorage.getItem(this.assetCode));
-    if (selectedLegends == null) {
-      return false;
-    }
-    for (const l of selectedLegends) {
-      if (l.key === key && l.selected === true) {
-        return true;
-      }
-    }
-  }
-
-  private setAssetReadingValues(ds: any, timestamps) {
-    this.assetReadingValues = {
-      labels: timestamps,
-      datasets: ds
-    };
-    this.assetChartType = 'line';
-    this.setChartOptions();
-  }
-
-  setGraphData(chart: Chart) {
-    this.isAlive = false;
-    this.showResetZoomButton = true;
-    const start = moment.utc(chart.scales['x-axis-0'].min);
-    const end = moment.utc(chart.scales['x-axis-0'].max);
-    console.log('pan start', start.toDate());
-    console.log('pan end', end.toDate());
-    const duration = moment.duration(end.diff(start));
-    console.log('duration', duration.asSeconds());
-    const seconds = duration.asSeconds();
-    const bucketSize = this.caluclateBucketSize(seconds);
-    const payload = {
-      assetCode: encodeURIComponent(this.assetCode),
-      start: start.unix(),
-      len: Math.round(seconds),
-      bucketSize: bucketSize
-    };
-    this.getAssetReadings(payload);
-  }
-
-  public toggleDropdown() {
-    const dropDown = document.querySelector('#time-dropdown');
-    dropDown.classList.toggle('is-active');
-    if (!dropDown.classList.contains('is-active')) {
-      this.timeDropDownOpened = false;
-    } else {
-      this.timeDropDownOpened = true;
-    }
-  }
-
-  public isNumber(val) {
-    return typeof val === 'number';
-  }
-
-  selectTab(id: number, showSpinner = true) {
-    this.showSpinner = showSpinner;
-    this.selectedTab = id;
-    this.getAssetCode(this.assetCode);
-  }
-
-  isEmptyObject(obj) {
-    return (obj && (Object.keys(obj).length === 0));
-  }
-
-  keyDescOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
-    return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
-  }
-
-  public resetChartZoomAndPannig() {
-    this.showResetZoomButton = false;
-    this.assetChart.chart.resetZoom();
-    this.getAssetCode(this.assetCode);
-    this.panning = false;
-    this.setChartOptions();
-  }
 
   getAssetReadings(payload: any) {
     this.assetService.getAssetReadingsBucket(payload).
       subscribe(
         (data: any[]) => {
-          this.showSpinner = false;
           this.loadPage = false;
           this.getBucketReadings(data);
         },
         error => {
-          this.showSpinner = false;
           console.log('error in response', error);
         });
   }
 
+  getBucketReadings(readings: any) {
+    this.numReadings = [];
+    const output = {};
+    let item: any;
+    // iterate the outer array to look at each item in that array
+    for (const r of readings) {
+      item = r.reading;
+      // iterate each key on the object
+      for (const prop in item) {
+        if (item.hasOwnProperty(prop)) {
+          // if this keys doesn't exist in the output object, add it
+          if (!(prop in output)) {
+            output[prop] = [];
+            output['timestamp'] = [];
+          }
+          // add data onto the end of the key's array
+          output[prop].push(item[prop].average);
+          output['timestamp'].push(r.timestamp);
+        }
+      }
+    }
+
+    let count = 0;
+    for (const key in item) {
+      this.numReadings.push({
+        x: uniq(output['timestamp'], 'timestamp'),
+        y: output[key],
+        title: key,
+        type: 'scatter', mode: 'lines',
+        name: key,
+        marker: {
+          color: this.getColorCode(key.trim(), count, false)
+        },
+        modeBarButtons: [{
+          displaylogo: false
+        }]
+      });
+      count++;
+    }
+    console.log('Read', this.numReadings);
+  }
+
   public caluclateBucketSize(duration) {
-    let bucket = Math.round(duration / 10);
+    let bucket = Math.round(duration / 600);
     return bucket = bucket === 0 ? 1 : (bucket > 48 ? 48 : bucket);
   }
 
-  setPaning(isPanning: boolean) {
-    this.panning = !isPanning;
-    this.setChartOptions();
-  }
-
-  setChartOptions() {
-    this.assetChartOptions = {
-      elements: {
-        point: { radius: 0 }
-      },
-      scales: {
-        xAxes: [{
-          type: 'time',
-          distribution: 'linear',
-          time: {
-            unit: 'second',
-            tooltipFormat: 'HH:mm:ss:SSS',
-            displayFormats: {
-              unit: 'second',
-              second: 'HH:mm:ss'
-            }
-          },
-          ticks: {
-            autoSkip: true
-          },
-          bounds: 'ticks'
-        }]
-      },
-      legend: {
-        onHover: (e: any) => {
-          e.target.style.cursor = 'pointer';
-        },
-        onClick: (e, legendItem) => {
-          console.log('clicked ', legendItem, e);
-          const index = legendItem.datasetIndex;
-          const chart = this.assetChart.chart;
-          const meta = chart.getDatasetMeta(index);
-          /**
-          * meta data have hidden property as null by default in chart.js
-          */
-          meta.hidden = meta.hidden === null ? !chart.data.datasets[index].hidden : null;
-          let savedLegendState = JSON.parse(sessionStorage.getItem(this.assetCode));
-          if (savedLegendState !== null) {
-            if (legendItem.hidden === false) {
-              savedLegendState.push({ key: legendItem.text, selected: true });
-            } else {
-              savedLegendState = savedLegendState.filter(dt => dt.key !== legendItem.text);
-            }
-          } else {
-            savedLegendState = [{ key: legendItem.text, selected: true }];
-          }
-          sessionStorage.setItem(this.assetCode, JSON.stringify(savedLegendState));
-          chart.update();
-        }
-      },
-      hover: {
-        onHover: (e) => {
-          if (this.panning) {
-            e.target.style.cursor = 'ew-resize';
-          } else {
-            e.target.style.cursor = 'default';
-          }
-        }
-      },
-      pan: {
-        enabled: true,
-        mode: 'x',
-        speed: 10,
-        onPan: () => {
-          this.isAlive = false;
-        },
-        onPanComplete: ({ chart }) => {
-          if (!this.panning) {
-            this.setGraphData(chart);
-          }
-        }
-      },
-      zoom: {
-        enabled: true,
-        mode: 'x',
-        sensitivity: 0.3,
-        onZoomComplete: ({ chart }) => {
-          this.setGraphData(chart);
-        }
-      },
-      responsive: true
-    };
-
-    if (this.panning) {
-      // in pan mode set mode to empty from x-axis to stop chart drag
-      this.assetChartOptions['pan']['mode'] = '';
-
-      this.assetChartOptions['zoom']['drag'] = {};
-      this.assetChartOptions['zoom']['drag']['enable'] = true;
-      this.assetChartOptions['zoom']['drag']['borderWidth'] = 1;
-      this.assetChartOptions['zoom']['drag']['backgroundColor'] = 'rgb(130, 202, 250, 0.4)';
+  calculateGraphData(event: any) {
+    console.log('e', event);
+    if (event['xaxis.range[0]'] === undefined) {
+      return;
     }
+    this.isAlive = false;
+    console.log('start', event['xaxis.range[0]']);
+    console.log('end', event['xaxis.range[1]']);
+    const start = moment.utc(event['xaxis.range[0]']);
+    const end = moment.utc(event['xaxis.range[1]']);
+    const duration = moment.duration(end.diff(start));
+    console.log('start(unix timestamp)', start.unix());
+    console.log('duration', duration.asSeconds());
+    const seconds = duration.asSeconds();
+    const bucketSize = this.caluclateBucketSize(seconds);
+    this.payload = {
+      assetCode: encodeURIComponent(this.assetCode),
+      start: start.unix(),
+      len: Math.round(seconds),
+      bucketSize: bucketSize
+    };
+    this.getAssetReadings(this.payload);
   }
+
+
 
   public ngOnDestroy(): void {
     this.isAlive = false;

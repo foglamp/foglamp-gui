@@ -1,6 +1,6 @@
 <div id="chart_modal" class="modal">
   <div class="modal-background"></div>
-  <div class="modal-card animated fadeIn" [ngClass]="{overflow: timeDropDownOpened}">
+  <div class="modal-card animated fadeIn">
     <header class="modal-card-head">
       <p class="modal-card-title is-size-5">{{assetCode}}
       </p>
@@ -8,7 +8,7 @@
         <button class="delete" aria-label="close" (click)="toggleModal(false);loadPage = false"></button>
       </div>
     </header>
-    <section class="modal-card-body" [ngClass]="{overflow: timeDropDownOpened}">
+    <section class="modal-card-body">
       <ng-container *ngIf="loadPage; else tabs">
         <div class="app-loading">
           &nbsp;
@@ -18,53 +18,8 @@
         </div>
       </ng-container>
       <ng-template #tabs>
-        <div class="columns">
-          <div class="column">
-            <div id="tab-content">
-              <ng-container *ngIf="showSpinner; else DataDiv">
-                <div class="app-loading">
-                  &nbsp;
-                  <svg class="spinner animated fadeIn fadeOut" viewBox="0 0 100 100">
-                    <circle class="path" cx="50%" cy="50%" r="10" fill="none" stroke-width="2" stroke-miterlimit="10" />
-                  </svg>
-                </div>
-              </ng-container>
-              <ng-template #DataDiv>
-                <div *ngIf="selectedTab === 1 && numberTypeReadingsList?.length > 0" class="is-active" data-content="1">
-                  <div class="columns btn-container">
-                    <div class="column ">
-                      <div class="field has-addons is-pulled-right">
-                        <p *ngIf="showResetZoomButton" class="control">
-                          <button class="button is-small tooltip is-tooltip-bottom" data-tooltip="Reset"
-                          (click)="resetChartZoomAndPannig()">
-                            <span class="icon is-small">
-                              <i class="fas fa-undo"></i>
-                            </span>
-                          </button>
-                        </p>
-                        <p class="control">
-                          <button [ngClass]="{'btn-pan': panning}" class="button is-small tooltip is-tooltip-bottom" data-tooltip="Pan"
-                          (click)="setPaning(panning)">
-                            <span class="icon is-small">
-                              <i class="fas fa-arrows-alt-h"></i>
-                            </span>
-                          </button>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="columns">
-                    <div class="column">
-                      <app-chart *ngIf="!showGraphSpinner" class="chart-container animated fadeIn"
-                        [type]="assetChartType" [data]="assetReadingValues" [options]="assetChartOptions" #assetChart>
-                      </app-chart>
-                    </div>
-                  </div>
-                </div>
-              </ng-template>
-            </div>
-          </div>
-        </div>
+        <plotly-plot #assetChart (relayout)="calculateGraphData($event)" [data]="numReadings" [layout]="layout"
+          [config]="config"></plotly-plot>
       </ng-template>
     </section>
   </div>

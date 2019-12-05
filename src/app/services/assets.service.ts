@@ -44,7 +44,7 @@ export class AssetsService {
 
   public getAssetReadingsBucket(payload) {
     let params = new HttpParams();
-    if (payload.start) {
+    if (payload.start !== 0) {
       params = params.append('start', payload.start);
     }
     if (payload.len) {
