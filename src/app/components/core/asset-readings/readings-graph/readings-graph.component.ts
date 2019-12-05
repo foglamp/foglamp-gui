@@ -241,16 +241,24 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.isAlive = false;
     console.log('start', event['xaxis.range[0]']);
     console.log('end', event['xaxis.range[1]']);
-    const start = moment.utc(event['xaxis.range[0]']);
-    const end = moment.utc(event['xaxis.range[1]']);
+
+    const start = moment(event['xaxis.range[0]']).utc();
+    const end = moment(event['xaxis.range[1]']).utc();
+    console.log('start utc', start.format());
+    console.log('end utc', end.format());
+
+    console.log('start(unix timestamp)', moment(start.format()).valueOf());
+    console.log('end(unix timestamp)', moment(end.format()).valueOf());
+
     const duration = moment.duration(end.diff(start));
-    console.log('start(unix timestamp)', start.unix());
-    console.log('duration', duration.asSeconds());
-    const seconds = duration.asSeconds();
+    console.log('duration', duration);
+
+    const seconds = duration.asSeconds();  // duration;
+
     const bucketSize = this.caluclateBucketSize(seconds);
     this.payload = {
       assetCode: encodeURIComponent(this.assetCode),
-      start: start.unix(),
+      start: moment(start.format()).valueOf() / 1000,
       len: Math.round(seconds),
       bucketSize: bucketSize
     };
