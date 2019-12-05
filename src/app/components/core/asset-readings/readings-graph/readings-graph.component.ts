@@ -242,15 +242,15 @@ export class ReadingsGraphComponent implements OnDestroy {
     console.log('start', event['xaxis.range[0]']);
     console.log('end', event['xaxis.range[1]']);
 
-    const start = moment(event['xaxis.range[0]']).utc();
-    const end = moment(event['xaxis.range[1]']).utc();
+    const start = moment(event['xaxis.range[1]']).utc();
+    const until = moment(event['xaxis.range[0]']).utc();
     console.log('start utc', start.format());
-    console.log('end utc', end.format());
+    console.log('end utc', until.format());
 
-    console.log('start(unix timestamp)', moment(start.format()).valueOf());
-    console.log('end(unix timestamp)', moment(end.format()).valueOf());
+    console.log('start(unix timestamp)', moment(start.format()).valueOf() / 1000);
+    console.log('end(unix timestamp)', moment(until.format()).valueOf() / 1000);
 
-    const duration = moment.duration(end.diff(start));
+    const duration = moment.duration(start.diff(until));
     console.log('duration', duration);
 
     const seconds = duration.asSeconds();  // duration;
