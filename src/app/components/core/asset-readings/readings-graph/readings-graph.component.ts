@@ -5,7 +5,7 @@ import { takeWhile, takeUntil } from 'rxjs/operators';
 import * as moment from 'moment';
 
 import { AssetsService, PingService } from '../../../../services';
-import { COLOR_CODES, MAX_INT_SIZE, POLLING_INTERVAL } from '../../../../utils';
+import Utils, { COLOR_CODES, MAX_INT_SIZE, POLLING_INTERVAL } from '../../../../utils';
 import { PlotlyService } from 'angular-plotly.js';
 
 @Component({
@@ -27,7 +27,6 @@ export class ReadingsGraphComponent implements OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
 
   layout = {
-    autosize: true,
     dragmode: 'pan',
     xaxis: {
       tickformat: '%H:%M:%S'
@@ -45,31 +44,69 @@ export class ReadingsGraphComponent implements OnDestroy {
     },
   };
 
+  timeWindowIndex = 8;  // initial value is 8th index i.e 600s
   config = {
     displaylogo: false,
-    responsive: true,
     modeBarButtonsToRemove: ['resetScale2d', 'hoverClosestCartesian',
-      'hoverCompareCartesian', 'lasso2d', 'zoom2d', 'autoScale2d',
-      'toImage', 'toggleSpikelines'],
-    modeBarButtonsToAdd: [[{
-      name: 'autoScale2d',
-      icon: {
-        'width': 1000,
-        'height': 1000,
-        // tslint:disable-next-line: max-line-length
-        'path': 'm250 850l-187 0-63 0 0-62 0-188 63 0 0 188 187 0 0 62z m688 0l-188 0 0-62 188 0 0-188 62 0 0 188 0 62-62 0z m-875-938l0 188-63 0 0-188 0-62 63 0 187 0 0 62-187 0z m875 188l0-188-188 0 0-62 188 0 62 0 0 62 0 188-62 0z m-125 188l-1 0-93-94-156 156 156 156 92-93 2 0 0 250-250 0 0-2 93-92-156-156-156 156 94 92 0 2-250 0 0-250 0 0 93 93 157-156-157-156-93 94 0 0 0-250 250 0 0 0-94 93 156 157 156-157-93-93 0 0 250 0 0 250z',
-        'transform': 'matrix(1 0 0 -1 0 850)'
+      'hoverCompareCartesian', 'lasso2d', 'zoom2d', 'autoScale2d', 'pan2d',
+      'zoomIn2d', 'zoomOut2d', 'toImage', 'toggleSpikelines'],
+    modeBarButtonsToAdd: [[
+      {
+        name: 'ZoomIn',
+        icon: {
+          'width': 875,
+          'height': 1000,
+          'path': 'm1 787l0-875 875 0 0 875-875 0z m687-500l-187 0 0-187-125 0 0 187-188 0 0 125 188 0 0 187 125 0 0-187 187 0 0-125z',
+          'transform': 'matrix(1 0 0 -1 0 850)'
+        },
+        click: () => {
+          if (this.timeWindowIndex <= 8) {  // TODO: FOGL-3516 Add sub-second granularity to time bucket size
+            console.log('minimum zoom level reached');
+            return;
+          }
+          this.timeWindowIndex--;
+          console.log('zoom in clicked', this.timeWindowIndex);
+          this.zoomGraph(Utils.getTimeWindow(this.timeWindowIndex));
+        }
       },
-      click: () => {
-        this.isAlive = true;
-        this.resetGraphToDefault();
-        if (this.assetCode !== undefined) {
-          this.getAssetCode(this.assetCode);
+      {
+        name: 'ZoomOut',
+        icon: {
+          'width': 875,
+          'height': 1000,
+          'path': 'm0 788l0-876 875 0 0 876-875 0z m688-500l-500 0 0 125 500 0 0-125z',
+          'transform': 'matrix(1 0 0 -1 0 850)'
+        },
+        click: () => {
+          if (this.timeWindowIndex >= 14) {
+            console.log('maximum zoom level reached');
+            return;
+          }
+          this.timeWindowIndex++;
+          console.log('zoom out clicked', this.timeWindowIndex);
+          this.zoomGraph(Utils.getTimeWindow(this.timeWindowIndex));
+        }
+      },
+      {
+        name: 'Reset',
+        icon: {
+          'width': 1000,
+          'height': 1000,
+          // tslint:disable-next-line: max-line-length
+          'path': 'm250 850l-187 0-63 0 0-62 0-188 63 0 0 188 187 0 0 62z m688 0l-188 0 0-62 188 0 0-188 62 0 0 188 0 62-62 0z m-875-938l0 188-63 0 0-188 0-62 63 0 187 0 0 62-187 0z m875 188l0-188-188 0 0-62 188 0 62 0 0 62 0 188-62 0z m-125 188l-1 0-93-94-156 156 156 156 92-93 2 0 0 250-250 0 0-2 93-92-156-156-156 156 94 92 0 2-250 0 0-250 0 0 93 93 157-156-157-156-93 94 0 0 0-250 250 0 0 0-94 93 156 157 156-157-93-93 0 0 250 0 0 250z',
+          'transform': 'matrix(1 0 0 -1 0 850)'
+        },
+        click: () => {
+          this.isAlive = true;
+          this.resetGraphToDefault();
+          if (this.assetCode !== undefined) {
+            this.getAssetCode(this.assetCode);
+          }
         }
       }
-    }
     ]]
   };
+
   payload = {
     assetCode: '',
     start: 0,
@@ -228,9 +265,23 @@ export class ReadingsGraphComponent implements OnDestroy {
     console.log('Read', this.numReadings);
   }
 
-  public caluclateBucketSize(duration) {
-    let bucket = Math.round(duration / 600);
-    return bucket = bucket === 0 ? 1 : (bucket > 48 ? 48 : bucket);
+  public zoomGraph(seconds: number) {
+    const maxDataPoints = 600;
+    const bucket = seconds / maxDataPoints;
+    const length = seconds;
+    console.log(' Bucket = ', bucket, ' length = ', length);
+    this.payload = {
+      assetCode: this.assetCode,
+      start: 0,
+      len: length,
+      bucketSize: bucket
+    };
+    this.getAssetReadings(this.payload);
+  }
+
+
+  public panning() {
+
   }
 
   calculateGraphData(event: any) {
@@ -242,25 +293,25 @@ export class ReadingsGraphComponent implements OnDestroy {
     console.log('start', event['xaxis.range[0]']);
     console.log('end', event['xaxis.range[1]']);
 
-    const start = moment(event['xaxis.range[1]']).utc();
-    const until = moment(event['xaxis.range[0]']).utc();
-    console.log('start utc', start.format());
-    console.log('end utc', until.format());
+    const panClickTime = moment(event['xaxis.range[0]']).utc();
+    const panReleaseTime = moment(event['xaxis.range[1]']).utc();
+    console.log('panClickTime utc', panClickTime.format());
+    console.log('panReleaseTime utc', panReleaseTime.format());
 
-    console.log('start(unix timestamp)', moment(start.format()).valueOf() / 1000);
-    console.log('end(unix timestamp)', moment(until.format()).valueOf() / 1000);
+    console.log('panClickTime(unix timestamp)', moment(panClickTime.format()).valueOf() / 1000);
+    console.log('panReleaseTime(unix timestamp)', moment(panReleaseTime.format()).valueOf() / 1000);
 
-    const duration = moment.duration(start.diff(until));
-    console.log('duration', duration);
+    const panDeltaTime = moment.duration(panReleaseTime.diff(panClickTime));
+    console.log('panDeltaTime', panDeltaTime);
 
-    const seconds = duration.asSeconds();  // duration;
+    const seconds = panDeltaTime.asSeconds();  // duration;
 
-    const bucketSize = this.caluclateBucketSize(seconds);
+    const bucketSize = this.zoomGraph(0);
     this.payload = {
       assetCode: encodeURIComponent(this.assetCode),
-      start: moment(start.format()).valueOf() / 1000,
+      start: moment(panClickTime.format()).valueOf() / 1000,
       len: Math.round(seconds),
-      bucketSize: bucketSize
+      bucketSize: 1
     };
     this.getAssetReadings(this.payload);
   }
