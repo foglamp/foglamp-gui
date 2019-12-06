@@ -26,6 +26,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   @ViewChild('assetChart', { static: false }) assetChart: any;
   destroy$: Subject<boolean> = new Subject<boolean>();
 
+  panning = false;
   layout = {
     dragmode: 'pan',
     xaxis: {
@@ -47,6 +48,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   timeWindowIndex = 8;  // initial value is 8th index i.e 600s
   config = {
     displaylogo: false,
+    displayModeBar: true,
     modeBarButtonsToRemove: ['resetScale2d', 'hoverClosestCartesian',
       'hoverCompareCartesian', 'lasso2d', 'zoom2d', 'autoScale2d', 'pan2d',
       'zoomIn2d', 'zoomOut2d', 'toImage', 'toggleSpikelines'],
@@ -66,7 +68,9 @@ export class ReadingsGraphComponent implements OnDestroy {
           }
           this.timeWindowIndex--;
           console.log('zoom in clicked', this.timeWindowIndex);
-          this.zoomGraph(Utils.getTimeWindow(this.timeWindowIndex));
+          if (!this.panning) {
+            this.zoomGraph(Utils.getTimeWindow(this.timeWindowIndex));
+          }
         }
       },
       {
@@ -84,7 +88,9 @@ export class ReadingsGraphComponent implements OnDestroy {
           }
           this.timeWindowIndex++;
           console.log('zoom out clicked', this.timeWindowIndex);
-          this.zoomGraph(Utils.getTimeWindow(this.timeWindowIndex));
+          if (!this.panning) {
+            this.zoomGraph(Utils.getTimeWindow(this.timeWindowIndex));
+          }
         }
       },
       {
@@ -155,6 +161,8 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   public resetGraphToDefault() {
+    this.timeWindowIndex = 8;
+    this.panning = false;
     // reset payload to default
     this.payload = {
       assetCode: this.assetCode,
@@ -210,7 +218,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     return cc;
   }
 
-
   getAssetReadings(payload: any) {
     this.assetService.getAssetReadingsBucket(payload).
       subscribe(
@@ -262,7 +269,7 @@ export class ReadingsGraphComponent implements OnDestroy {
       });
       count++;
     }
-    console.log('Read', this.numReadings);
+    // console.log('Read', this.numReadings);
   }
 
   public zoomGraph(seconds: number) {
@@ -279,44 +286,48 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.getAssetReadings(this.payload);
   }
 
-
-  public panning() {
-
-  }
-
   calculateGraphData(event: any) {
-    console.log('e', event);
+    // console.log('e', event);
     if (event['xaxis.range[0]'] === undefined) {
       return;
     }
-    this.isAlive = false;
-    console.log('start', event['xaxis.range[0]']);
-    console.log('end', event['xaxis.range[1]']);
 
+    // console.log('payload', this.payload);
+    this.panning = true;
+    this.isAlive = false;
+    const maxDataPoints = 600;
     const panClickTime = moment(event['xaxis.range[0]']).utc();
     const panReleaseTime = moment(event['xaxis.range[1]']).utc();
+
     console.log('panClickTime utc', panClickTime.format());
     console.log('panReleaseTime utc', panReleaseTime.format());
 
-    console.log('panClickTime(unix timestamp)', moment(panClickTime.format()).valueOf() / 1000);
-    console.log('panReleaseTime(unix timestamp)', moment(panReleaseTime.format()).valueOf() / 1000);
+    // console.log('panClickTime(unix timestamp)', moment(panClickTime.format()).valueOf() / 1000);
+    // console.log('panReleaseTime(unix timestamp)', moment(panReleaseTime.format()).valueOf() / 1000);
 
-    const panDeltaTime = moment.duration(panReleaseTime.diff(panClickTime));
+    const panDeltaTime = moment.duration(panReleaseTime.diff(panClickTime)).asSeconds();
     console.log('panDeltaTime', panDeltaTime);
 
-    const seconds = panDeltaTime.asSeconds();  // duration;
+    const now = moment.utc(new Date()).valueOf(); // in milliseconds
+    console.log('now', now);
 
-    const bucketSize = this.zoomGraph(0);
+    const currentTimeStamp = Utils.getTimeWindow(this.timeWindowIndex); // in seconds
+    console.log('current time', currentTimeStamp);
+
+    const start = now - currentTimeStamp - panDeltaTime;
+    console.log('start', start);
+
+    const bucket = currentTimeStamp / maxDataPoints;
+    console.log('bucket', bucket);
+
     this.payload = {
       assetCode: encodeURIComponent(this.assetCode),
       start: moment(panClickTime.format()).valueOf() / 1000,
-      len: Math.round(seconds),
-      bucketSize: 1
+      len: currentTimeStamp,
+      bucketSize: bucket
     };
     this.getAssetReadings(this.payload);
   }
-
-
 
   public ngOnDestroy(): void {
     this.isAlive = false;
