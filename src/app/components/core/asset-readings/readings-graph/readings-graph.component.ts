@@ -54,7 +54,7 @@ export class ReadingsGraphComponent implements OnDestroy {
       'zoomIn2d', 'zoomOut2d', 'toImage', 'toggleSpikelines'],
     modeBarButtonsToAdd: [[
       {
-        name: 'ZoomIn',
+        name: 'Zoom in',
         icon: {
           'width': 875,
           'height': 1000,
@@ -74,7 +74,7 @@ export class ReadingsGraphComponent implements OnDestroy {
         }
       },
       {
-        name: 'ZoomOut',
+        name: 'Zoom out',
         icon: {
           'width': 875,
           'height': 1000,
@@ -258,7 +258,8 @@ export class ReadingsGraphComponent implements OnDestroy {
         x: uniq(output['timestamp'], 'timestamp'),
         y: output[key],
         title: key,
-        type: 'scatter', mode: 'lines',
+        type: 'scatter',
+        mode: 'lines',
         name: key,
         marker: {
           color: this.getColorCode(key.trim(), count, false)
@@ -269,7 +270,6 @@ export class ReadingsGraphComponent implements OnDestroy {
       });
       count++;
     }
-    // console.log('Read', this.numReadings);
   }
 
   public zoomGraph(seconds: number) {
@@ -287,7 +287,6 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   calculateGraphData(event: any) {
-    // console.log('e', event);
     if (event['xaxis.range[0]'] === undefined) {
       return;
     }
@@ -299,6 +298,9 @@ export class ReadingsGraphComponent implements OnDestroy {
     const panClickTime = moment(event['xaxis.range[0]']).utc();
     const panReleaseTime = moment(event['xaxis.range[1]']).utc();
 
+    console.log('Pan Click Time ', event['xaxis.range[0]']);
+    console.log('Pan Release Time ', event['xaxis.range[1]']);
+
     console.log('panClickTime utc', panClickTime.format());
     console.log('panReleaseTime utc', panReleaseTime.format());
 
@@ -308,22 +310,22 @@ export class ReadingsGraphComponent implements OnDestroy {
     const panDeltaTime = moment.duration(panReleaseTime.diff(panClickTime)).asSeconds();
     console.log('panDeltaTime', panDeltaTime);
 
-    const now = moment.utc(new Date()).valueOf(); // in milliseconds
+    const now = moment.utc(new Date()).valueOf() / 1000.0; // in milliseconds
     console.log('now', now);
 
-    const currentTimeStamp = Utils.getTimeWindow(this.timeWindowIndex); // in seconds
-    console.log('current time', currentTimeStamp);
+    const currentTimeWindow = Utils.getTimeWindow(this.timeWindowIndex); // in seconds
+    console.log('current time', currentTimeWindow);
 
-    const start = now - currentTimeStamp - panDeltaTime;
+    const start = now - currentTimeWindow - panDeltaTime;
     console.log('start', start);
 
-    const bucket = currentTimeStamp / maxDataPoints;
+    const bucket = currentTimeWindow / maxDataPoints;
     console.log('bucket', bucket);
 
     this.payload = {
       assetCode: encodeURIComponent(this.assetCode),
-      start: moment(panClickTime.format()).valueOf() / 1000,
-      len: currentTimeStamp,
+      start: start,
+      len: currentTimeWindow,
       bucketSize: bucket
     };
     this.getAssetReadings(this.payload);
