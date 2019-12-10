@@ -28,7 +28,6 @@ export class ReadingsGraphComponent implements OnDestroy {
 
   panning = false;
   layout = {
-
     title: 'Current Data Mode',
     font: {
       size: 12
@@ -270,12 +269,8 @@ export class ReadingsGraphComponent implements OnDestroy {
       }
     }
 
-    const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
-    console.log('now', now);
     let count = 0;
     for (const key in item) {
-      // const timestamps  = uniq(output['timestamp'], 'timestamp');
-      // this.layout.xaxis['range'] = [timestamps[timestamps.length - 1], timestamps[0]];
       this.numReadings.push({
         x: uniq(output['timestamp'], 'timestamp'),
         y: output[key],
@@ -297,23 +292,8 @@ export class ReadingsGraphComponent implements OnDestroy {
   public zoomGraph(seconds: number) {
     const maxDataPoints = 600;
     const bucket = seconds / maxDataPoints;
-    // const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
-    // console.log('now', now);
-
     const length = seconds;
     console.log(' Bucket = ', bucket, ' length = ', length);
-
-    // const startPoint = moment(now - length).format('hh:mm:ss');
-    // console.log('start point', startPoint);
-
-    const Plotly = this.plotly.getPlotly();
-    console.log('Plotly', Plotly);
-
-    // Plotly.relayout(this.assetChart.plotEl.nativeElement, {
-    //   'xaxis.autorange': true,
-    //   'yaxis.autorange': true
-    // });
-
     this.payload = {
       assetCode: this.assetCode,
       start: 0,
