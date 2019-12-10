@@ -28,9 +28,22 @@ export class ReadingsGraphComponent implements OnDestroy {
 
   panning = false;
   layout = {
+
+    title: 'Current Data Mode',
+    font: {
+      size: 12
+    },
     dragmode: 'pan',
     xaxis: {
-      tickformat: '%H:%M:%S'
+      tickformat: '%H:%M:%S',
+      type: 'date',
+      title: {
+        text: 'Time Window - 10 mins',
+        font: {
+          size: 14,
+          color: '#7f7f7f'
+        }
+      },
     },
     yaxis: {
       fixedrange: true
@@ -42,10 +55,10 @@ export class ReadingsGraphComponent implements OnDestroy {
       b: 30,
       t: 50,
       pad: 1
-    },
+    }
   };
 
-  timeWindowIndex = 8;  // initial value is 8th index i.e 600s
+  timeWindowIndex = 23;  // initial value is 23rd index i.e 720s
   config = {
     displaylogo: false,
     displayModeBar: true,
@@ -62,14 +75,16 @@ export class ReadingsGraphComponent implements OnDestroy {
           'transform': 'matrix(1 0 0 -1 0 850)'
         },
         click: () => {
-          if (this.timeWindowIndex <= 8) {  // TODO: FOGL-3516 Add sub-second granularity to time bucket size
+          if (this.timeWindowIndex <= 24) {  // TODO: FOGL-3516 Add sub-second granularity to time bucket size
             console.log('minimum zoom level reached');
             return;
           }
           this.timeWindowIndex--;
           console.log('zoom in clicked', this.timeWindowIndex);
           if (!this.panning) {
-            this.zoomGraph(Utils.getTimeWindow(this.timeWindowIndex));
+            const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
+            this.updateGraphTitle(timeWindow.key);
+            this.zoomGraph(timeWindow.value);
           }
         }
       },
@@ -82,14 +97,16 @@ export class ReadingsGraphComponent implements OnDestroy {
           'transform': 'matrix(1 0 0 -1 0 850)'
         },
         click: () => {
-          if (this.timeWindowIndex >= 14) {
+          if (this.timeWindowIndex >= 37) {
             console.log('maximum zoom level reached');
             return;
           }
           this.timeWindowIndex++;
           console.log('zoom out clicked', this.timeWindowIndex);
           if (!this.panning) {
-            this.zoomGraph(Utils.getTimeWindow(this.timeWindowIndex));
+            const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
+            this.updateGraphTitle(timeWindow.key);
+            this.zoomGraph(timeWindow.value);
           }
         }
       },
@@ -161,7 +178,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   public resetGraphToDefault() {
-    this.timeWindowIndex = 8;
+    this.timeWindowIndex = 23;
     this.panning = false;
     // reset payload to default
     this.payload = {
@@ -175,6 +192,7 @@ export class ReadingsGraphComponent implements OnDestroy {
       'xaxis.autorange': true,
       'yaxis.autorange': true
     });
+    this.updateGraphTitle('10 mins');
   }
 
   public getAssetCode(assetCode: string) {
@@ -252,8 +270,12 @@ export class ReadingsGraphComponent implements OnDestroy {
       }
     }
 
+    const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
+    console.log('now', now);
     let count = 0;
     for (const key in item) {
+      // const timestamps  = uniq(output['timestamp'], 'timestamp');
+      // this.layout.xaxis['range'] = [timestamps[timestamps.length - 1], timestamps[0]];
       this.numReadings.push({
         x: uniq(output['timestamp'], 'timestamp'),
         y: output[key],
@@ -275,8 +297,23 @@ export class ReadingsGraphComponent implements OnDestroy {
   public zoomGraph(seconds: number) {
     const maxDataPoints = 600;
     const bucket = seconds / maxDataPoints;
+    // const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
+    // console.log('now', now);
+
     const length = seconds;
     console.log(' Bucket = ', bucket, ' length = ', length);
+
+    // const startPoint = moment(now - length).format('hh:mm:ss');
+    // console.log('start point', startPoint);
+
+    const Plotly = this.plotly.getPlotly();
+    console.log('Plotly', Plotly);
+
+    // Plotly.relayout(this.assetChart.plotEl.nativeElement, {
+    //   'xaxis.autorange': true,
+    //   'yaxis.autorange': true
+    // });
+
     this.payload = {
       assetCode: this.assetCode,
       start: 0,
@@ -310,25 +347,31 @@ export class ReadingsGraphComponent implements OnDestroy {
     const panDeltaTime = moment.duration(panReleaseTime.diff(panClickTime)).asSeconds();
     console.log('panDeltaTime', panDeltaTime);
 
-    const now = moment.utc(new Date()).valueOf() / 1000.0; // in milliseconds
+    const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
     console.log('now', now);
 
     const currentTimeWindow = Utils.getTimeWindow(this.timeWindowIndex); // in seconds
-    console.log('current time', currentTimeWindow);
+    console.log('current time window', currentTimeWindow);
 
-    const start = now - currentTimeWindow - panDeltaTime;
+    this.updateGraphTitle(currentTimeWindow.key);
+
+    const start = now - currentTimeWindow.value - panDeltaTime;
     console.log('start', start);
 
-    const bucket = currentTimeWindow / maxDataPoints;
+    const bucket = currentTimeWindow.value / maxDataPoints;
     console.log('bucket', bucket);
 
     this.payload = {
       assetCode: encodeURIComponent(this.assetCode),
       start: start,
-      len: currentTimeWindow,
+      len: currentTimeWindow.value,
       bucketSize: bucket
     };
     this.getAssetReadings(this.payload);
+  }
+
+  public updateGraphTitle(timeWindowText) {
+    this.layout.xaxis.title.text = `Time Window - ${timeWindowText}`;
   }
 
   public ngOnDestroy(): void {

@@ -89,8 +89,49 @@ export default class Utils {
   }
 
   public static getTimeWindow(index: number) {
-    const timeWindows = [0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 60, 600, 3600, 14400, 86400, 604800, 2419200, 29030400];
-    return timeWindows[index];
+    const timeWindows = {
+      '1/100,000 secs': 0.00001,
+      '1/50,000 secs': 0.00002,
+      '1/20,000 secs': 0.00005,
+      '1/10,000 secs': 0.0001,
+      '1/5,000 secs': 0.0002,
+      '1/2,000 secs': 0.0005,
+      '1/1,000 secs': 0.001,
+      '1/500 secs': 0.002,
+      '1/200 secs': 0.005,
+      '1/100 secs': 0.01,
+      '1/50 secs': 0.02,
+      '1/20 secs': 0.05,
+      '1/10 secs': 0.1,
+      '1/5 secs': 0.2,
+      '1/2 secs': 0.5,
+      '1 secs': 1,
+      '2 secs': 2,
+      '5 secs': 5,
+      '12 secs': 12,
+      '30 secs': 30,
+      '1 min': 60,
+      '2 mins': 120,
+      '5 mins': 300,
+      '12 mins': 720,
+      '30 mins': 1800,
+      '1 hour': 3600,
+      '2 hours': 7200,
+      '5 hours': 18000,
+      '12 hours': 43200,
+      '1 day': 86400,
+      '2 days': 172800,
+      '4 days': 345600,
+      '1 week': 604800,
+      '2 weeks': 1209600,
+      '1 month': 2419200,
+      '2 months': 4838400,
+      '5 months': 12096000,
+      '1 year': 29030400
+    };
+    const key = Object.keys(timeWindows)[index];
+    const value = Object.values(timeWindows)[index];
+    return { key, value };
   }
 
 }
