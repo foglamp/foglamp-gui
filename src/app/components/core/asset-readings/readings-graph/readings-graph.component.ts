@@ -74,7 +74,7 @@ export class ReadingsGraphComponent implements OnDestroy {
           'transform': 'matrix(1 0 0 -1 0 850)'
         },
         click: () => {
-          if (this.timeWindowIndex <= 24) {  // TODO: FOGL-3516 Add sub-second granularity to time bucket size
+          if (this.timeWindowIndex <= 23) {  // TODO: FOGL-3516 Add sub-second granularity to time bucket size
             console.log('minimum zoom level reached');
             return;
           }
@@ -96,7 +96,7 @@ export class ReadingsGraphComponent implements OnDestroy {
           'transform': 'matrix(1 0 0 -1 0 850)'
         },
         click: () => {
-          if (this.timeWindowIndex >= 37) {
+          if (this.timeWindowIndex >= 38) {
             console.log('maximum zoom level reached');
             return;
           }
@@ -195,7 +195,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   public getAssetCode(assetCode: string) {
-    this.payload.assetCode = encodeURIComponent(assetCode);
+    this.payload.assetCode = assetCode;
     this.assetCode = assetCode;
     this.loadPage = true;
     this.notify.emit(false);
@@ -239,15 +239,19 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.assetService.getAssetReadingsBucket(payload).
       subscribe(
         (data: any[]) => {
+          if (this.loadPage) {
+            this.generateGraph(data);
+          } else {
+            this.updateGraph(data);
+          }
           this.loadPage = false;
-          this.getBucketReadings(data);
         },
         error => {
           console.log('error in response', error);
         });
   }
 
-  getBucketReadings(readings: any) {
+  generateGraph(readings: any) {
     this.numReadings = [];
     const output = {};
     let item: any;
@@ -274,7 +278,6 @@ export class ReadingsGraphComponent implements OnDestroy {
       this.numReadings.push({
         x: uniq(output['timestamp'], 'timestamp'),
         y: output[key],
-        title: key,
         type: 'scatter',
         mode: 'lines',
         name: key,
@@ -287,6 +290,45 @@ export class ReadingsGraphComponent implements OnDestroy {
       });
       count++;
     }
+  }
+
+  public updateGraph(assetReadings: any) {
+    this.numReadings = [];
+    const output = {};
+    let item: any;
+    // iterate the outer array to look at each item in that array
+    for (const r of assetReadings) {
+      item = r.reading;
+      // iterate each key on the object
+      for (const prop in item) {
+        if (item.hasOwnProperty(prop)) {
+          // if this keys doesn't exist in the output object, add it
+          if (!(prop in output)) {
+            output[prop] = [];
+            output['timestamp'] = [];
+          }
+          // add data onto the end of the key's array
+          output[prop].push(item[prop].average);
+          output['timestamp'].push(r.timestamp);
+        }
+      }
+    }
+
+    for (const key in item) {
+      this.numReadings.push({
+        x: uniq(output['timestamp'], 'timestamp'),
+        y: output[key],
+      });
+    }
+
+    const timestamps = uniq(output['timestamp'], 'timestamp');
+    const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
+    const graphStartTimeSeconds = this.payload.start === 0 ? (now - this.payload.len) : this.payload.start;
+    const graphStartDateTime = moment(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss');
+
+    const Plotly = this.plotly.getPlotly();
+    Plotly.relayout(this.assetChart.plotEl.nativeElement,
+      'xaxis.range', [graphStartDateTime, timestamps[0]]);
   }
 
   public zoomGraph(seconds: number) {
@@ -342,7 +384,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     console.log('bucket', bucket);
 
     this.payload = {
-      assetCode: encodeURIComponent(this.assetCode),
+      assetCode: this.assetCode,
       start: start,
       len: currentTimeWindow.value,
       bucketSize: bucket

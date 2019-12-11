@@ -37,7 +37,7 @@ export class AssetsService {
     if (+offset !== 0) {
       params = params.set('offset', offset.toString());
     }
-    return this.http.get(this.GET_ASSET + '/' + assetCode, { params: params }).pipe(
+    return this.http.get(this.GET_ASSET + '/' + encodeURIComponent(assetCode), { params: params }).pipe(
       map(response => response),
       catchError(error => throwError(error)));
   }
@@ -51,9 +51,10 @@ export class AssetsService {
       params = params.append('length', payload.len);
     }
 
-    return this.http.get(`${this.GET_ASSET}/${payload.assetCode}/bucket/${payload.bucketSize}`, { params: params }).pipe(
-      map(response => response),
-      catchError(error => throwError(error)));
+    return this.http.get(`${this.GET_ASSET}/${encodeURIComponent(payload.assetCode)}/bucket/${payload.bucketSize}`,
+      { params: params }).pipe(
+        map(response => response),
+        catchError(error => throwError(error)));
   }
 
   /**

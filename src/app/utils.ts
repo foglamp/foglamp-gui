@@ -24,7 +24,6 @@ export default class Utils {
   public static leftPad(repeat_time: string) {
     if (repeat_time !== undefined) {  // server sends time in xh:mm:ss format if x = 0
       repeat_time = repeat_time.length === 7 ? repeat_time = '0' + repeat_time : repeat_time;
-      console.log('time', repeat_time);
       return repeat_time;
     }
   }
@@ -80,7 +79,6 @@ export default class Utils {
       return true;
     }
     const totalSec = (+hh * 60 * 60) + (+mm * 60) + (+ss);
-    console.log('Total sec', totalSec);
     return totalSec < 0 || totalSec >= 86400;
   }
 
@@ -108,26 +106,27 @@ export default class Utils {
       '1 secs': 1,
       '2 secs': 2,
       '5 secs': 5,
-      '12 secs': 12,
+      '10 secs': 10,
       '30 secs': 30,
       '1 min': 60,
       '2 mins': 120,
       '5 mins': 300,
-      '12 mins': 720,
+      '10 mins': 600,
       '30 mins': 1800,
       '1 hour': 3600,
       '2 hours': 7200,
-      '5 hours': 18000,
+      '3 hours': 10800,
+      '6 hours': 21600,
       '12 hours': 43200,
       '1 day': 86400,
       '2 days': 172800,
       '4 days': 345600,
       '1 week': 604800,
       '2 weeks': 1209600,
-      '1 month': 2419200,
-      '2 months': 4838400,
-      '5 months': 12096000,
-      '1 year': 29030400
+      '1 month': 2592000,
+      '2 months': 5184000,
+      '6 months': 15552000,
+      '1 year': 31104000
     };
     const key = Object.keys(timeWindows)[index];
     const value = Object.values(timeWindows)[index];
