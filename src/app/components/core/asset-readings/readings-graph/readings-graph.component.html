@@ -18,7 +18,7 @@
         </div>
       </ng-container>
       <ng-template #tabs>
-        <plotly-plot #assetChart (relayout)="calculateGraphData($event)" [data]="numReadings" [layout]="layout"
+        <plotly-plot #assetChart (relayout)="dragGraph($event)" [data]="numReadings" [layout]="layout"
           [config]="config"></plotly-plot>
       </ng-template>
     </section>

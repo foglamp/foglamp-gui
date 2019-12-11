@@ -27,6 +27,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
 
   panning = false;
+  zoom = false;
   layout = {
     title: 'Current Data Mode',
     font: {
@@ -51,7 +52,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     margin: {
       l: 50,
       r: 50,
-      b: 30,
+      b: 50,
       t: 50,
       pad: 1
     }
@@ -179,6 +180,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   public resetGraphToDefault() {
     this.timeWindowIndex = 23;
     this.panning = false;
+    this.zoom = false;
     // reset payload to default
     this.payload = {
       assetCode: this.assetCode,
@@ -239,11 +241,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.assetService.getAssetReadingsBucket(payload).
       subscribe(
         (data: any[]) => {
-          if (this.loadPage) {
-            this.generateGraph(data);
-          } else {
-            this.updateGraph(data);
-          }
+          this.generateGraph(data);
           this.loadPage = false;
         },
         error => {
@@ -290,48 +288,24 @@ export class ReadingsGraphComponent implements OnDestroy {
       });
       count++;
     }
+    if (this.zoom) {
+      const timestamps = uniq(output['timestamp'], 'timestamp');
+      this.updateZoomGraph(timestamps);
+    }
   }
 
-  public updateGraph(assetReadings: any) {
-    this.numReadings = [];
-    const output = {};
-    let item: any;
-    // iterate the outer array to look at each item in that array
-    for (const r of assetReadings) {
-      item = r.reading;
-      // iterate each key on the object
-      for (const prop in item) {
-        if (item.hasOwnProperty(prop)) {
-          // if this keys doesn't exist in the output object, add it
-          if (!(prop in output)) {
-            output[prop] = [];
-            output['timestamp'] = [];
-          }
-          // add data onto the end of the key's array
-          output[prop].push(item[prop].average);
-          output['timestamp'].push(r.timestamp);
-        }
-      }
-    }
-
-    for (const key in item) {
-      this.numReadings.push({
-        x: uniq(output['timestamp'], 'timestamp'),
-        y: output[key],
-      });
-    }
-
-    const timestamps = uniq(output['timestamp'], 'timestamp');
+  public updateZoomGraph(timestamps: any) {
+    console.log('update zoom graph');
     const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
     const graphStartTimeSeconds = this.payload.start === 0 ? (now - this.payload.len) : this.payload.start;
     const graphStartDateTime = moment(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss');
-
     const Plotly = this.plotly.getPlotly();
     Plotly.relayout(this.assetChart.plotEl.nativeElement,
       'xaxis.range', [graphStartDateTime, timestamps[0]]);
   }
 
   public zoomGraph(seconds: number) {
+    this.zoom = true;
     const maxDataPoints = 600;
     const bucket = seconds / maxDataPoints;
     const length = seconds;
@@ -345,7 +319,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.getAssetReadings(this.payload);
   }
 
-  calculateGraphData(event: any) {
+  dragGraph(event: any) {
     if (event['xaxis.range[0]'] === undefined) {
       return;
     }
