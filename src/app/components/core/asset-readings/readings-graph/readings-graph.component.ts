@@ -29,7 +29,6 @@ export class ReadingsGraphComponent implements OnDestroy {
   panning = false;
   zoom = false;
   layout = {
-    title: 'Current Data Mode',
     font: {
       size: 12
     },
