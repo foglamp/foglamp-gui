@@ -79,7 +79,6 @@ export class ReadingsGraphComponent implements OnDestroy {
             return;
           }
           this.timeWindowIndex--;
-          console.log('zoom in clicked', this.timeWindowIndex);
           const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
           this.updateTimeWindowText(timeWindow.key);
           this.zoomGraph(timeWindow.value);
@@ -99,7 +98,6 @@ export class ReadingsGraphComponent implements OnDestroy {
             return;
           }
           this.timeWindowIndex++;
-          console.log('zoom out clicked', this.timeWindowIndex);
           const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
           this.updateTimeWindowText(timeWindow.key);
           this.zoomGraph(timeWindow.value);
@@ -173,7 +171,6 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   public resetGraphToDefault() {
-    console.log('reset graph');
     this.timeWindowIndex = 23;
     this.panning = false;
     this.zoom = false;
@@ -316,7 +313,6 @@ export class ReadingsGraphComponent implements OnDestroy {
       return;
     }
     this.zoom = false;
-    console.log('drag', event);
     this.panning = true;
     // this.isAlive = false;
     const maxDataPoints = 600;
@@ -359,7 +355,6 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   public updateZoomGraph(timestamps: any) {
-    console.log('update zoom graph', this.timeWindowIndex);
     const Plotly = this.plotly.getPlotly();
     if (this.timeWindowIndex > 23) {
       const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
