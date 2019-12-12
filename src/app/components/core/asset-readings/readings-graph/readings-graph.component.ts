@@ -80,11 +80,9 @@ export class ReadingsGraphComponent implements OnDestroy {
           }
           this.timeWindowIndex--;
           console.log('zoom in clicked', this.timeWindowIndex);
-          if (!this.panning) {
-            const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
-            this.updateGraphTitle(timeWindow.key);
-            this.zoomGraph(timeWindow.value);
-          }
+          const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
+          this.updateTimeWindowText(timeWindow.key);
+          this.zoomGraph(timeWindow.value);
         }
       },
       {
@@ -102,11 +100,9 @@ export class ReadingsGraphComponent implements OnDestroy {
           }
           this.timeWindowIndex++;
           console.log('zoom out clicked', this.timeWindowIndex);
-          if (!this.panning) {
-            const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
-            this.updateGraphTitle(timeWindow.key);
-            this.zoomGraph(timeWindow.value);
-          }
+          const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
+          this.updateTimeWindowText(timeWindow.key);
+          this.zoomGraph(timeWindow.value);
         }
       },
       {
@@ -177,6 +173,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   public resetGraphToDefault() {
+    console.log('reset graph');
     this.timeWindowIndex = 23;
     this.panning = false;
     this.zoom = false;
@@ -192,7 +189,7 @@ export class ReadingsGraphComponent implements OnDestroy {
       'xaxis.autorange': true,
       'yaxis.autorange': true
     });
-    this.updateGraphTitle('10 mins');
+    this.updateTimeWindowText('10 mins');
   }
 
   public getAssetCode(assetCode: string) {
@@ -290,17 +287,13 @@ export class ReadingsGraphComponent implements OnDestroy {
     if (this.zoom) {
       const timestamps = uniq(output['timestamp'], 'timestamp');
       this.updateZoomGraph(timestamps);
+    } else if (this.panning && !this.zoom) {
+      const Plotly = this.plotly.getPlotly();
+      Plotly.relayout(this.assetChart.plotEl.nativeElement, {
+        'xaxis.autorange': true,
+        'yaxis.autorange': true
+      });
     }
-  }
-
-  public updateZoomGraph(timestamps: any) {
-    console.log('update zoom graph');
-    const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
-    const graphStartTimeSeconds = this.payload.start === 0 ? (now - this.payload.len) : this.payload.start;
-    const graphStartDateTime = moment(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss');
-    const Plotly = this.plotly.getPlotly();
-    Plotly.relayout(this.assetChart.plotEl.nativeElement,
-      'xaxis.range', [graphStartDateTime, timestamps[0]]);
   }
 
   public zoomGraph(seconds: number) {
@@ -322,10 +315,10 @@ export class ReadingsGraphComponent implements OnDestroy {
     if (event['xaxis.range[0]'] === undefined) {
       return;
     }
-
-    // console.log('payload', this.payload);
+    this.zoom = false;
+    console.log('drag', event);
     this.panning = true;
-    this.isAlive = false;
+    // this.isAlive = false;
     const maxDataPoints = 600;
     const panClickTime = moment(event['xaxis.range[0]']).utc();
     const panReleaseTime = moment(event['xaxis.range[1]']).utc();
@@ -348,7 +341,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     const currentTimeWindow = Utils.getTimeWindow(this.timeWindowIndex); // in seconds
     console.log('current time window', currentTimeWindow);
 
-    this.updateGraphTitle(currentTimeWindow.key);
+    this.updateTimeWindowText(currentTimeWindow.key);
 
     const start = now - currentTimeWindow.value - panDeltaTime;
     console.log('start', start);
@@ -365,7 +358,25 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.getAssetReadings(this.payload);
   }
 
-  public updateGraphTitle(timeWindowText) {
+  public updateZoomGraph(timestamps: any) {
+    console.log('update zoom graph', this.timeWindowIndex);
+    const Plotly = this.plotly.getPlotly();
+    if (this.timeWindowIndex > 23) {
+      const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
+      const graphStartTimeSeconds = this.payload.start === 0 ? (now - this.payload.len) : this.payload.start;
+      const graphStartDateTime = moment(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss');
+      Plotly.relayout(this.assetChart.plotEl.nativeElement,
+        'xaxis.range', [graphStartDateTime, timestamps[0]]);
+    } else {
+      Plotly.relayout(this.assetChart.plotEl.nativeElement, {
+        'xaxis.autorange': true,
+        'yaxis.autorange': true
+      });
+    }
+
+  }
+
+  public updateTimeWindowText(timeWindowText) {
     this.layout.xaxis.title.text = `Time Window - ${timeWindowText}`;
   }
 
