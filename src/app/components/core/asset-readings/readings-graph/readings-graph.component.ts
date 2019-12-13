@@ -272,6 +272,7 @@ export class ReadingsGraphComponent implements OnDestroy {
         type: 'scatter',
         mode: 'lines',
         name: key,
+        visible: this.getLegendState(key),
         marker: {
           color: this.getColorCode(key.trim(), count, false)
         },
@@ -369,6 +370,39 @@ export class ReadingsGraphComponent implements OnDestroy {
       });
     }
 
+  }
+
+  legendClick(event) {
+    const legendItem = event.data[event.curveNumber].name;
+    let selectedLegends = JSON.parse(sessionStorage.getItem(this.assetCode));
+    if (selectedLegends !== null) {
+        let legends = [];
+        selectedLegends.forEach(lg => {
+          if (lg === legendItem) {
+            legends = selectedLegends.filter(dt => dt !== legendItem);
+          }
+        });
+        if (legends.length === 0) {
+          selectedLegends.push(legendItem);
+        } else {
+          selectedLegends = legends;
+        }
+    } else {
+      selectedLegends = [legendItem];
+    }
+    sessionStorage.setItem(this.assetCode, JSON.stringify(selectedLegends));
+  }
+
+  public getLegendState(key) {
+    const selectedLegends = JSON.parse(sessionStorage.getItem(this.assetCode));
+    if (selectedLegends == null) {
+      return true;
+    }
+    for (const lg of selectedLegends) {
+      if (lg === key) {
+        return 'legendonly';
+      }
+    }
   }
 
   public updateTimeWindowText(timeWindowText) {
