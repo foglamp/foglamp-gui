@@ -171,6 +171,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   public resetGraphToDefault() {
+    sessionStorage.removeItem(this.assetCode);
     this.timeWindowIndex = 23;
     this.panning = false;
     this.zoom = false;
