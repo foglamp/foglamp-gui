@@ -282,7 +282,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     const timestamps = uniq(output['timestamp'], 'timestamp');
     const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
     const graphStartTimeSeconds = this.payload.start === 0 ? (now - this.payload.len) : this.payload.start;
-    const graphStartDateTime = moment(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss');
+    const graphStartDateTime = moment.utc(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss');
     this.layout.xaxis['range'] = [graphStartDateTime, timestamps[0]];
   }
 
@@ -291,7 +291,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     const maxDataPoints = 600;
     const bucket = seconds / maxDataPoints;
     const length = seconds;
-    console.log(' Bucket = ', bucket, ' length = ', length);
+    console.log('Bucket = ', bucket, ' length = ', length);
     this.payload = {
       assetCode: this.assetCode,
       start: 0,
@@ -326,9 +326,9 @@ export class ReadingsGraphComponent implements OnDestroy {
     const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
     console.log('now', now);
 
-    const futureTime = moment(event['xaxis.range[1]']).utc().valueOf() / 1000.0;
-    if (!this.panning && now < futureTime) {
-      console.log('Graph can not be drag in future time.');
+    const draggedToTime = moment(event['xaxis.range[1]']).utc().valueOf() / 1000.0;
+    if (!this.panning && now < draggedToTime) {
+      console.log('Graph cannot be dragged in future time.');
       return;
     }
 
