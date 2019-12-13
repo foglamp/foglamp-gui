@@ -59,6 +59,7 @@ export class ReadingsGraphComponent implements OnDestroy {
 
   timeWindowIndex = 23;  // initial value is 23rd index i.e 720s
   config = {
+    doubleClick: false,
     displaylogo: false,
     displayModeBar: true,
     modeBarButtonsToRemove: ['resetScale2d', 'hoverClosestCartesian',
@@ -376,20 +377,11 @@ export class ReadingsGraphComponent implements OnDestroy {
   legendClick(event) {
     const legendItem = event.data[event.curveNumber].name;
     let selectedLegends = JSON.parse(sessionStorage.getItem(this.assetCode));
-    if (selectedLegends !== null) {
-        let legends = [];
-        selectedLegends.forEach(lg => {
-          if (lg === legendItem) {
-            legends = selectedLegends.filter(dt => dt !== legendItem);
-          }
-        });
-        if (legends.length === 0) {
-          selectedLegends.push(legendItem);
-        } else {
-          selectedLegends = legends;
-        }
+    selectedLegends = selectedLegends === null ? [] : selectedLegends;
+    if (selectedLegends.includes(legendItem)) {
+      selectedLegends = selectedLegends.filter(dt => dt !== legendItem);
     } else {
-      selectedLegends = [legendItem];
+      selectedLegends.push(legendItem);
     }
     sessionStorage.setItem(this.assetCode, JSON.stringify(selectedLegends));
   }
