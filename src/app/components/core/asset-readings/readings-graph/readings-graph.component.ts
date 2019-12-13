@@ -114,10 +114,9 @@ export class ReadingsGraphComponent implements OnDestroy {
           'transform': 'matrix(1 0 0 -1 0 850)'
         },
         click: () => {
-          this.isAlive = true;
           this.resetGraphToDefault();
           if (this.assetCode !== undefined) {
-            this.getAssetCode(this.assetCode);
+            this.getAssetReadings(this.payload);
           }
         }
       }
@@ -183,11 +182,6 @@ export class ReadingsGraphComponent implements OnDestroy {
       len: 600,
       bucketSize: 1
     };
-    const Plotly = this.plotly.getPlotly();
-    Plotly.relayout(this.assetChart.plotEl.nativeElement, {
-      'xaxis.autorange': true,
-      'yaxis.autorange': true
-    });
     this.updateTimeWindowText('10 mins');
   }
 
@@ -284,16 +278,12 @@ export class ReadingsGraphComponent implements OnDestroy {
       });
       count++;
     }
-    if (this.zoom) {
-      const timestamps = uniq(output['timestamp'], 'timestamp');
-      this.updateZoomGraph(timestamps);
-    } else if (this.panning && !this.zoom) {
-      const Plotly = this.plotly.getPlotly();
-      Plotly.relayout(this.assetChart.plotEl.nativeElement, {
-        'xaxis.autorange': true,
-        'yaxis.autorange': true
-      });
-    }
+
+    const timestamps = uniq(output['timestamp'], 'timestamp');
+    const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
+    const graphStartTimeSeconds = this.payload.start === 0 ? (now - this.payload.len) : this.payload.start;
+    const graphStartDateTime = moment(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss');
+    this.layout.xaxis['range'] = [graphStartDateTime, timestamps[0]];
   }
 
   public zoomGraph(seconds: number) {
@@ -315,8 +305,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     if (event['xaxis.range[0]'] === undefined) {
       return;
     }
-    this.zoom = false;
-    this.panning = true;
+
     // this.isAlive = false;
     const maxDataPoints = 600;
     const panClickTime = moment(event['xaxis.range[0]']).utc();
@@ -337,6 +326,15 @@ export class ReadingsGraphComponent implements OnDestroy {
     const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
     console.log('now', now);
 
+    const futureTime = moment(event['xaxis.range[1]']).utc().valueOf() / 1000.0;
+    if (!this.panning && now < futureTime) {
+      console.log('Graph can not be drag in future time.');
+      return;
+    }
+
+    this.zoom = false;
+    this.panning = true;
+
     const currentTimeWindow = Utils.getTimeWindow(this.timeWindowIndex); // in seconds
     console.log('current time window', currentTimeWindow);
 
@@ -355,23 +353,6 @@ export class ReadingsGraphComponent implements OnDestroy {
       bucketSize: bucket
     };
     this.getAssetReadings(this.payload);
-  }
-
-  public updateZoomGraph(timestamps: any) {
-    const Plotly = this.plotly.getPlotly();
-    if (this.timeWindowIndex > 23) {
-      const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
-      const graphStartTimeSeconds = this.payload.start === 0 ? (now - this.payload.len) : this.payload.start;
-      const graphStartDateTime = moment(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss');
-      Plotly.relayout(this.assetChart.plotEl.nativeElement,
-        'xaxis.range', [graphStartDateTime, timestamps[0]]);
-    } else {
-      Plotly.relayout(this.assetChart.plotEl.nativeElement, {
-        'xaxis.autorange': true,
-        'yaxis.autorange': true
-      });
-    }
-
   }
 
   legendClick(event) {
