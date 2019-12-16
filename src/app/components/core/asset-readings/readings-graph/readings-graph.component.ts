@@ -34,7 +34,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     },
     dragmode: 'pan',
     xaxis: {
-      tickformat: '%H:%M:%S',
+      tickformat: '%H:%M:%S.%L',
       type: 'date',
       title: {
         text: 'Time Window - 10 mins',
@@ -75,7 +75,7 @@ export class ReadingsGraphComponent implements OnDestroy {
           'transform': 'matrix(1 0 0 -1 0 850)'
         },
         click: () => {
-          if (this.timeWindowIndex <= 23) {  // TODO: FOGL-3516 Add sub-second granularity to time bucket size
+          if (this.timeWindowIndex <= 0) {
             console.log('minimum zoom level reached');
             return;
           }
@@ -282,7 +282,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     const timestamps = uniq(output['timestamp'], 'timestamp');
     const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
     const graphStartTimeSeconds = this.payload.start === 0 ? (now - this.payload.len) : this.payload.start;
-    const graphStartDateTime = moment.utc(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss');
+    const graphStartDateTime = moment(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss:ms');
     this.layout.xaxis['range'] = [graphStartDateTime, timestamps[0]];
   }
 
@@ -329,6 +329,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     const draggedToTime = moment(event['xaxis.range[1]']).utc().valueOf() / 1000.0;
     if (!this.panning && now < draggedToTime) {
       console.log('Graph cannot be dragged in future time.');
+      this.getAssetReadings(this.payload);
       return;
     }
 
