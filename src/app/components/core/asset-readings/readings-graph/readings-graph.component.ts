@@ -82,7 +82,12 @@ export class ReadingsGraphComponent implements OnDestroy {
           this.timeWindowIndex--;
           const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
           this.updateTimeWindowText(timeWindow.key);
+          if (this.panning) {
+            this.panModeZoom();
+            return;
+          }
           this.zoomGraph(timeWindow.value);
+
         }
       },
       {
@@ -101,6 +106,10 @@ export class ReadingsGraphComponent implements OnDestroy {
           this.timeWindowIndex++;
           const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
           this.updateTimeWindowText(timeWindow.key);
+          if (this.panning) {
+            this.panModeZoom(true);
+            return;
+          }
           this.zoomGraph(timeWindow.value);
         }
       },
@@ -306,53 +315,56 @@ export class ReadingsGraphComponent implements OnDestroy {
       return;
     }
 
-    // this.isAlive = false;
     const maxDataPoints = 600;
-    const panClickTime = moment(event['xaxis.range[0]']).utc();
-    const panReleaseTime = moment(event['xaxis.range[1]']).utc();
+    console.log('click', this.numReadings[0].x[this.numReadings[0].x.length - 1]);
+    const panClickTime = moment(this.numReadings[0].x[this.numReadings[0].x.length - 1]).utc();
+    const panReleaseTime = moment(event['xaxis.range[0]']).utc();
 
-    console.log('Pan Click Time ', event['xaxis.range[0]']);
-    console.log('Pan Release Time ', event['xaxis.range[1]']);
+    console.log('Pan Click Time ', panClickTime);
+    console.log('Pan Release Time ', panReleaseTime);
 
     console.log('panClickTime utc', panClickTime.format());
     console.log('panReleaseTime utc', panReleaseTime.format());
 
-    // console.log('panClickTime(unix timestamp)', moment(panClickTime.format()).valueOf() / 1000);
-    // console.log('panReleaseTime(unix timestamp)', moment(panReleaseTime.format()).valueOf() / 1000);
-
-    const panDeltaTime = moment.duration(panReleaseTime.diff(panClickTime)).asSeconds();
+    const panDeltaTime = moment.duration(panClickTime.diff(panReleaseTime)).asSeconds();
     console.log('panDeltaTime', panDeltaTime);
 
     const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
     console.log('now', now);
 
-    const draggedToTime = moment(event['xaxis.range[1]']).utc().valueOf() / 1000.0;
-    if (!this.panning && now < draggedToTime) {
-      console.log('Graph cannot be dragged in future time.');
-      this.getAssetReadings(this.payload);
-      return;
-    }
-
-    this.zoom = false;
-    this.panning = true;
-
     const currentTimeWindow = Utils.getTimeWindow(this.timeWindowIndex); // in seconds
     console.log('current time window', currentTimeWindow);
 
-    this.updateTimeWindowText(currentTimeWindow.key);
-
-    const start = now - currentTimeWindow.value - panDeltaTime;
+    let start = now - currentTimeWindow.value - panDeltaTime;
     console.log('start', start);
 
     const bucket = currentTimeWindow.value / maxDataPoints;
     console.log('bucket', bucket);
 
+    const draggedToTime = moment(event['xaxis.range[1]']).utc().valueOf() / 1000.0;
+    console.log('draggedToTime', draggedToTime);
+
+    this.zoom = false;
+    this.panning = true;
+
+    start = (start + length) >= now ? start = 0 : start;
     this.payload = {
       assetCode: this.assetCode,
       start: start,
       len: currentTimeWindow.value,
       bucketSize: bucket
     };
+
+    if (now < draggedToTime) {
+      this.panning = false;
+      console.log('Graph cannot be dragged in future time.');
+      this.payload = {
+        assetCode: this.assetCode,
+        start: 0,
+        len: currentTimeWindow.value,
+        bucketSize: bucket
+      };
+    }
     this.getAssetReadings(this.payload);
   }
 
@@ -383,6 +395,38 @@ export class ReadingsGraphComponent implements OnDestroy {
   public updateTimeWindowText(timeWindowText) {
     this.layout.xaxis.title.text = `Time Window - ${timeWindowText}`;
   }
+
+  panModeZoom(zoomOut = false) {
+    // <Start> =(previous Start) + (previous Timespan in seconds) / 2 - (new Timespan in seconds) /2
+    console.log('lateset payload', this.payload);
+    const currentTimeWindow = Utils.getTimeWindow(this.timeWindowIndex); // in seconds
+    console.log('current time window', currentTimeWindow);
+    let start = this.payload.start + this.payload.len / 2 - currentTimeWindow.value / 2;
+    console.log('start', start);
+    // <bucket> = (new Timespan in seconds) / (Max Datapoints)
+    const bucket = currentTimeWindow.value / 600;
+    // <length> = (new Timespan in seconds)
+    const len = currentTimeWindow.value;
+
+    if (zoomOut) {
+      const totalDuration = start + len;
+      console.log('totalDuration', totalDuration);
+
+      const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
+      console.log('now', now);
+
+      if (start < 0 || totalDuration >= now) {
+        console.log('Graph cannot be dragged in future time.');
+        start = 0;
+      }
+    }
+    this.payload.start = start;
+    this.payload.len = len;
+    this.payload.bucketSize = bucket;
+    console.log('final payload', this.payload);
+    this.getAssetReadings(this.payload);
+  }
+
 
   public ngOnDestroy(): void {
     this.isAlive = false;
