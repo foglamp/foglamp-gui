@@ -271,7 +271,6 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   generateGraph(readings: any) {
-    console.log('readings', readings);
     this.numReadings = [];
     const output = {};
     let item: any;
@@ -292,7 +291,6 @@ export class ReadingsGraphComponent implements OnDestroy {
         }
       }
     }
-    console.log('item', item);
     let count = 0;
     for (const key in item) {
       this.numReadings.push({
