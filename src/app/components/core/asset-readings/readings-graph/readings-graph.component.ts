@@ -34,7 +34,39 @@ export class ReadingsGraphComponent implements OnDestroy {
     },
     dragmode: 'pan',
     xaxis: {
-      tickformat: '%H:%M:%S.%L',
+      tickformatstops: [{
+        'dtickrange': [null, 5000], // below 5 seconds
+        'value': '%H:%M:%S.%L'
+      },
+      {
+        'dtickrange': [5000, 60000], // 1 sec to 1 min
+        'value': '%H:%M:%S'
+      },
+      {
+        'dtickrange': [60000, 3600000], // 1 min to 1 hour
+        'value': '%H:%M:%S'
+      },
+      {
+        'dtickrange': [3600000, 86400000], // 1 hour to 1 day (24 hours)
+        'value': '%H:%M %e %b'
+      },
+      {
+        'dtickrange': [86400000, 604800000], // 1 day to 1 week
+        'value': '%e %b'
+      },
+      {
+        'dtickrange': [604800000, 'M1'], // 1 week to 1 month
+        'value': '%e %b'
+      },
+      {
+        'dtickrange': ['M1', 'M12'], // 1 month to 12 months
+        'value': '%b %y'
+      },
+      {
+        'dtickrange': ['M12', null], // above 12 months
+        'value': '%Y'
+      }
+    ],
       type: 'date',
       title: {
         text: 'Time Window - 10 mins',
@@ -239,6 +271,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   generateGraph(readings: any) {
+    console.log('readings', readings);
     this.numReadings = [];
     const output = {};
     let item: any;
@@ -259,7 +292,7 @@ export class ReadingsGraphComponent implements OnDestroy {
         }
       }
     }
-
+    console.log('item', item);
     let count = 0;
     for (const key in item) {
       this.numReadings.push({
