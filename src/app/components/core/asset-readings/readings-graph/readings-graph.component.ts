@@ -13,6 +13,7 @@ import { PlotlyService } from 'angular-plotly.js';
   templateUrl: './readings-graph.component.html',
   styleUrls: ['./readings-graph.component.css']
 })
+
 export class ReadingsGraphComponent implements OnDestroy {
   public assetCode: string;
   public MAX_RANGE = MAX_INT_SIZE;
@@ -39,19 +40,19 @@ export class ReadingsGraphComponent implements OnDestroy {
         'value': '%H:%M:%S.%L'
       },
       {
-        'dtickrange': [5000, 60000], // 1 sec to 1 min
+        'dtickrange': [5000, 60000], // 5 seconds to 1 min
         'value': '%H:%M:%S'
       },
       {
-        'dtickrange': [60000, 3600000], // 1 min to 1 hour
+        'dtickrange': [60000, 7200000], // 1 min to 2 hours
         'value': '%H:%M:%S'
       },
       {
-        'dtickrange': [3600000, 86400000], // 1 hour to 1 day (24 hours)
-        'value': '%H:%M %e %b'
+        'dtickrange': [7200000, 82800000], // 2 hours to (23 hours)
+        'value': '%e %b %H:%M'
       },
       {
-        'dtickrange': [86400000, 604800000], // 1 day to 1 week
+        'dtickrange': [82800000, 604800000], // 23 hours to 1 week
         'value': '%e %b'
       },
       {
@@ -61,12 +62,7 @@ export class ReadingsGraphComponent implements OnDestroy {
       {
         'dtickrange': ['M1', 'M12'], // 1 month to 12 months
         'value': '%b %y'
-      },
-      {
-        'dtickrange': ['M12', null], // above 12 months
-        'value': '%Y'
-      }
-    ],
+      }],
       type: 'date',
       title: {
         text: 'Time Window - 10 mins',
