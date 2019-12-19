@@ -293,6 +293,8 @@ export class ReadingsGraphComponent implements OnDestroy {
     const graphStartTimeSeconds = this.payload.start === 0 ? (now - this.payload.len) : this.payload.start;
     const graphStartDateTime = moment(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss.SSS');
     this.layout.xaxis['range'] = [graphStartDateTime, timestamps[0]];
+    const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
+    this.updateXAxisTickFormat(timeWindow.value);
   }
 
   public zoomGraph(seconds: number) {
@@ -300,7 +302,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     const maxDataPoints = 600;
     const bucket = seconds / maxDataPoints;
     const length = seconds;
-    this.updateTimeFormat(length);
+    this.updateXAxisTickFormat(length);
     console.log('Bucket = ', bucket, ' length = ', length);
     this.payload = {
       assetCode: this.assetCode,
@@ -311,14 +313,18 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.getAssetReadings(this.payload);
   }
 
-  updateTimeFormat(length) {
+  updateXAxisTickFormat(length) {
     // below 1 minute
     if (length < 60) {
       this.layout.xaxis.tickformat = '%H:%M:%S.%L';
     }
-    // 1 minute to 1 day
-    if (60 <= length && length < 86400) {
+    // 1 minute to 6 hours
+    if (60 <= length && length <= 21600) {
       this.layout.xaxis.tickformat = '%H:%M:%S';
+    }
+    // 6 hours to 1 day
+    if (21600 < length && length < 86400) {
+      this.layout.xaxis.tickformat = '%H:%M';
     }
     // 1 day to 1 week
     if (86400 <= length && length < 604800) {
@@ -335,7 +341,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   dragGraph(event: any) {
-    if (event['xaxis.range[0]'] === undefined) {
+    if (event['xaxis.range[0]'] === undefined  || this.numReadings[0] === undefined) {
       return;
     }
 
