@@ -35,34 +35,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     },
     dragmode: 'pan',
     xaxis: {
-      tickformatstops: [{
-        'dtickrange': [null, 5000], // below 5 seconds
-        'value': '%H:%M:%S.%L'
-      },
-      {
-        'dtickrange': [5000, 60000], // 5 seconds to 1 min
-        'value': '%H:%M:%S'
-      },
-      {
-        'dtickrange': [60000, 7200000], // 1 min to 2 hours
-        'value': '%H:%M:%S'
-      },
-      {
-        'dtickrange': [7200000, 82800000], // 2 hours to (23 hours)
-        'value': '%e %b %H:%M'
-      },
-      {
-        'dtickrange': [82800000, 604800000], // 23 hours to 1 week
-        'value': '%e %b'
-      },
-      {
-        'dtickrange': [604800000, 'M1'], // 1 week to 1 month
-        'value': '%e %b'
-      },
-      {
-        'dtickrange': ['M1', 'M12'], // 1 month to 12 months
-        'value': '%b %y'
-      }],
+      tickformat: '%H:%M:%S',
       type: 'date',
       title: {
         text: 'Time Window - 10 mins',
@@ -327,6 +300,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     const maxDataPoints = 600;
     const bucket = seconds / maxDataPoints;
     const length = seconds;
+    this.updateTimeFormat(length);
     console.log('Bucket = ', bucket, ' length = ', length);
     this.payload = {
       assetCode: this.assetCode,
@@ -335,6 +309,29 @@ export class ReadingsGraphComponent implements OnDestroy {
       bucketSize: bucket
     };
     this.getAssetReadings(this.payload);
+  }
+
+  updateTimeFormat(length) {
+    // below 1 minute
+    if (length < 60) {
+      this.layout.xaxis.tickformat = '%H:%M:%S.%L';
+    }
+    // 1 minute to 1 day
+    if (60 <= length && length < 86400) {
+      this.layout.xaxis.tickformat = '%H:%M:%S';
+    }
+    // 1 day to 1 week
+    if (86400 <= length && length < 604800) {
+      this.layout.xaxis.tickformat = '%e %b %H:%M';
+    }
+    // 1 week to 6 months
+    if (604800 <= length && length < 15552000) {
+      this.layout.xaxis.tickformat = '%e %b';
+    }
+    // above 6 months
+    if (15552000 <= length) {
+      this.layout.xaxis.tickformat = '%b %y';
+    }
   }
 
   dragGraph(event: any) {
