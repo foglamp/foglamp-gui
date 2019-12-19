@@ -59,7 +59,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     }
   };
 
-  timeWindowIndex = this.DEFAULT_TIME_WINDOW_INDEX;  // initial value is 20th index i.e 720s
+  timeWindowIndex = this.DEFAULT_TIME_WINDOW_INDEX;  // initial value is 600s
   config = {
     doubleClick: false,
     displaylogo: false,
