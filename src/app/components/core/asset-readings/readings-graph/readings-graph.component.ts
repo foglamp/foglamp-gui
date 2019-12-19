@@ -302,7 +302,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     const maxDataPoints = 600;
     const bucket = seconds / maxDataPoints;
     const length = seconds;
-    this.updateXAxisTickFormat(length);
     console.log('Bucket = ', bucket, ' length = ', length);
     this.payload = {
       assetCode: this.assetCode,
@@ -341,7 +340,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   dragGraph(event: any) {
-    if (event['xaxis.range[0]'] === undefined  || this.numReadings[0] === undefined) {
+    if (event['xaxis.range[0]'] === undefined  || this.numReadings.length === 0) {
       return;
     }
 
