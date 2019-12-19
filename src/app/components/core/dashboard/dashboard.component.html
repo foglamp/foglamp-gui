@@ -51,7 +51,8 @@
         <div *ngIf="statistic != undefined" class="box">
           <h6 class="subtitle is-6">{{ statistic.description }}</h6>
           <br />
-          <app-chart [type]="statistic.chartType" [data]="statistic.chartValue" [options]="chartOptions"></app-chart>
+          <!-- <app-chart [type]="statistic.chartType" [data]="statistic.chartValue" [options]="chartOptions"></app-chart> -->
+          <plotly-plot [data]="statistic.chartValue" [layout]="layout" [config]="config"></plotly-plot>
           <br />
           <h6>Total since startup:
             <b> {{ statistic.value | number }} </b>

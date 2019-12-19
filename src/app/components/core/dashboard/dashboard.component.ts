@@ -6,6 +6,7 @@ import { takeWhile, takeUntil } from 'rxjs/operators';
 import { DateFormatterPipe } from '../../../pipes';
 import { AlertService, PingService, StatisticsService } from '../../../services';
 import { GRAPH_REFRESH_INTERVAL, STATS_HISTORY_TIME_FILTER } from '../../../utils';
+import { PlotlyService } from 'angular-plotly.js';
 
 @Component({
   selector: 'app-dashboard',
@@ -34,13 +35,53 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   DEFAULT_LIMIT = 20;
   private isAlive: boolean;
+  readingsData = [];
 
   destroy$: Subject<boolean> = new Subject<boolean>();
+
+  panning = false;
+  zoom = false;
+  layout = {
+    font: {
+      size: 12
+    },
+    dragmode: 'false',
+    xaxis: {
+      tickformat: '%H:%M:%S',
+      type: 'date',
+      title: {
+        font: {
+          size: 14,
+          color: '#7f7f7f'
+        }
+      },
+    },
+    yaxis: {
+      fixedrange: true
+    },
+    height: 500,
+    margin: {
+      l: 50,
+      r: 50,
+      b: 50,
+      t: 50,
+      pad: 1
+    }
+  };
+  config = {
+    doubleClick: false,
+    displaylogo: false,
+    displayModeBar: true,
+    modeBarButtonsToRemove: ['resetScale2d', 'hoverClosestCartesian',
+      'hoverCompareCartesian', 'lasso2d', 'zoom2d', 'autoScale2d', 'pan2d',
+      'zoomIn2d', 'zoomOut2d', 'toImage', 'toggleSpikelines']
+  };
 
   constructor(private statisticsService: StatisticsService,
     private alertService: AlertService,
     private dateFormatter: DateFormatterPipe,
-    private ping: PingService) {
+    private ping: PingService,
+    public plotly: PlotlyService) {
     this.isAlive = true;
     this.ping.refreshIntervalChanged
       .pipe(takeUntil(this.destroy$))
@@ -137,18 +178,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   protected getChartValues(labels, data, color) {
-    this.getChartOptions();
+    // this.getChartOptions();
     return {
-      labels: labels,
-      datasets: [
-        {
-          label: '',
-          data: data,
-          backgroundColor: color,
-          fill: false,
-          lineTension: 0
-        }
-      ]
+      x: labels,
+      y: data,
+      type: 'scatter',
+      mode: 'lines',
+      marker: {
+        color: color
+      },
+      modeBarButtons: [{
+        displaylogo: false
+      }]
     };
   }
 
@@ -191,8 +232,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.graphsToShow.map(statistics => {
             if (statistics.key === dt.key) {
               statistics.chartValue = this.getChartValues(labels, record, 'rgb(144,238,144)');
-              statistics.chartType = 'line';
               statistics.limit = this.DEFAULT_LIMIT;
+              console.log('statistics.chartValue', statistics.chartValue);
             }
           });
         });
@@ -216,6 +257,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.statisticsService.getStatisticsHistory(this.optedTime, null, null)
     .pipe(takeUntil(this.destroy$))
     .subscribe((data: any[]) => {
+        console.log('data', data);
         this.statisticsKeys.forEach(dt => {
           const labels = [];
           const record = map(data['statistics'], dt.key).reverse();
@@ -225,12 +267,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
             ts = this.dateFormatter.transform(ts, 'HH:mm:ss');
             labels.push(ts);
           });
+          console.log('labels', labels);
+          console.log('record', record);
           this.graphsToShow = this.graphsToShow.filter(value => value !== undefined);
           this.graphsToShow.map(statistics => {
             if (statistics.key === dt.key) {
               statistics.chartValue = this.getChartValues(labels, record, 'rgb(144,238,144)');
-              statistics.chartType = 'line';
               statistics.limit = this.DEFAULT_LIMIT;
+              console.log('statistics.chartValue', statistics.chartValue);
             }
           });
         });

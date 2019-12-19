@@ -1487,6 +1487,13 @@ amdefine@>=0.0.4:
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
   integrity sha1-SlKCrBZHKek2Gbz9OtFR+BfOkfU=
 
+angular-plotly.js@^1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/angular-plotly.js/-/angular-plotly.js-1.4.2.tgz#25a8d7adf3f0cbdf5e7d3bbe80d9909dc3cb7bc4"
+  integrity sha512-Je3MNs/2WOHc+/I73tZxg64QI2oeicWlYLoV8kEOxDnmmabskZyZjxdSkGZaxg14tdGiMoH1mru+D9mGZTQkiQ==
+  dependencies:
+    tslib "^1.9.0"
+
 angular-tree-component@~8.4.0:
   version "8.4.0"
   resolved "https://registry.yarnpkg.com/angular-tree-component/-/angular-tree-component-8.4.0.tgz#1e36118e4a5c0e573764a2a58efd66ec793fdc20"
