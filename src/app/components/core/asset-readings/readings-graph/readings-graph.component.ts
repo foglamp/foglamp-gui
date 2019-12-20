@@ -27,7 +27,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   @ViewChild('assetChart', { static: false }) assetChart: any;
   destroy$: Subject<boolean> = new Subject<boolean>();
 
-  DEFAULT_TIME_WINDOW_INDEX = 20;
+  DEFAULT_TIME_WINDOW_INDEX = 23;
   panning = false;
   zoom = false;
   layout = {
@@ -81,6 +81,11 @@ export class ReadingsGraphComponent implements OnDestroy {
             console.log('minimum zoom level reached');
             return;
           }
+
+          if (this.numReadings.length <= 0 || (this.numReadings.length > 0 && this.numReadings[0].x.length <= 1)) {
+            console.log('No readings to zoom in');
+            return;
+          }
           this.timeWindowIndex--;
           const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
           this.updateTimeWindowText(timeWindow.key);
@@ -101,12 +106,12 @@ export class ReadingsGraphComponent implements OnDestroy {
           'transform': 'matrix(1 0 0 -1 0 850)'
         },
         click: () => {
-          const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
-          if (this.timeWindowIndex >= timeWindow.size) {
+          if (this.timeWindowIndex >= Utils.getTimeWindow(this.timeWindowIndex).size - 1) {
             console.log('maximum zoom level reached');
             return;
           }
           this.timeWindowIndex++;
+          const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
           this.updateTimeWindowText(timeWindow.key);
           if (this.panning) {
             this.panModeZoom(true);
@@ -272,11 +277,12 @@ export class ReadingsGraphComponent implements OnDestroy {
     }
     let count = 0;
     for (const key in item) {
+      const readingTimestamps = uniq(output['timestamp'], 'timestamp');
       this.numReadings.push({
-        x: uniq(output['timestamp'], 'timestamp'),
+        x: readingTimestamps,
         y: output[key],
         type: 'scatter',
-        mode: 'lines',
+        mode: readingTimestamps.length === 1 ? 'markers' : 'lines',
         name: key,
         visible: this.getLegendState(key),
         marker: {
@@ -341,7 +347,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   dragGraph(event: any) {
-    if (event['xaxis.range[0]'] === undefined  || this.numReadings.length === 0) {
+    if (event['xaxis.range[0]'] === undefined || this.numReadings.length === 0) {
       return;
     }
 
