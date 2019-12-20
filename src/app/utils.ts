@@ -88,9 +88,6 @@ export default class Utils {
 
   public static getTimeWindow(index: number) {
     const timeWindows = {
-      '1/100,000 secs': 0.00001,
-      '1/50,000 secs': 0.00002,
-      '1/20,000 secs': 0.00005,
       '1/10,000 secs': 0.0001,
       '1/5,000 secs': 0.0002,
       '1/2,000 secs': 0.0005,
@@ -130,7 +127,8 @@ export default class Utils {
     };
     const key = Object.keys(timeWindows)[index];
     const value = Object.values(timeWindows)[index];
-    return { key, value };
+    const size = Object.keys(timeWindows).length;
+    return { key, value, size };
   }
 
 }

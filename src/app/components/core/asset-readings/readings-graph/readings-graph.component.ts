@@ -27,6 +27,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   @ViewChild('assetChart', { static: false }) assetChart: any;
   destroy$: Subject<boolean> = new Subject<boolean>();
 
+  DEFAULT_TIME_WINDOW_INDEX = 20;
   panning = false;
   zoom = false;
   layout = {
@@ -58,7 +59,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     }
   };
 
-  timeWindowIndex = 23;  // initial value is 23rd index i.e 720s
+  timeWindowIndex = this.DEFAULT_TIME_WINDOW_INDEX;  // initial value is 600s
   config = {
     doubleClick: false,
     displaylogo: false,
@@ -100,12 +101,12 @@ export class ReadingsGraphComponent implements OnDestroy {
           'transform': 'matrix(1 0 0 -1 0 850)'
         },
         click: () => {
-          if (this.timeWindowIndex >= 38) {
+          const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
+          if (this.timeWindowIndex >= timeWindow.size) {
             console.log('maximum zoom level reached');
             return;
           }
           this.timeWindowIndex++;
-          const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
           this.updateTimeWindowText(timeWindow.key);
           if (this.panning) {
             this.panModeZoom(true);
@@ -182,7 +183,7 @@ export class ReadingsGraphComponent implements OnDestroy {
 
   public resetGraphToDefault() {
     sessionStorage.removeItem(this.assetCode);
-    this.timeWindowIndex = 23;
+    this.timeWindowIndex = this.DEFAULT_TIME_WINDOW_INDEX;
     this.panning = false;
     this.zoom = false;
     // reset payload to default
