@@ -13,6 +13,7 @@ import { PlotlyService } from 'angular-plotly.js';
   templateUrl: './readings-graph.component.html',
   styleUrls: ['./readings-graph.component.css']
 })
+
 export class ReadingsGraphComponent implements OnDestroy {
   public assetCode: string;
   public MAX_RANGE = MAX_INT_SIZE;
@@ -26,6 +27,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   @ViewChild('assetChart', { static: false }) assetChart: any;
   destroy$: Subject<boolean> = new Subject<boolean>();
 
+  DEFAULT_TIME_WINDOW_INDEX = 20;
   panning = false;
   zoom = false;
   layout = {
@@ -34,7 +36,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     },
     dragmode: 'pan',
     xaxis: {
-      tickformat: '%H:%M:%S.%L',
+      tickformat: '%H:%M:%S',
       type: 'date',
       title: {
         text: 'Time Window - 10 mins',
@@ -57,7 +59,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     }
   };
 
-  timeWindowIndex = 23;  // initial value is 23rd index i.e 720s
+  timeWindowIndex = this.DEFAULT_TIME_WINDOW_INDEX;  // initial value is 600s
   config = {
     doubleClick: false,
     displaylogo: false,
@@ -99,12 +101,12 @@ export class ReadingsGraphComponent implements OnDestroy {
           'transform': 'matrix(1 0 0 -1 0 850)'
         },
         click: () => {
-          if (this.timeWindowIndex >= 38) {
+          const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
+          if (this.timeWindowIndex >= timeWindow.size) {
             console.log('maximum zoom level reached');
             return;
           }
           this.timeWindowIndex++;
-          const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
           this.updateTimeWindowText(timeWindow.key);
           if (this.panning) {
             this.panModeZoom(true);
@@ -181,7 +183,7 @@ export class ReadingsGraphComponent implements OnDestroy {
 
   public resetGraphToDefault() {
     sessionStorage.removeItem(this.assetCode);
-    this.timeWindowIndex = 23;
+    this.timeWindowIndex = this.DEFAULT_TIME_WINDOW_INDEX;
     this.panning = false;
     this.zoom = false;
     // reset payload to default
@@ -268,7 +270,6 @@ export class ReadingsGraphComponent implements OnDestroy {
         }
       }
     }
-
     let count = 0;
     for (const key in item) {
       this.numReadings.push({
@@ -293,6 +294,8 @@ export class ReadingsGraphComponent implements OnDestroy {
     const graphStartTimeSeconds = this.payload.start === 0 ? (now - this.payload.len) : this.payload.start;
     const graphStartDateTime = moment(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss.SSS');
     this.layout.xaxis['range'] = [graphStartDateTime, timestamps[0]];
+    const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
+    this.updateXAxisTickFormat(timeWindow.value);
   }
 
   public zoomGraph(seconds: number) {
@@ -310,8 +313,35 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.getAssetReadings(this.payload);
   }
 
+  updateXAxisTickFormat(length) {
+    // below 1 minute
+    if (length < 60) {
+      this.layout.xaxis.tickformat = '%H:%M:%S.%L';
+    }
+    // 1 minute to 6 hours
+    if (60 <= length && length <= 21600) {
+      this.layout.xaxis.tickformat = '%H:%M:%S';
+    }
+    // 6 hours to 1 day
+    if (21600 < length && length < 86400) {
+      this.layout.xaxis.tickformat = '%H:%M';
+    }
+    // 1 day to 1 week
+    if (86400 <= length && length < 604800) {
+      this.layout.xaxis.tickformat = '%e %b %H:%M';
+    }
+    // 1 week to 6 months
+    if (604800 <= length && length < 15552000) {
+      this.layout.xaxis.tickformat = '%e %b';
+    }
+    // above 6 months
+    if (15552000 <= length) {
+      this.layout.xaxis.tickformat = '%b %y';
+    }
+  }
+
   dragGraph(event: any) {
-    if (event['xaxis.range[0]'] === undefined) {
+    if (event['xaxis.range[0]'] === undefined  || this.numReadings.length === 0) {
       return;
     }
 
