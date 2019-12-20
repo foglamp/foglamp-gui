@@ -64,7 +64,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     doubleClick: false,
     displaylogo: false,
     displayModeBar: true,
-    modeBarButtonsToRemove: ['resetScale2d', 'hoverClosestCartesian',
+    modeBarButtonsToRemove: ['resetScale2d', 'hoverClosestCartesian', 'select2d',
       'hoverCompareCartesian', 'lasso2d', 'zoom2d', 'autoScale2d', 'pan2d',
       'zoomIn2d', 'zoomOut2d', 'toImage', 'toggleSpikelines'],
     modeBarButtonsToAdd: [[
@@ -371,7 +371,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     const currentTimeWindow = Utils.getTimeWindow(this.timeWindowIndex); // in seconds
     console.log('current time window', currentTimeWindow);
 
-    let start = now - currentTimeWindow.value - panDeltaTime;
+    const start = now - currentTimeWindow.value - panDeltaTime;
     console.log('start', start);
 
     const bucket = currentTimeWindow.value / maxDataPoints;
@@ -382,8 +382,6 @@ export class ReadingsGraphComponent implements OnDestroy {
 
     this.zoom = false;
     this.panning = true;
-
-    start = (start + length) >= now ? start = 0 : start;
     this.payload = {
       assetCode: this.assetCode,
       start: start,
@@ -437,6 +435,10 @@ export class ReadingsGraphComponent implements OnDestroy {
     console.log('lateset payload', this.payload);
     const currentTimeWindow = Utils.getTimeWindow(this.timeWindowIndex); // in seconds
     console.log('current time window', currentTimeWindow);
+
+    const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
+    console.log('now', now);
+
     let start = this.payload.start + this.payload.len / 2 - currentTimeWindow.value / 2;
     console.log('start', start);
     // <bucket> = (new Timespan in seconds) / (Max Datapoints)
@@ -447,13 +449,10 @@ export class ReadingsGraphComponent implements OnDestroy {
     if (zoomOut) {
       const totalDuration = start + len;
       console.log('totalDuration', totalDuration);
-
-      const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
-      console.log('now', now);
-
       if (start < 0 || totalDuration >= now) {
         console.log('Graph cannot be dragged in future time.');
         start = 0;
+        this.panning = false;
       }
     }
     this.payload.start = start;
