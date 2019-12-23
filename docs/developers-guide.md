@@ -88,7 +88,6 @@ Set API base URL in `environments/environment.prod.ts`, you can always change it
 #### Dev
  Library         |   Version     | Latest Stable (? Y/n) | License
 ---------------- | ------------- | --------------------  | ------------
-chart.js         |  2.8.0        |        2.8.0          | MIT
 core-js          |  3.3.3        |        3.3.3          | MIT
 ng-sidebar       |  8.0.0        |        8.0.0          | MIT
 moment           |  2.24.0       |        2.24.0         | MIT

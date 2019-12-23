@@ -5,7 +5,6 @@ import { takeWhile, takeUntil } from 'rxjs/operators';
 
 import { AlertService, PingService, StatisticsService } from '../../../services';
 import { GRAPH_REFRESH_INTERVAL, STATS_HISTORY_TIME_FILTER } from '../../../utils';
-import { PlotlyService } from 'angular-plotly.js';
 
 @Component({
   selector: 'app-dashboard',
@@ -59,12 +58,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     yaxis: {
       fixedrange: true
     },
-    height: 500,
+    height: 300,
     margin: {
-      l: 50,
-      r: 50,
-      b: 50,
-      t: 50,
+      l: 30,
+      r: 30,
+      b: 30,
+      t: 30,
       pad: 1
     }
   };
@@ -79,8 +78,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   constructor(private statisticsService: StatisticsService,
     private alertService: AlertService,
-    private ping: PingService,
-    public plotly: PlotlyService) {
+    private ping: PingService) {
     this.isAlive = true;
     this.ping.refreshIntervalChanged
       .pipe(takeUntil(this.destroy$))
