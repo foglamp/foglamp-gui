@@ -94,7 +94,6 @@ export class ReadingsGraphComponent implements OnDestroy {
             return;
           }
           this.zoomGraph(timeWindow.value);
-
         }
       },
       {
@@ -296,12 +295,20 @@ export class ReadingsGraphComponent implements OnDestroy {
     }
 
     const timestamps = uniq(output['timestamp'], 'timestamp');
+    if (timestamps.length === 0) {
+      return;
+    }
     const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
     const graphStartTimeSeconds = this.payload.start === 0 ? (now - this.payload.len) : this.payload.start;
     const graphStartDateTime = moment(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss.SSS');
     this.layout.xaxis['range'] = [graphStartDateTime, timestamps[0]];
     const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
     this.updateXAxisTickFormat(timeWindow.value);
+    const Plotly = this.plotly.getPlotly();
+    if (this.assetChart) {
+      Plotly.relayout(this.assetChart.plotEl.nativeElement,
+        'xaxis.range', [graphStartDateTime, timestamps[0]]);
+    }
   }
 
   public zoomGraph(seconds: number) {
@@ -347,13 +354,12 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   dragGraph(event: any) {
-    if (event['xaxis.range[0]'] === undefined || this.numReadings.length === 0) {
+    if (event['xaxis.range[0]'] === undefined) {
       return;
     }
-
     const maxDataPoints = 600;
-    console.log('click', this.numReadings[0].x[this.numReadings[0].x.length - 1]);
-    const panClickTime = moment(this.numReadings[0].x[this.numReadings[0].x.length - 1]).utc();
+    let panClickTime = this.numReadings.length > 0 ? this.numReadings[0].x[this.numReadings[0].x.length - 1] : event['xaxis.range[1]'];
+    panClickTime = moment(panClickTime).utc();
     const panReleaseTime = moment(event['xaxis.range[0]']).utc();
 
     console.log('Pan Click Time ', panClickTime);
