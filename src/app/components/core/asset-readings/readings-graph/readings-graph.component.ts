@@ -29,7 +29,7 @@ export class ReadingsGraphComponent implements OnDestroy {
 
   DEFAULT_TIME_WINDOW_INDEX = 23;
   panning = false;
-  zoom = false;
+  zoomOut = false;
   layout = {
     font: {
       size: 12
@@ -82,10 +82,11 @@ export class ReadingsGraphComponent implements OnDestroy {
             return;
           }
 
-          if (this.numReadings.length <= 0 || (this.numReadings.length > 0 && this.numReadings[0].x.length <= 1)) {
+          if (!this.zoomOut && (this.numReadings.length <= 0 || (this.numReadings.length > 0 && this.numReadings[0].x.length <= 1))) {
             console.log('No readings to zoom in');
             return;
           }
+          this.zoomOut = false;
           this.timeWindowIndex--;
           const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
           this.updateTimeWindowText(timeWindow.key);
@@ -105,6 +106,7 @@ export class ReadingsGraphComponent implements OnDestroy {
           'transform': 'matrix(1 0 0 -1 0 850)'
         },
         click: () => {
+          this.zoomOut = true;
           if (this.timeWindowIndex >= Utils.getTimeWindow(this.timeWindowIndex).size - 1) {
             console.log('maximum zoom level reached');
             return;
@@ -189,7 +191,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     sessionStorage.removeItem(this.assetCode);
     this.timeWindowIndex = this.DEFAULT_TIME_WINDOW_INDEX;
     this.panning = false;
-    this.zoom = false;
+    this.zoomOut = false;
     // reset payload to default
     this.payload = {
       assetCode: this.assetCode,
@@ -312,7 +314,6 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   public zoomGraph(seconds: number) {
-    this.zoom = true;
     const maxDataPoints = 600;
     const bucket = seconds / maxDataPoints;
     const length = seconds;
@@ -386,7 +387,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     const draggedToTime = moment(event['xaxis.range[1]']).utc().valueOf() / 1000.0;
     console.log('draggedToTime', draggedToTime);
 
-    this.zoom = false;
     this.panning = true;
     this.payload = {
       assetCode: this.assetCode,
