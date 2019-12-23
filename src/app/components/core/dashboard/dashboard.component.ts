@@ -3,9 +3,9 @@ import { map } from 'lodash';
 import { interval, Subject } from 'rxjs';
 import { takeWhile, takeUntil } from 'rxjs/operators';
 
-import { DateFormatterPipe } from '../../../pipes';
 import { AlertService, PingService, StatisticsService } from '../../../services';
 import { GRAPH_REFRESH_INTERVAL, STATS_HISTORY_TIME_FILTER } from '../../../utils';
+import { PlotlyService } from 'angular-plotly.js';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,7 +17,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Filtered array of received statistics data (having objects except key @FOGBENCH).
   statistics = [];
 
-  // Array of Statistics Keys (["BUFFERED", "DISCARDED", "PURGED", ....])
+  // Array of Statistics Keys (['BUFFERED', 'DISCARDED', 'PURGED', ....])
   statisticsKeys = [];
 
   selectedGraphsList = [] =
@@ -27,20 +27,60 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Array of the graphs to show
   graphsToShow = [];
 
-  public chartOptions: object;
-
+  public showSpinner = false;
   public refreshInterval = GRAPH_REFRESH_INTERVAL;
   public optedTime;
 
   DEFAULT_LIMIT = 20;
   private isAlive: boolean;
+  private REQUEST_TIMEOUT_INTERVAL = 5000;
 
   destroy$: Subject<boolean> = new Subject<boolean>();
 
+  panning = false;
+  zoom = false;
+  layout = {
+    showlegend: false,
+    font: {
+      size: 12
+    },
+    dragmode: 'false',
+    xaxis: {
+      fixedrange: true,
+      tickformat: '%H:%M:%S',
+      type: 'date',
+      title: {
+        font: {
+          size: 14,
+          color: '#7f7f7f'
+        }
+      },
+    },
+    yaxis: {
+      fixedrange: true
+    },
+    height: 500,
+    margin: {
+      l: 50,
+      r: 50,
+      b: 50,
+      t: 50,
+      pad: 1
+    }
+  };
+  config = {
+    doubleClick: false,
+    displaylogo: false,
+    displayModeBar: true,
+    modeBarButtonsToRemove: ['resetScale2d', 'hoverClosestCartesian',
+      'hoverCompareCartesian', 'lasso2d', 'zoom2d', 'autoScale2d', 'pan2d',
+      'zoomIn2d', 'zoomOut2d', 'toImage', 'toggleSpikelines', 'resetViews', 'resetViewMapbox']
+  };
+
   constructor(private statisticsService: StatisticsService,
     private alertService: AlertService,
-    private dateFormatter: DateFormatterPipe,
-    private ping: PingService) {
+    private ping: PingService,
+    public plotly: PlotlyService) {
     this.isAlive = true;
     this.ping.refreshIntervalChanged
       .pipe(takeUntil(this.destroy$))
@@ -53,6 +93,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.showLoadingSpinner();
     // To check if data saved in valid format in local storage
     const optedGraphStorage = JSON.parse(localStorage.getItem('OPTED_GRAPHS'));
     if (optedGraphStorage != null && typeof (optedGraphStorage[0]) !== 'object') {
@@ -121,34 +162,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
         });
   }
 
-  protected getChartOptions() {
-    this.chartOptions = {
-      legend: {
-        display: false
-      },
-      scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: true
-          }
-        }]
-      }
-    };
-  }
-
   protected getChartValues(labels, data, color) {
-    this.getChartOptions();
     return {
-      labels: labels,
-      datasets: [
-        {
-          label: '',
-          data: data,
-          backgroundColor: color,
-          fill: false,
-          lineTension: 0
-        }
-      ]
+      x: labels,
+      y: data,
+      type: 'scatter',
+      mode: 'lines',
+      marker: {
+        color: color
+      },
+      modeBarButtons: [{
+        displaylogo: false
+      }]
     };
   }
 
@@ -184,14 +209,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
           let history_ts = map(data['statistics'], 'history_ts');
           history_ts = history_ts.reverse();
           history_ts.forEach(ts => {
-            ts = this.dateFormatter.transform(ts, 'HH:mm:ss');
             labels.push(ts);
           });
           this.graphsToShow = this.graphsToShow.filter(value => value !== undefined);
           this.graphsToShow.map(statistics => {
             if (statistics.key === dt.key) {
-              statistics.chartValue = this.getChartValues(labels, record, 'rgb(144,238,144)');
-              statistics.chartType = 'line';
+              statistics.chartValue = [];
+              const chartValue = this.getChartValues(labels, record, 'rgb(144,238,144)');
+              statistics.chartValue.push(chartValue);
               statistics.limit = this.DEFAULT_LIMIT;
             }
           });
@@ -207,6 +232,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   public getStatisticsHistory(time = null): void {
+    this.showLoadingSpinner();
     if (time == null) {
       localStorage.setItem('STATS_HISTORY_TIME_FILTER', STATS_HISTORY_TIME_FILTER);
     } else {
@@ -222,26 +248,38 @@ export class DashboardComponent implements OnInit, OnDestroy {
           let history_ts = map(data['statistics'], 'history_ts');
           history_ts = history_ts.reverse();
           history_ts.forEach(ts => {
-            ts = this.dateFormatter.transform(ts, 'HH:mm:ss');
             labels.push(ts);
           });
           this.graphsToShow = this.graphsToShow.filter(value => value !== undefined);
           this.graphsToShow.map(statistics => {
+            statistics.chartValue = [];
             if (statistics.key === dt.key) {
-              statistics.chartValue = this.getChartValues(labels, record, 'rgb(144,238,144)');
-              statistics.chartType = 'line';
+              const chartValue = this.getChartValues(labels, record, 'rgb(144,238,144)');
+              statistics.chartValue.push(chartValue);
               statistics.limit = this.DEFAULT_LIMIT;
             }
+            setTimeout(() => {
+              this.hideLoadingSpinner();
+            }, this.REQUEST_TIMEOUT_INTERVAL);
           });
         });
       },
         error => {
+          this.hideLoadingSpinner();
           if (error.status === 0) {
             console.log('service down', error);
           } else {
             this.alertService.error(error.statusText);
           }
         });
+  }
+
+  public showLoadingSpinner() {
+    this.showSpinner = true;
+  }
+
+  public hideLoadingSpinner() {
+    this.showSpinner = false;
   }
 
   public toggleDropDown(id: string) {

@@ -21,3 +21,7 @@
 .dropdown {
   width: auto !important;
 }
+
+.app-loading {
+  height: auto;
+}
