@@ -6,7 +6,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthCheckGuard } from '../../../guards';
 import { PipesModule } from '../../../pipes/pipes.module';
 import { AssetsService } from '../../../services';
-import { ChartModule } from '../../common/chart';
 import { NumberInputDebounceModule } from '../../common/number-input-debounce/number-input-debounce.module';
 import { PaginationModule } from '../../common/pagination/pagination.module';
 import { ReadingsGraphComponent } from '../asset-readings/readings-graph/readings-graph.component';
@@ -37,7 +36,6 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     PipesModule,
     PlotlyModule,
-    ChartModule,
     NumberInputDebounceModule,
     PaginationModule
   ],
