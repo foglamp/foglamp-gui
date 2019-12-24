@@ -270,7 +270,7 @@ export class ReadingsGraphComponent implements OnDestroy {
             output[prop] = [];
           }
           // add data onto the end of the key's array
-          output[prop].push(item[prop].average);
+          output[prop].push({ read: item[prop].average, ts: r.timestamp });
           readingTimestamps.push(r.timestamp);
         }
       }
@@ -280,8 +280,8 @@ export class ReadingsGraphComponent implements OnDestroy {
     let count = 0;
     for (const key in output) {
       this.numReadings.push({
-        x: readingTimestamps,
-        y: output[key],
+        x: output[key].map(({ ts }) => ts),
+        y: output[key].map(({ read }) => read),
         type: 'scatter',
         mode: output[key].length === 1 ? 'markers' : 'lines',
         name: key,
