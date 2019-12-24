@@ -258,32 +258,32 @@ export class ReadingsGraphComponent implements OnDestroy {
   generateGraph(readings: any) {
     this.numReadings = [];
     const output = {};
-    let item: any;
+    let readingTimestamps = [];
     // iterate the outer array to look at each item in that array
     for (const r of readings) {
-      item = r.reading;
+      const item = r.reading;
       // iterate each key on the object
       for (const prop in item) {
         if (item.hasOwnProperty(prop)) {
           // if this keys doesn't exist in the output object, add it
           if (!(prop in output)) {
             output[prop] = [];
-            output['timestamp'] = [];
           }
           // add data onto the end of the key's array
           output[prop].push(item[prop].average);
-          output['timestamp'].push(r.timestamp);
+          readingTimestamps.push(r.timestamp);
         }
       }
     }
+
+    readingTimestamps = uniq(readingTimestamps, 'timestamp');
     let count = 0;
-    for (const key in item) {
-      const readingTimestamps = uniq(output['timestamp'], 'timestamp');
+    for (const key in output) {
       this.numReadings.push({
         x: readingTimestamps,
         y: output[key],
         type: 'scatter',
-        mode: readingTimestamps.length === 1 ? 'markers' : 'lines',
+        mode: output[key].length === 1 ? 'markers' : 'lines',
         name: key,
         visible: this.getLegendState(key),
         marker: {
@@ -296,20 +296,19 @@ export class ReadingsGraphComponent implements OnDestroy {
       count++;
     }
 
-    const timestamps = uniq(output['timestamp'], 'timestamp');
-    if (timestamps.length === 0) {
+    if (readingTimestamps.length === 0) {
       return;
     }
     const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
     const graphStartTimeSeconds = this.payload.start === 0 ? (now - this.payload.len) : this.payload.start;
     const graphStartDateTime = moment(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss.SSS');
-    this.layout.xaxis['range'] = [graphStartDateTime, timestamps[0]];
+    this.layout.xaxis['range'] = [graphStartDateTime, readingTimestamps[0]];
     const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
     this.updateXAxisTickFormat(timeWindow.value);
     const Plotly = this.plotly.getPlotly();
     if (this.assetChart) {
       Plotly.relayout(this.assetChart.plotEl.nativeElement,
-        'xaxis.range', [graphStartDateTime, timestamps[0]]);
+        'xaxis.range', [graphStartDateTime, readingTimestamps[0]]);
     }
   }
 
