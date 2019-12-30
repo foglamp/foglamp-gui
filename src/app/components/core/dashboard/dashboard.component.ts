@@ -5,6 +5,7 @@ import { takeWhile, takeUntil } from 'rxjs/operators';
 
 import { AlertService, PingService, StatisticsService } from '../../../services';
 import { GRAPH_REFRESH_INTERVAL, STATS_HISTORY_TIME_FILTER } from '../../../utils';
+import { analyze } from 'tern';
 
 @Component({
   selector: 'app-dashboard',
@@ -38,37 +39,36 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   panning = false;
   zoom = false;
-  layout = {
-    showlegend: false,
-    font: {
-      size: 12
-    },
-    dragmode: 'false',
-    xaxis: {
-      fixedrange: true,
-      tickformat: '%H:%M:%S',
-      type: 'date',
-      title: {
-        font: {
-          size: 14,
-          color: '#7f7f7f'
-        }
-      },
-      rangemode: 'tozero'
-    },
-    yaxis: {
-      fixedrange: true,
-      rangemode: 'tozero'
-    },
-    height: 300,
-    margin: {
-      l: 30,
-      r: 30,
-      b: 30,
-      t: 30,
-      pad: 1
-    }
-  };
+  // layout = {
+  //   showlegend: false,
+  //   font: {
+  //     size: 12
+  //   },
+  //   dragmode: 'false',
+  //   xaxis: {
+  //     fixedrange: true,
+  //     tickformat: '%H:%M:%S',
+  //     type: 'date',
+  //     title: {
+  //       font: {
+  //         size: 14,
+  //         color: '#7f7f7f'
+  //       }
+  //     }
+  //   },
+  //   yaxis: {
+  //     fixedrange: false,
+  //     rangemode: 'tozero'
+  //   },
+  //   height: 300,
+  //   margin: {
+  //     l: 30,
+  //     r: 30,
+  //     b: 30,
+  //     t: 30,
+  //     pad: 1
+  //   }
+  // };
   config = {
     doubleClick: false,
     displaylogo: false,
@@ -218,6 +218,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               const chartValue = this.getChartValues(labels, record, 'rgb(144,238,144)');
               statistics.chartValue.push(chartValue);
               statistics.limit = this.DEFAULT_LIMIT;
+              statistics.layout = this.setLayout(statistics.value);
             }
           });
         });
@@ -257,6 +258,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               const chartValue = this.getChartValues(labels, record, 'rgb(144,238,144)');
               statistics.chartValue.push(chartValue);
               statistics.limit = this.DEFAULT_LIMIT;
+              statistics.layout = this.setLayout(statistics.value);
             }
             setTimeout(() => {
               this.hideLoadingSpinner();
@@ -272,6 +274,44 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.alertService.error(error.statusText);
           }
         });
+  }
+
+  setLayout(value) {
+    const layout = {
+      showlegend: false,
+      font: {
+        size: 12
+      },
+      dragmode: 'false',
+      xaxis: {
+        fixedrange: true,
+        tickformat: '%H:%M:%S',
+        type: 'date',
+        title: {
+          font: {
+            size: 14,
+            color: '#7f7f7f'
+          }
+        }
+      },
+      yaxis: {
+        fixedrange: true,
+        rangemode: 'nonnegative',
+        range: [0, 8]
+      },
+      height: 300,
+      margin: {
+        l: 30,
+        r: 30,
+        b: 30,
+        t: 30,
+        pad: 5
+      }
+    };
+    if (value !== 0) {
+      layout.yaxis.range = [];
+    }
+    return layout;
   }
 
   public showLoadingSpinner() {
