@@ -302,7 +302,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
     const graphStartTimeSeconds = this.payload.start === 0 ? (now - this.payload.len) : this.payload.start;
     const graphStartDateTime = moment(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss.SSS');
-    const graphEndDateTime = this.panning || readingTimestamps !== undefined
+    const graphEndDateTime = this.panning || readingTimestamps.length > 0
       ? readingTimestamps[0] : moment(now * 1000).format('YYYY-M-D H:mm:ss.SSS');
     this.layout.xaxis['range'] = [graphStartDateTime, graphEndDateTime];
     console.log('range', this.layout.xaxis['range']);
