@@ -54,9 +54,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
           color: '#7f7f7f'
         }
       },
+      rangemode: 'tozero'
     },
     yaxis: {
-      fixedrange: true
+      fixedrange: true,
+      rangemode: 'tozero'
     },
     height: 300,
     margin: {
