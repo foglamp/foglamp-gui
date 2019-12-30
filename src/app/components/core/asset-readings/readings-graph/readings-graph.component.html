@@ -18,8 +18,8 @@
         </div>
       </ng-container>
       <ng-template #tabs>
-        <plotly-plot #assetChart (relayout)="dragGraph($event)" (legendClick)="legendClick($event)" [data]="numReadings" [layout]="layout"
-          [config]="config"></plotly-plot>
+        <plotly-plot #assetChart (relayout)="dragGraph($event)" (afterPlot)="calculateDragTime()" (legendClick)="legendClick($event)"
+          [data]="numReadings" [layout]="layout" [config]="config"></plotly-plot>
       </ng-template>
     </section>
   </div>

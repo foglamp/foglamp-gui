@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnDestroy, HostListener, Output, ViewChild } from '@angular/core';
 import { uniq } from 'lodash';
 import { interval, Subject } from 'rxjs';
-import { takeWhile, takeUntil } from 'rxjs/operators';
+import { takeWhile, takeUntil, repeatWhen } from 'rxjs/operators';
 import * as moment from 'moment';
 
 import { AssetsService, PingService } from '../../../../services';
@@ -22,10 +22,14 @@ export class ReadingsGraphComponent implements OnDestroy {
 
   public loadPage = true;
   private isAlive: boolean;
+
   numReadings = [];
+  startPingInterval = new Subject<boolean>();
+  destroy$: Subject<boolean> = new Subject<boolean>();
+  xAxisRange = [];
+
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('assetChart', { static: false }) assetChart: any;
-  destroy$: Subject<boolean> = new Subject<boolean>();
 
   DEFAULT_TIME_WINDOW_INDEX = 23;
   panning = false;
@@ -89,7 +93,6 @@ export class ReadingsGraphComponent implements OnDestroy {
           this.zoomOut = false;
           this.timeWindowIndex--;
           const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
-          this.updateTimeWindowText(timeWindow.key);
           if (this.panning) {
             this.panModeZoom();
             return;
@@ -113,7 +116,6 @@ export class ReadingsGraphComponent implements OnDestroy {
           }
           this.timeWindowIndex++;
           const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
-          this.updateTimeWindowText(timeWindow.key);
           if (this.panning) {
             this.panModeZoom(true);
             return;
@@ -213,7 +215,8 @@ export class ReadingsGraphComponent implements OnDestroy {
     } else {
       this.isAlive = true;
       interval(this.graphRefreshInterval)
-        .pipe(takeWhile(() => this.isAlive), takeUntil(this.destroy$)) // only fires when component is alive
+        .pipe(takeWhile(() => this.isAlive), repeatWhen(() => this.startPingInterval),
+          takeUntil(this.destroy$)) // only fires when component is alive
         .subscribe(() => {
           this.getAssetReadings(this.payload);
         });
@@ -299,11 +302,13 @@ export class ReadingsGraphComponent implements OnDestroy {
     const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
     const graphStartTimeSeconds = this.payload.start === 0 ? (now - this.payload.len) : this.payload.start;
     const graphStartDateTime = moment(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss.SSS');
-    const graphEndDateTime = readingTimestamps[0] === undefined ? moment(now * 1000)
-      .format('YYYY-M-D H:mm:ss.SSS') : readingTimestamps[0];
+    const graphEndDateTime = this.panning || readingTimestamps !== undefined
+      ? readingTimestamps[0] : moment(now * 1000).format('YYYY-M-D H:mm:ss.SSS');
     this.layout.xaxis['range'] = [graphStartDateTime, graphEndDateTime];
+    console.log('range', this.layout.xaxis['range']);
     const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
     this.updateXAxisTickFormat(timeWindow.value);
+    this.updateTimeWindowText(timeWindow.key);
     const Plotly = this.plotly.getPlotly();
     if (this.assetChart) {
       Plotly.relayout(this.assetChart.plotEl.nativeElement,
@@ -352,15 +357,24 @@ export class ReadingsGraphComponent implements OnDestroy {
     }
   }
 
+  calculateDragTime() {
+    const point = this.assetChart.plotEl.nativeElement.layout.xaxis.range[0];
+    if (this.xAxisRange.length > 1) {
+      this.xAxisRange.shift();
+      this.xAxisRange.push(point);
+      return;
+    }
+    this.xAxisRange.push(point);
+  }
+
   dragGraph(event: any) {
     if (event['xaxis.range[0]'] === undefined) {
       return;
     }
+    console.log('point', this.xAxisRange);
     const maxDataPoints = 600;
-    let panClickTime = this.numReadings.length > 0 ? this.numReadings[0].x[this.numReadings[0].x.length - 1] : event['xaxis.range[1]'];
-    panClickTime = moment(panClickTime).utc();
-    const panReleaseTime = moment(event['xaxis.range[0]']).utc();
-
+    const panClickTime = moment(this.xAxisRange[0]).utc();
+    const panReleaseTime = moment(this.xAxisRange[1]).utc();
     console.log('Pan Click Time ', panClickTime);
     console.log('Pan Release Time ', panReleaseTime);
 
@@ -386,6 +400,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     console.log('draggedToTime', draggedToTime);
 
     this.panning = true;
+    this.isAlive = false;
     this.payload = {
       assetCode: this.assetCode,
       start: start,
@@ -396,6 +411,8 @@ export class ReadingsGraphComponent implements OnDestroy {
     if (now < draggedToTime) {
       this.panning = false;
       console.log('Graph cannot be dragged in future time.');
+      this.isAlive = true;
+      this.startPingInterval.next(this.isAlive);
       this.payload = {
         assetCode: this.assetCode,
         start: 0,
@@ -465,7 +482,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     console.log('final payload', this.payload);
     this.getAssetReadings(this.payload);
   }
-
 
   public ngOnDestroy(): void {
     this.isAlive = false;
