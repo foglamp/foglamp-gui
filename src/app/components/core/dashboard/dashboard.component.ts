@@ -5,7 +5,6 @@ import { takeWhile, takeUntil } from 'rxjs/operators';
 
 import { AlertService, PingService, StatisticsService } from '../../../services';
 import { GRAPH_REFRESH_INTERVAL, STATS_HISTORY_TIME_FILTER } from '../../../utils';
-import { analyze } from 'tern';
 
 @Component({
   selector: 'app-dashboard',
@@ -39,36 +38,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   panning = false;
   zoom = false;
-  // layout = {
-  //   showlegend: false,
-  //   font: {
-  //     size: 12
-  //   },
-  //   dragmode: 'false',
-  //   xaxis: {
-  //     fixedrange: true,
-  //     tickformat: '%H:%M:%S',
-  //     type: 'date',
-  //     title: {
-  //       font: {
-  //         size: 14,
-  //         color: '#7f7f7f'
-  //       }
-  //     }
-  //   },
-  //   yaxis: {
-  //     fixedrange: false,
-  //     rangemode: 'tozero'
-  //   },
-  //   height: 300,
-  //   margin: {
-  //     l: 30,
-  //     r: 30,
-  //     b: 30,
-  //     t: 30,
-  //     pad: 1
-  //   }
-  // };
   config = {
     doubleClick: false,
     displaylogo: false,
