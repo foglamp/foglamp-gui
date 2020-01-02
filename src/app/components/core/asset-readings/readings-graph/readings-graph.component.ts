@@ -186,6 +186,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     if (activeDropDowns.length > 0) {
       activeDropDowns[0].classList.remove('is-active');
     }
+    this.startPingInterval.complete();
     this.resetGraphToDefault();
   }
 
@@ -202,6 +203,9 @@ export class ReadingsGraphComponent implements OnDestroy {
       bucketSize: 1
     };
     this.updateTimeWindowText('10 mins');
+    this.isAlive = true;
+    console.log(this.startPingInterval);
+    this.startPingInterval.next(this.isAlive);
   }
 
   public getAssetCode(assetCode: string) {
@@ -302,11 +306,11 @@ export class ReadingsGraphComponent implements OnDestroy {
     const now = moment.utc(new Date()).valueOf() / 1000.0; // in seconds
     const graphStartTimeSeconds = this.payload.start === 0 ? (now - this.payload.len) : this.payload.start;
     const graphStartDateTime = moment(graphStartTimeSeconds * 1000).format('YYYY-M-D H:mm:ss.SSS');
-    const graphEndDateTime = (this.panning && readingTimestamps.length > 0) || readingTimestamps.length > 0
-      ? readingTimestamps[0] : moment(now * 1000).format('YYYY-M-D H:mm:ss.SSS');
+    const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
+    const graphEndDateTime = this.panning ? moment((this.payload.start + this.payload.len) * 1000).format('YYYY-M-D H:mm:ss.SSS')
+      : moment(now * 1000).format('YYYY-M-D H:mm:ss.SSS');
     this.layout.xaxis['range'] = [graphStartDateTime, graphEndDateTime];
     console.log('range', this.layout.xaxis['range']);
-    const timeWindow = Utils.getTimeWindow(this.timeWindowIndex);
     this.updateXAxisTickFormat(timeWindow.value);
     this.updateTimeWindowText(timeWindow.key);
     const Plotly = this.plotly.getPlotly();
