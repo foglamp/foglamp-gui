@@ -204,7 +204,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     };
     this.updateTimeWindowText('10 mins');
     this.isAlive = true;
-    console.log(this.startPingInterval);
     this.startPingInterval.next(this.isAlive);
   }
 
@@ -375,7 +374,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     if (event['xaxis.range[0]'] === undefined) {
       return;
     }
-    console.log('point', this.xAxisRange);
     const maxDataPoints = 600;
     const panClickTime = moment(this.xAxisRange[0]).utc();
     const panReleaseTime = moment(this.xAxisRange[1]).utc();
