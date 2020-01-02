@@ -52,7 +52,7 @@
                   </div>
                 </div>
               </div>
-              <small *ngIf="!certExtension" class="help is-danger level-left">should be a .cert, .pem or .json file</small>
+              <small *ngIf="!certExtension" class="help is-danger level-left">should be a .cert, .cer, .crt, .pem or .json file</small>
             </div>
           </div>
           <div class="columns">
@@ -64,7 +64,6 @@
                     <input *ngIf="certOnly == '0'" type="checkbox" ng-model="certonly" (change)="onCertOnlyChange($event)"> Certificate Only 
                   </label>
                 </div>
-                <p class="help">PEM or JSON</p>
               </div>
             </div>
           </div>

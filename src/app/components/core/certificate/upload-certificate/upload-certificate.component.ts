@@ -93,7 +93,7 @@ export class UploadCertificateComponent implements OnInit {
     if (event.target.files.length !== 0) {
       const fileName = event.target.files[0].name;
       const ext = fileName.substr(fileName.lastIndexOf('.') + 1);
-      if (ext === 'cert' || ext === 'pem' || ext === 'json') {
+      if (ext === 'cert' || ext === 'cer' || ext === 'crt' || ext === 'pem' || ext === 'json') {
         this.certExtension = true;
       } else {
         this.certExtension = false;
@@ -141,11 +141,6 @@ export class UploadCertificateComponent implements OnInit {
       formData.append('cert', this.cert, this.cert.name);
       if (this.certOnly === '0') {
         formData.append('key', this.key, this.key.name);
-      }
-      const ext = this.cert.name.substr(this.cert.name.lastIndexOf('.') + 1);
-      if (this.certOnly === '1' && ext === 'cert') {
-        this.alertService.error('Accepted file extensions are .pem or .json');
-        return;
       }
       formData.append('overwrite', this.overwrite);
       /** request started */
