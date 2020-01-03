@@ -13,7 +13,6 @@ export class UploadCertificateComponent implements OnInit {
   key;
   cert;
   overwrite = '0';
-  certOnly = '0';
   keyExtension = true;
   certExtension = true;
 
@@ -33,13 +32,11 @@ export class UploadCertificateComponent implements OnInit {
     this.form = this.formBuilder.group({
       key: null,
       cert: null,
-      overwrite: '0',
-      certonly: '0'
+      overwrite: '0'
     });
 
     // Set default value on form
     this.form.get('overwrite').setValue('0');
-    this.form.get('certonly').setValue('0');
   }
 
   protected resetForm() {
@@ -48,11 +45,9 @@ export class UploadCertificateComponent implements OnInit {
     this.keyExtension = true;
     this.certExtension = true;
     this.overwrite = '0';
-    this.certOnly = '0';
     this.cert = '';
     this.key = '';
     this.form.get('overwrite').setValue('0');
-    this.form.get('certonly').setValue('0');
   }
 
   public toggleModal(isOpen: Boolean) {
@@ -105,20 +100,6 @@ export class UploadCertificateComponent implements OnInit {
     }
   }
 
-  onCertOnlyChange(event) {
-    if (event.target.checked) {
-      this.certOnly = '1';
-      // disable the key browse option
-      this.form.get('key').disable();
-      this.key = '';
-      this.form.get('key').setValue('');
-      this.keyExtension = true;
-    } else {
-      this.certOnly = '0';
-      this.form.get('key').enable();
-    }
-  }
-
   onOverwriteChange(event) {
     if (event.target.checked) {
       this.overwrite = '1';
@@ -128,19 +109,16 @@ export class UploadCertificateComponent implements OnInit {
   }
 
   uploadCertificate() {
-    if (this.certOnly === '1' && !this.cert) {
-      this.alertService.error('Certificate is missing');
-      return;
-    }
-    if (this.certOnly === '0' && (!this.cert || !this.key)) {
-      this.alertService.error('Key or Certificate file is missing');
-      return;
-    }
-    if (this.certExtension && this.keyExtension) {
+    if (this.certExtension || this.keyExtension) {
       const formData = new FormData();
-      formData.append('cert', this.cert, this.cert.name);
-      if (this.certOnly === '0') {
+      if (this.key) {
         formData.append('key', this.key, this.key.name);
+      }
+      if (this.cert) {
+        formData.append('cert', this.cert, this.cert.name);
+      } else {
+        this.alertService.error('Certificate is missing');
+        return;
       }
       formData.append('overwrite', this.overwrite);
       /** request started */
