@@ -414,7 +414,6 @@ export class ReadingsGraphComponent implements OnDestroy {
       this.panning = false;
       console.log('Graph cannot be dragged in future time.');
       this.isAlive = true;
-      this.startPingInterval.next(this.isAlive);
       this.payload = {
         assetCode: this.assetCode,
         start: 0,
