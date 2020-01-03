@@ -88,10 +88,10 @@ export class UploadCertificateComponent implements OnInit {
     if (event.target.files.length !== 0) {
       const fileName = event.target.files[0].name;
       const ext = fileName.substr(fileName.lastIndexOf('.') + 1);
-      if (ext === 'cert' || ext === 'cer' || ext === 'crt' || ext === 'pem' || ext === 'json') {
+      const certExtensions = ['cert', 'cer', 'crt', 'pem', 'json'];
+      this.certExtension = false;
+      if (certExtensions.includes(ext)) {
         this.certExtension = true;
-      } else {
-        this.certExtension = false;
       }
       if (event.target.files.length > 0) {
         const file = event.target.files[0];
