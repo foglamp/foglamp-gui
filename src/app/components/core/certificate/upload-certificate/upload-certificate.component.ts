@@ -13,8 +13,8 @@ export class UploadCertificateComponent implements OnInit {
   key;
   cert;
   overwrite = '0';
-  keyExtension = true;
-  certExtension = true;
+  keyExtension = false;
+  certExtension = false;
 
   @ViewChild('fileInput', { static: true }) fileInput: ElementRef;
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
@@ -42,8 +42,10 @@ export class UploadCertificateComponent implements OnInit {
   protected resetForm() {
     this.form.get('key').setValue('');
     this.form.get('cert').setValue('');
-    this.keyExtension = true;
-    this.certExtension = true;
+    this.form.get('key').markAsUntouched();
+    this.form.get('cert').markAsUntouched();
+    this.keyExtension = false;
+    this.certExtension = false;
     this.overwrite = '0';
     this.cert = '';
     this.key = '';
@@ -109,7 +111,8 @@ export class UploadCertificateComponent implements OnInit {
   }
 
   uploadCertificate() {
-    if ((this.keyExtension && this.key) || this.certExtension) {
+    // Check if extension of uploaded Certificate and Key (if exist) is valid
+    if (this.certExtension && !(this.key && !this.keyExtension)) {
       const formData = new FormData();
       if (this.key) {
         formData.append('key', this.key, this.key.name);

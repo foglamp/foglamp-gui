@@ -28,7 +28,7 @@
                   </div>
                 </div>
               </div>
-              <small *ngIf="!keyExtension" class="help is-danger level-left">should be a .key or .pem file</small>
+              <small *ngIf="!keyExtension && form.controls['key'].touched && form.controls['key'].value" class="help is-danger level-left">should be a .key or .pem file</small>
             </div>
           </div>
           <div class="columns">
@@ -52,7 +52,7 @@
                   </div>
                 </div>
               </div>
-              <small *ngIf="!certExtension" class="help is-danger level-left">should be a .cert, .cer, .crt, .pem or .json file</small>
+              <small *ngIf="!certExtension && form.controls['cert'].touched && form.controls['cert'].value" class="help is-danger level-left">should be a .cert, .cer, .crt, .pem or .json file</small>
             </div>
           </div>
           <div class="columns">
