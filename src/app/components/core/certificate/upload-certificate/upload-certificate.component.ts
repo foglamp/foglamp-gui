@@ -112,16 +112,15 @@ export class UploadCertificateComponent implements OnInit {
 
   uploadCertificate() {
     // Check if extension of uploaded Certificate and Key (if exist) is valid
-    if (this.certExtension && !(this.key && !this.keyExtension)) {
+    if ((this.cert && !this.certExtension) || (this.key && !this.keyExtension)) {
+      this.alertService.error('Please upload files with correct format and extension');
+    } else {
       const formData = new FormData();
       if (this.key) {
         formData.append('key', this.key, this.key.name);
       }
       if (this.cert) {
         formData.append('cert', this.cert, this.cert.name);
-      } else {
-        this.alertService.error('Certificate is missing');
-        return;
       }
       formData.append('overwrite', this.overwrite);
       /** request started */
@@ -144,8 +143,6 @@ export class UploadCertificateComponent implements OnInit {
               this.alertService.error(error.statusText);
             }
           });
-    } else {
-      this.alertService.error('Please upload files with correct format and extension');
     }
   }
 }
