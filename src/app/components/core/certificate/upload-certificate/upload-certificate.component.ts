@@ -111,38 +111,43 @@ export class UploadCertificateComponent implements OnInit {
   }
 
   uploadCertificate() {
+    // Check if file has been uploaded or not
+    if (!this.cert && !this.key) {
+      this.alertService.error('Key or Certificate file is missing');
+      return;
+    }
     // Check if extension of uploaded Certificate and Key (if exist) is valid
     if ((this.cert && !this.certExtension) || (this.key && !this.keyExtension)) {
-      this.alertService.error('Please upload files with correct format and extension');
-    } else {
-      const formData = new FormData();
-      if (this.key) {
-        formData.append('key', this.key, this.key.name);
-      }
-      if (this.cert) {
-        formData.append('cert', this.cert, this.cert.name);
-      }
-      formData.append('overwrite', this.overwrite);
-      /** request started */
-      this.ngProgress.start();
-      this.certificateService.uploadCertificate(formData).
-        subscribe(
-          (data) => {
-            /** request completed */
-            this.ngProgress.done();
-            this.notify.emit();
-            this.toggleModal(false);
-            this.alertService.success(data['result']);
-          },
-          error => {
-            /** request completed */
-            this.ngProgress.done();
-            if (error.status === 0) {
-              console.log('service down ', error);
-            } else {
-              this.alertService.error(error.statusText);
-            }
-          });
+      this.alertService.error('Please upload files with correct format & extension');
+      return;
     }
+    const formData = new FormData();
+    if (this.key) {
+      formData.append('key', this.key, this.key.name);
+    }
+    if (this.cert) {
+      formData.append('cert', this.cert, this.cert.name);
+    }
+    formData.append('overwrite', this.overwrite);
+    /** request started */
+    this.ngProgress.start();
+    this.certificateService.uploadCertificate(formData).
+      subscribe(
+        (data) => {
+          /** request completed */
+          this.ngProgress.done();
+          this.notify.emit();
+          this.toggleModal(false);
+          this.alertService.success(data['result']);
+        },
+        error => {
+          /** request completed */
+          this.ngProgress.done();
+          if (error.status === 0) {
+            console.log('service down ', error);
+          } else {
+            this.alertService.error(error.statusText);
+          }
+        });
   }
 }
