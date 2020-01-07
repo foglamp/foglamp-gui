@@ -32,6 +32,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   @ViewChild('assetChart', { static: false }) assetChart: any;
 
   DEFAULT_TIME_WINDOW_INDEX = 23;
+  DEFAULT_TIME_WINDOW = 600;
   panning = false;
   zoomOut = false;
   layout = {
@@ -145,7 +146,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   payload = {
     assetCode: '',
     start: 0,
-    len: 600,
+    len: this.DEFAULT_TIME_WINDOW,
     bucketSize: 1
   };
 
@@ -170,9 +171,9 @@ export class ReadingsGraphComponent implements OnDestroy {
     // reset all variable and array to default state
     this.readKeyColorLabel = [];
     sessionStorage.removeItem(this.assetCode);
-    const chart_modal = <HTMLDivElement>document.getElementById('chart_modal');
+    const chartModal = <HTMLDivElement>document.getElementById('chart_modal');
     if (shouldOpen) {
-      chart_modal.classList.add('is-active');
+      chartModal.classList.add('is-active');
       return;
     }
     if (this.graphRefreshInterval === -1) {
@@ -181,11 +182,8 @@ export class ReadingsGraphComponent implements OnDestroy {
       this.notify.emit(true);
     }
     this.isAlive = false;
-    chart_modal.classList.remove('is-active');
-    const activeDropDowns = Array.prototype.slice.call(document.querySelectorAll('.dropdown.is-active'));
-    if (activeDropDowns.length > 0) {
-      activeDropDowns[0].classList.remove('is-active');
-    }
+    chartModal.classList.remove('is-active');
+
     this.startPingInterval.complete();
     this.resetGraphToDefault();
   }
@@ -199,7 +197,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.payload = {
       assetCode: this.assetCode,
       start: 0,
-      len: 600,
+      len: this.DEFAULT_TIME_WINDOW,
       bucketSize: 1
     };
     this.updateTimeWindowText('10 mins');
@@ -320,7 +318,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   public zoomGraph(seconds: number) {
-    const maxDataPoints = 600;
+    const maxDataPoints = this.DEFAULT_TIME_WINDOW;
     const bucket = seconds / maxDataPoints;
     const length = seconds;
     console.log('Bucket = ', bucket, ' length = ', length);
@@ -364,8 +362,6 @@ export class ReadingsGraphComponent implements OnDestroy {
     const point = this.assetChart.plotEl.nativeElement.layout.xaxis.range[0];
     if (this.xAxisRange.length > 1) {
       this.xAxisRange.shift();
-      this.xAxisRange.push(point);
-      return;
     }
     this.xAxisRange.push(point);
   }
@@ -374,7 +370,8 @@ export class ReadingsGraphComponent implements OnDestroy {
     if (event['xaxis.range[0]'] === undefined) {
       return;
     }
-    const maxDataPoints = 600;
+
+    const maxDataPoints = this.DEFAULT_TIME_WINDOW;
     const panClickTime = moment(this.xAxisRange[0]).utc();
     const panReleaseTime = moment(this.xAxisRange[1]).utc();
     console.log('Pan Click Time ', panClickTime);
@@ -454,7 +451,6 @@ export class ReadingsGraphComponent implements OnDestroy {
 
   panModeZoom(zoomOut = false) {
     // <Start> =(previous Start) + (previous Timespan in seconds) / 2 - (new Timespan in seconds) /2
-    console.log('lateset payload', this.payload);
     const currentTimeWindow = Utils.getTimeWindow(this.timeWindowIndex); // in seconds
     console.log('current time window', currentTimeWindow);
 
@@ -464,7 +460,7 @@ export class ReadingsGraphComponent implements OnDestroy {
     let start = this.payload.start + this.payload.len / 2 - currentTimeWindow.value / 2;
     console.log('start', start);
     // <bucket> = (new Timespan in seconds) / (Max Datapoints)
-    const bucket = currentTimeWindow.value / 600;
+    const bucket = currentTimeWindow.value / this.DEFAULT_TIME_WINDOW;
     // <length> = (new Timespan in seconds)
     const len = currentTimeWindow.value;
 
