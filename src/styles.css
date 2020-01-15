@@ -218,7 +218,19 @@ table.scroll tbody {
   }
 }
 
+.container.is-fluid {
+  min-height: 100%;
+  margin-bottom: -142px; 
+}
 
+.container.is-fluid:after {
+  content: "";
+  display: block;
+}
+
+.footer, .container.is-fluid:after {
+  height: 142px; 
+}
 
 /**
 Custom css for bulma dropdown
