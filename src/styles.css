@@ -232,6 +232,10 @@ table.scroll tbody {
   height: 144px; 
 }
 
+.footer {
+  padding: 6rem 1.5rem 6rem !important;
+}
+
 /**
 Custom css for bulma dropdown
 Card Modal dropdown issue(overlapping issue) https://github.com/jgthms/bulma/issues/936
