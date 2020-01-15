@@ -220,7 +220,7 @@ table.scroll tbody {
 
 .container.is-fluid {
   min-height: 100%;
-  margin-bottom: -142px; 
+  margin-bottom: -144px; 
 }
 
 .container.is-fluid:after {
@@ -229,7 +229,7 @@ table.scroll tbody {
 }
 
 .footer, .container.is-fluid:after {
-  height: 142px; 
+  height: 144px; 
 }
 
 /**
