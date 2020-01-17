@@ -46,6 +46,7 @@ table.scroll tbody {
 
 .fixed-overflow {
   overflow-x: hidden;
+  height: 100%;
 }
 
 .sidebar {
@@ -199,8 +200,8 @@ table.scroll tbody {
     max-height: 72vh;
   }
 
-  .container.is-fluid {
-    min-height: 95%;
+  .page-container {
+    min-height: 93%;
   }
 }
 
@@ -209,7 +210,7 @@ table.scroll tbody {
     max-height: 70vh;
   }
 
-  .container.is-fluid {
+  .page-container {
     min-height: 92%;
   }
 }
@@ -219,8 +220,8 @@ table.scroll tbody {
     max-height: 62vh;
   }
 
-  .container.is-fluid {
-    min-height: 91%;
+  .page-container {
+    min-height: 89%;
   }
 }
 
@@ -229,21 +230,21 @@ table.scroll tbody {
     max-height: 49vh;
   }
 
-  .container.is-fluid {
-    min-height: 89%;
+  .page-container {
+    min-height: 87%;
   }
 }
 
-.container.is-fluid {
+.page-container {
   margin-bottom: -144px; 
 }
 
-.container.is-fluid:after {
+.page-container:after {
   content: "";
   display: block;
 }
 
-.footer, .container.is-fluid:after {
+.footer, .page-container:after {
   height: 144px; 
 }
 
