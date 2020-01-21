@@ -215,8 +215,8 @@ export class ReadingsGraphComponent implements OnDestroy {
     const numReadings = [];
     const strReadings = [];
     const arrReadings = [];
-    this.timestamps = readings.map((r: any) => r.timestamp);
 
+    this.timestamps = readings.map((r: any) => r.timestamp);
     for (const r of readings) {
       Object.entries(r.reading).forEach(([k, value]) => {
         if (typeof value === 'number') {
@@ -232,10 +232,18 @@ export class ReadingsGraphComponent implements OnDestroy {
             data: value
           });
         }
-        if (Array.isArray(value)) {
+        if (Array.isArray(value) && k === 'spectrum') {
+          const spectrumFrequency = value.map((read, index) =>
+            read * r.reading.spectrum_freq_scale
+            + r.reading.spectrum_min_freq
+            + r.reading.spectrum_freq_scale / 2
+            + (index) * r.reading.spectrum_freq_scale
+          );
+
           arrReadings.push({
             key: k,
-            read: value
+            read: value,
+            freq: spectrumFrequency
           });
         }
       });
@@ -304,7 +312,8 @@ export class ReadingsGraphComponent implements OnDestroy {
     return chain(assetReadings).groupBy('key').map(function (group, key) {
       return {
         key: key,
-        read: map(group, 'read')
+        read: map(group, 'read'),
+        freq: map(group, 'freq')
       };
     }).value();
   }
@@ -438,6 +447,7 @@ export class ReadingsGraphComponent implements OnDestroy {
       data: [
         {
           type: 'surface',
+          x: readings.map(r => r.freq)[0],
           y: timestamps,
           z: readings.map(r => r.read)[0],
           showscale: false,
@@ -462,9 +472,9 @@ export class ReadingsGraphComponent implements OnDestroy {
       layout: {
         title: this.assetCode,
         showlegend: true,
-        autoSize: true,
+        autoSize: false,
         margin: {
-          b: 40,
+          b: 80,
           l: 60,
           r: 10,
           t: 25
