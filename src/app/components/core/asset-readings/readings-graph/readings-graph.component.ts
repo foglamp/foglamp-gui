@@ -442,14 +442,16 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   create3DGraph(readings: any, ts: any) {
-    const timestamps = ts.map((t: any) => this.dateFormatter.transform(t, 'HH:mm:ss:SSS'));
+    const timestamps = ts.map((t: any) => this.dateFormatter.transform(t, 'HH:mm:ss'));
+    const frequency = readings.map(r => r.freq)[0];
+    const amplitude = readings.map(r => r.read)[0];
     this.polyGraphData = {
       data: [
         {
           type: 'surface',
-          x: readings.map(r => r.freq)[0],
+          x: frequency,
           y: timestamps,
-          z: readings.map(r => r.read)[0],
+          z: amplitude,
           showscale: false,
           colorscale: [
             ['0', 'rgba(68,1,84,1)'],
@@ -470,12 +472,59 @@ export class ReadingsGraphComponent implements OnDestroy {
         },
       ],
       layout: {
-        title: this.assetCode,
+        title: {
+          text: this.assetCode,
+          font: {
+            size: 16,
+            color: '#7f7f7f'
+          },
+          xref: 'paper'
+        },
         showlegend: true,
         autoSize: false,
+        scene: {
+          xaxis: {
+            title: {
+              text: 'Freq(Hz)',
+              font: {
+                size: 10,
+                color: '#7f7f7f'
+              },
+              xref: 'paper'
+            }
+          },
+          yaxis: {
+            title: {
+              text: 'Time',
+              font: {
+                size: 10,
+                color: '#7f7f7f'
+              },
+              xref: 'paper'
+            }
+          },
+          zaxis: {
+            title: {
+              text: 'Amplitude',
+              font: {
+                size: 10,
+                color: '#7f7f7f'
+              },
+              xref: 'paper'
+            }
+          },
+          camera: {
+            eye: {
+              x: 1,
+              y: 2,
+              z: 0.1
+            }
+          }
+        },
+        height: 500,
         margin: {
-          b: 80,
-          l: 60,
+          b: 10,
+          l: 10,
           r: 10,
           t: 25
         }
@@ -484,7 +533,17 @@ export class ReadingsGraphComponent implements OnDestroy {
         displayModeBar: false
       }
     };
-    this.generate3Dgraph();
+
+    if (this.Graph === undefined) {
+      this.generate3Dgraph();
+    } else {
+      const update = {
+        x: [frequency],
+        y: [timestamps],
+        z: [amplitude],
+      };
+      Plotly.update(this.Graph.nativeElement, update);
+    }
   }
 
   public async generate3Dgraph() {
