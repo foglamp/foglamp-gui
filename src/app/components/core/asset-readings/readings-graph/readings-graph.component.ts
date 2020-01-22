@@ -446,15 +446,15 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   create3DGraph(readings: any, ts: any) {
-    const timestamps = ts.map((t: any) => this.dateFormatter.transform(t, 'HH:mm:ss'));
+    const timestamps = ts.map((t: any) => this.dateFormatter.transform(t, 'HH:mm:ss')).reverse();
     const frequency = readings.map(r => r.freq)[0];
     const amplitude = readings.map(r => r.read)[0];
+    const frequencyAvailable = !isEmpty(frequency[0]);
     this.polyGraphData = {
       data: [
         {
           type: 'surface',
-          ...isEmpty(frequency) && { x: frequency },
-          // x: frequency,
+          ...frequencyAvailable && { x: frequency },
           y: timestamps,
           z: amplitude,
           showscale: false,
@@ -489,6 +489,7 @@ export class ReadingsGraphComponent implements OnDestroy {
         autoSize: true,
         scene: {
           xaxis: {
+            automargin: true,
             title: {
               text: 'Freq(Hz)',
               font: {
@@ -499,6 +500,7 @@ export class ReadingsGraphComponent implements OnDestroy {
             }
           },
           yaxis: {
+            automargin: true,
             title: {
               text: 'Time',
               font: {
@@ -509,6 +511,7 @@ export class ReadingsGraphComponent implements OnDestroy {
             }
           },
           zaxis: {
+            automargin: true,
             title: {
               text: 'Amplitude',
               font: {
@@ -542,7 +545,7 @@ export class ReadingsGraphComponent implements OnDestroy {
       this.generate3Dgraph();
     } else {
       const update = {
-        ...isEmpty(frequency) && { x: [frequency] },
+        ...frequencyAvailable && { x: [frequency] },
         y: [timestamps],
         z: [amplitude],
       };
