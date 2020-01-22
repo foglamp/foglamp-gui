@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnDestroy, HostListener, Output, ViewChild, ElementRef } from '@angular/core';
-import { orderBy, chain, map, groupBy, mapValues, omit } from 'lodash';
+import { orderBy, chain, map, groupBy, mapValues, omit, isEmpty } from 'lodash';
 import { interval, Subject } from 'rxjs';
 import { takeWhile, takeUntil } from 'rxjs/operators';
 
@@ -233,12 +233,16 @@ export class ReadingsGraphComponent implements OnDestroy {
           });
         }
         if (Array.isArray(value) && k === 'spectrum') {
-          const spectrumFrequency = value.map((read, index) =>
-            read * r.reading.spectrum_freq_scale
-            + r.reading.spectrum_min_freq
-            + r.reading.spectrum_freq_scale / 2
-            + (index) * r.reading.spectrum_freq_scale
-          );
+          const spectrumFrequency = value.map((read, index) => {
+            {
+              if (r.reading.spectrum_freq_scale !== undefined) {
+                return read * r.reading.spectrum_freq_scale
+                  + r.reading.spectrum_min_freq
+                  + r.reading.spectrum_freq_scale / 2
+                  + (index) * r.reading.spectrum_freq_scale;
+              }
+            }
+          }).filter(f => f !== undefined);
 
           arrReadings.push({
             key: k,
@@ -449,7 +453,8 @@ export class ReadingsGraphComponent implements OnDestroy {
       data: [
         {
           type: 'surface',
-          x: frequency,
+          ...isEmpty(frequency) && { x: frequency },
+          // x: frequency,
           y: timestamps,
           z: amplitude,
           showscale: false,
@@ -537,7 +542,7 @@ export class ReadingsGraphComponent implements OnDestroy {
       this.generate3Dgraph();
     } else {
       const update = {
-        x: [frequency],
+        ...isEmpty(frequency) && { x: [frequency] },
         y: [timestamps],
         z: [amplitude],
       };
