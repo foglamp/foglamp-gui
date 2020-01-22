@@ -458,22 +458,7 @@ export class ReadingsGraphComponent implements OnDestroy {
           y: timestamps,
           z: amplitude,
           showscale: false,
-          colorscale: [
-            ['0', 'rgba(68,1,84,1)'],
-            ['0.1', 'rgba(61,77,137,1)'],
-            ['0.2', 'rgba(57,89,140,1)'],
-            ['0.3', 'rgba(49,104,142,1)'],
-            ['0.4', 'rgba(44,119,142,1)'],
-            ['0.5', 'rgba(38,136,141,1)'],
-            ['0.6', 'rgba(33,154,138,1)'],
-            ['0.7', 'rgba(50,178,124,1)'],
-            ['0.8', 'rgba(101,201,96,1)'],
-            ['0.9', 'rgba(101,201,96,1)'],
-            ['1', 'rgba(253,231,37,1)']],
-          colorbar: {
-            tick0: 0,
-            dtick: 5
-          }
+          colorscale: 'Rainbow'
         },
       ],
       layout: {
