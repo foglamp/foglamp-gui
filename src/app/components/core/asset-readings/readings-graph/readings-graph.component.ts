@@ -481,7 +481,7 @@ export class ReadingsGraphComponent implements OnDestroy {
           xref: 'paper'
         },
         showlegend: true,
-        autoSize: false,
+        autoSize: true,
         scene: {
           xaxis: {
             title: {
@@ -521,7 +521,6 @@ export class ReadingsGraphComponent implements OnDestroy {
             }
           }
         },
-        height: 500,
         margin: {
           b: 10,
           l: 10,
