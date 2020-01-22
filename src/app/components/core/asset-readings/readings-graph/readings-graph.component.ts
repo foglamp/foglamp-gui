@@ -446,7 +446,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   }
 
   create3DGraph(readings: any, ts: any) {
-    const timestamps = ts.map((t: any) => this.dateFormatter.transform(t, 'HH:mm:ss')).reverse();
+    const timestamps = ts.map((t: any) => this.dateFormatter.transform(t, 'HH:mm:ss'));
     const frequency = readings.map(r => r.freq)[0];
     const amplitude = readings.map(r => r.read)[0];
     const frequencyAvailable = !isEmpty(frequency[0]);
@@ -489,6 +489,7 @@ export class ReadingsGraphComponent implements OnDestroy {
         autoSize: true,
         scene: {
           xaxis: {
+            autorange: 'reversed',
             automargin: true,
             title: {
               text: 'Freq(Hz)',
@@ -500,6 +501,7 @@ export class ReadingsGraphComponent implements OnDestroy {
             }
           },
           yaxis: {
+            autorange: 'reversed',
             automargin: true,
             title: {
               text: 'Time',
