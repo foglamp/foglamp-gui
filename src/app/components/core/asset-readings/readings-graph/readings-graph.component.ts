@@ -43,7 +43,9 @@ export class ReadingsGraphComponent implements OnDestroy {
   @Output() notify: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('assetChart', { static: false }) assetChart: Chart;
   @ViewChild('3DGraph', { static: false }) Graph: ElementRef;
+  @ViewChild('FFT2DGraph', { static: false }) FFT2DGraph: ElementRef;
 
+  public fft2DReadings = [];
   public numberTypeReadingsList = [];
   public stringTypeReadingsList: any;
   public arrayTypeReadingsList = [];
@@ -143,7 +145,7 @@ export class ReadingsGraphComponent implements OnDestroy {
       .pipe(takeWhile(() => this.isAlive), takeUntil(this.destroy$)) // only fires when component is alive
       .subscribe(() => {
         this.autoRefresh = true;
-        if (this.selectedTab === 4) {
+        if (this.selectedTab === 5) {
           this.showAssetReadingsSummary(this.assetCode, this.limit, this.optedTime);
         } else {
           this.plotReadingsGraph(this.assetCode, this.limit, this.optedTime);
@@ -255,6 +257,9 @@ export class ReadingsGraphComponent implements OnDestroy {
     this.numberTypeReadingsList = numReadings.length > 0 ? this.mergeObjects(numReadings) : [];
     this.stringTypeReadingsList = strReadings;
     this.arrayTypeReadingsList = arrReadings.length > 0 ? this.mergeObjects(arrReadings) : [];
+    this.fft2DReadings = this.arrayTypeReadingsList.length > 0 && !isEmpty(arrReadings[0].freq)
+      && arrReadings[0].key === 'spectrum' ? [arrReadings[0]] : [];
+
     this.stringTypeReadingsList = mapValues(groupBy(this.stringTypeReadingsList,
       (reading) => this.dateFormatter.transform(reading.timestamp, 'HH:mm:ss:SSS')), rlist => rlist.map(read => omit(read, 'timestamp')));
     this.setTabData();
@@ -268,6 +273,8 @@ export class ReadingsGraphComponent implements OnDestroy {
         this.selectedTab = 2;
       } else if (!this.isEmptyObject(this.stringTypeReadingsList)) {
         this.selectedTab = 3;
+      } else if (this.fft2DReadings.length > 0) {
+        this.selectedTab = 4;
       }
       this.isModalOpened = false;
     }
@@ -296,7 +303,7 @@ export class ReadingsGraphComponent implements OnDestroy {
       }
     }
 
-    if (this.selectedTab === 4 && this.numberTypeReadingsList.length === 0) {
+    if (this.selectedTab === 5 && this.numberTypeReadingsList.length === 0) {
       if (this.arrayTypeReadingsList.length > 0) {
         this.selectedTab = 2;
       } else if (!this.isEmptyObject(this.stringTypeReadingsList)) {
@@ -308,7 +315,10 @@ export class ReadingsGraphComponent implements OnDestroy {
       this.statsAssetReadingsGraph(this.numberTypeReadingsList, this.timestamps);
     } else if (this.selectedTab === 2 && this.arrayTypeReadingsList.length > 0) {
       this.create3DGraph(this.arrayTypeReadingsList, this.timestamps);
+    } else if (this.selectedTab === 4 && this.fft2DReadings.length > 0) {
+      this.createFFT2DGraph(this.fft2DReadings);
     }
+
     this.showSpinner = false;
   }
 
@@ -445,6 +455,75 @@ export class ReadingsGraphComponent implements OnDestroy {
     }
   }
 
+
+  createFFT2DGraph(readings: any) {
+    const frequency = readings.map(r => r.freq)[0];
+    const amplitude = readings.map(r => r.read)[0];
+    const data = {
+      data: [
+        {
+          type: 'scatter',
+          mode: 'lines',
+          x: frequency,
+          y: amplitude,
+        },
+      ],
+      layout: {
+        title: {
+          text: this.assetCode,
+          font: {
+            size: 16,
+            color: '#7f7f7f'
+          },
+          xref: 'paper'
+        },
+        showlegend: false,
+        autoSize: true,
+        xaxis: {
+          automargin: true,
+          title: {
+            text: 'Freq(Hz)',
+            font: {
+              size: 12,
+              color: '#7f7f7f'
+            },
+            xref: 'paper'
+          }
+        },
+        yaxis: {
+          automargin: true,
+          title: {
+            text: 'Amplitude',
+            font: {
+              size: 12,
+              color: '#7f7f7f'
+            },
+            xref: 'paper'
+          }
+        },
+        margin: {
+          b: 10,
+          l: 10,
+          r: 10,
+          t: 25
+        }
+      },
+      frames: [],
+      config: {
+        displayModeBar: false
+      }
+    };
+
+    const intervalId = setInterval(() => {
+      if (this.FFT2DGraph) {
+        Plotly.newPlot(
+          this.FFT2DGraph.nativeElement,
+          data);
+        clearInterval(intervalId);
+      }
+    }, 100);
+  }
+
   create3DGraph(readings: any, ts: any) {
     const timestamps = ts.map((t: any) => this.dateFormatter.transform(t, 'HH:mm:ss'));
     const frequency = readings.map(r => r.freq)[0];
@@ -560,7 +639,7 @@ export class ReadingsGraphComponent implements OnDestroy {
   selectTab(id: number, showSpinner = true) {
     this.showSpinner = showSpinner;
     this.selectedTab = id;
-    if (this.graphRefreshInterval === -1 && this.selectedTab === 4) {
+    if (this.graphRefreshInterval === -1 && this.selectedTab === 5) {
       this.showAssetReadingsSummary(this.assetCode, this.limit, this.optedTime);
     } else if (this.graphRefreshInterval === -1) {
       this.plotReadingsGraph(this.assetCode, this.limit, this.optedTime);
