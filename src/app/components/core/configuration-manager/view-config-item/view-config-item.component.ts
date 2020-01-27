@@ -411,11 +411,12 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
 
       for (const k in data) {
         data[k].key = k;
+
         if (data[k].hasOwnProperty('validity')) {
           data[k].validityExpression = data[k].validity;
           config.forEach(el => {
-            data[k].validityExpression = data[k].validityExpression.includes(el.key) ? data[k].validityExpression
-              .replace(new RegExp(`\\b${el.key}\\b`), `'${el.value}'`) : data[k].validityExpression;
+            data[k].validityExpression = data[k].validityExpression.includes(`${el.key.trim()}`)
+              ? data[k].validityExpression.replace(new RegExp(`${el.key}` + '\\s=='), `"${el.value}" ==`) : data[k].validityExpression;
           });
         }
       }
@@ -462,7 +463,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
           }
           if (expression.includes(el.key)) {
             expression = expression
-              .replace(new RegExp(el.key, 'g'), `'${el.value}'`);
+              .replace(new RegExp(`${el.key}` + '\\s=='), `"${el.value}" ==`);
           }
         });
         cnf.validityExpression = expression;
