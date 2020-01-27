@@ -463,11 +463,12 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
           }
           if (expression.includes(el.key)) {
             expression = expression
-              .replace(new RegExp(`${el.key}` + '\\s=='), `"${el.value}" ==`);
+              .replace(new RegExp(`${el.key}` + '\\s=='), `"${el.value !== undefined ? el.value : el.default}" ==`);
           }
         });
         cnf.validityExpression = expression;
       }
+
       if (cnf.hasOwnProperty('mandatory') && cnf['key'] === key) {
         if (cnf['mandatory'] === 'true' && configValue.trim().length === 0) {
           this.form.controls[key].setErrors({ 'required': true });
