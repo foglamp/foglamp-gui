@@ -416,7 +416,8 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
           data[k].validityExpression = data[k].validity;
           config.forEach(el => {
             data[k].validityExpression = data[k].validityExpression.includes(`${el.key.trim()}`)
-              ? data[k].validityExpression.replace(new RegExp(`${el.key}` + '\\s=='), `"${el.value}" ==`) : data[k].validityExpression;
+              ? data[k].validityExpression.replace(new RegExp(`\\b${el.key.trim()}+(?=.*=)\\b`),
+               `"${el.value}"`) : data[k].validityExpression;
           });
         }
       }
@@ -463,7 +464,7 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
           }
           if (expression.includes(el.key)) {
             expression = expression
-              .replace(new RegExp(`${el.key}` + '\\s=='), `"${el.value !== undefined ? el.value : el.default}" ==`);
+              .replace(new RegExp(`\\b${el.key.trim()}+(?=.*=)\\b`), `"${el.value !== undefined ? el.value : el.default}"`);
           }
         });
         cnf.validityExpression = expression;
