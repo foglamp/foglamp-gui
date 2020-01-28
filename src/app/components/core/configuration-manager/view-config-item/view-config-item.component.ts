@@ -409,18 +409,24 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
         });
       }
 
+
+
       for (const k in data) {
         data[k].key = k;
 
         if (data[k].hasOwnProperty('validity')) {
           data[k].validityExpression = data[k].validity;
           config.forEach(el => {
-            data[k].validityExpression = data[k].validityExpression.includes(`${el.key.trim()}`)
-              ? data[k].validityExpression.replace(new RegExp(`\\b${el.key.trim()}+(?=.*=)\\b`),
-               `"${el.value}"`) : data[k].validityExpression;
+            const regex = new RegExp(`${el.key}[^"]?\\s?.=`);
+            if (regex.test(data[k].validityExpression)) {
+              data[k].validityExpression = data[k].validityExpression.replace(`${el.key}`, `"${el.value}"`);
+            }
           });
         }
       }
+
+      console.log('asset', data);
+
 
       for (const k in data) {
         if (data.hasOwnProperty(k)) {
@@ -462,9 +468,11 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
           if (el.key === key) {
             el.value = configValue;
           }
-          if (expression.includes(el.key)) {
+
+          const regex = new RegExp(`${el.key}[^"]?\\s?.=`);
+          if (regex.test(expression)) {
             expression = expression
-              .replace(new RegExp(`\\b${el.key.trim()}+(?=.*=)\\b`), `"${el.value !== undefined ? el.value : el.default}"`);
+              .replace(new RegExp(`${el.key.trim()}+(?=.*=)`), `"${el.value !== undefined ? el.value : el.default}"`);
           }
         });
         cnf.validityExpression = expression;
