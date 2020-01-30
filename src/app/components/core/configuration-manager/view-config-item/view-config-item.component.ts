@@ -409,11 +409,8 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
         });
       }
 
-
-
       for (const k in data) {
         data[k].key = k;
-
         if (data[k].hasOwnProperty('validity')) {
           data[k].validityExpression = data[k].validity;
           config.forEach(el => {
@@ -424,9 +421,6 @@ export class ViewConfigItemComponent implements OnInit, OnChanges, OnDestroy {
           });
         }
       }
-
-      console.log('asset', data);
-
 
       for (const k in data) {
         if (data.hasOwnProperty(k)) {
